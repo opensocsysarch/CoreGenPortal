@@ -45,7 +45,7 @@ sudo yum -y install wxGTK3 wxGTK3-devel
 ```
 1. Clone the CoreGenPortal repository
 ```
-git clone FOO
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
 1. Setup your build tree
 ```
@@ -71,7 +71,7 @@ brew install wxmac
 ```
 1. Clone the CoreGenPortal repository
 ```
-git clone FOO
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
 1. Setup your build tree
 ```
