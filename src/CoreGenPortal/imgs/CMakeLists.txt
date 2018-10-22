@@ -1,0 +1,16 @@
+# src/CoreGenPortal/imgs CMake
+#
+# Copyright (C) 2017-2018 Tactical Computing Laboratories, LLC
+# All Rights Reserved
+# contact@tactcomplabs.com
+#
+# See LICENSE in the top level directory for licensing details
+#
+
+#-- copy files
+file (COPY logo.png DESTINATION .)
+
+#-- install files
+install (FILES logo.png DESTINATION .)
+
+#-- EOF
