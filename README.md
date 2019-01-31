@@ -29,8 +29,52 @@ is certainly possible to build/install on intermediate release and/or developmen
 versions, we do not currently test these scenarios.
 
 #### Ubuntu 16.04
+1. Install the system dependencies
+```
+sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev
+```
+1. Clone the CoreGenPortal repository
+```
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
+```
+1. Setup your build tree
+```
+cd CoreGenPortal
+mkdir build
+cd build
+```
+1. Execute CMake to generate the makefiles
+```
+cmake ../
+```
+1. Execute the build
+```
+make
+```
 
 #### Ubuntu 18.04
+1. Install the system dependencies
+```
+sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev
+```
+1. Clone the CoreGenPortal repository
+```
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
+```
+1. Setup your build tree
+```
+cd CoreGenPortal
+mkdir build
+cd build
+```
+1. Execute CMake to generate the makefiles
+```
+cmake ../
+```
+1. Execute the build
+```
+make
+```
 
 ### Centos7
 
@@ -97,7 +141,7 @@ make
 - -DCOREGEN\_INSTALL\_PATH=/path/to/coregen/install : The default is /opt/coregen
 
 ### Documentation Options
-* -DBUILD\_DOCUMENTATION=ON  : Enables Doxygenized documentaition.  ``make docs`` will build the documentation (requires Doxygen to be installed)
+* -DBUILD\_DOCUMENTATION=ON  : Enables Doxygenized documentaition.  ``make doc`` will build the documentation (requires Doxygen to be installed)
 
 ### Developer Build Options
 * -DYAML\_PATH=/path/to/alternate/yaml-cpp : Set an alternate yaml-cpp library path
