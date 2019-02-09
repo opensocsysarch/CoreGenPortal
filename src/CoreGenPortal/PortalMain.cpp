@@ -14,6 +14,7 @@
 #include <wx/splash.h>
 
 #include "PortalMainFrame.h"
+#include "PortalConsts.h"
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -32,10 +33,10 @@ IMPLEMENT_APP(CoreGenPortal);
 bool CoreGenPortal::OnInit(){
 
   // Initial setup
-  SetAppName(wxT("CoreGenPortal"));
-  SetAppDisplayName(wxT("CoreGenPortal"));
-  SetVendorName(wxT("Tactical Computing Laboratories, LLC"));
-  SetVendorDisplayName(wxT("Tactical Computing Laboratories, LLC"));
+  SetAppName(PORTAL_APP_NAME);
+  SetAppDisplayName(PORTAL_APP_NAME);
+  SetVendorName(PORTAL_VENDOR_NAME);
+  SetVendorDisplayName(PORTAL_VENDOR_NAME);
 
   // Setup the splash screen
   wxFileName f(wxStandardPaths::Get().GetExecutablePath());
