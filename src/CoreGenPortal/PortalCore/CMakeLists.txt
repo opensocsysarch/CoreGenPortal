@@ -9,6 +9,7 @@
 
 set(CGPortalCoreSrcs
 CoreStoneCutterEditor.cpp
+CoreErrorDiag.cpp
 )
 
 #-- target deps

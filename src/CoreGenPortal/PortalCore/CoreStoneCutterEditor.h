@@ -13,7 +13,6 @@
 
 //-- WX HEADERS
 #include <wx/wxprec.h>
-#include <wx/splash.h>
 #include <wx/artprov.h>
 #include <wx/aui/auibook.h>
 #include <wx/splitter.h>
