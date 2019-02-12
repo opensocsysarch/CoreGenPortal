@@ -78,6 +78,10 @@ make
 
 ### Centos7
 
+Centos7 (CentOS 7.4, 1704) has somewhat of an older toolchain.  As a result,
+the build requires some rather unique system packages.  Utilize the following
+steps on vanilla CentOS 7.4 systems.
+
 1. Install the EPEL repository (required to pull the wxGTK3 RPMs).
 ```
 wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm
@@ -87,6 +91,12 @@ sudo rpm -Uvh epel-release-7-11.noarch.rpm
 ```
 sudo yum -y install wxGTK3 wxGTK3-devel
 ```
+1. [Optional] For those wishing to build CentOS7 RPMS, you also need the following packages.
+```
+sudo yum install rpm-build rpmdevtools
+```
+1. Enable the SCL LLVM environment (this will create a fresh bash shell with the correct paths)
+``scl enable llvm-toolset-7 bash``
 1. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
