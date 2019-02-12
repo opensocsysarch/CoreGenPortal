@@ -96,7 +96,9 @@ sudo yum -y install wxGTK3 wxGTK3-devel
 sudo yum install rpm-build rpmdevtools
 ```
 1. Enable the SCL LLVM environment (this will create a fresh bash shell with the correct paths)
-``scl enable llvm-toolset-7 bash``
+```
+scl enable llvm-toolset-7 bash
+```
 1. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
