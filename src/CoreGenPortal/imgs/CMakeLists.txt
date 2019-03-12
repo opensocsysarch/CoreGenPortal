@@ -1,6 +1,6 @@
 # src/CoreGenPortal/imgs CMake
 #
-# Copyright (C) 2017-2018 Tactical Computing Laboratories, LLC
+# Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 # All Rights Reserved
 # contact@tactcomplabs.com
 #
