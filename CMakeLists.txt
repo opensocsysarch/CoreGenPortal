@@ -1,6 +1,6 @@
 # CoreGenPortal Top-Level CMake
 #
-# Copyright (C) 2017-2018 Tactical Computing Laboratories, LLC
+# Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 # All Rights Reserved
 # contact@tactcomplabs.com
 #
@@ -50,6 +50,11 @@ message(STATUS "Building for ${CMAKE_SYSTEM_NAME}")
 # Add package paths
 if(NOT COREGEN_INSTALL_PATH)
   set(COREGEN_INSTALL_PATH "/opt/coregen")
+endif()
+
+if(NOT PORTAL_INCLUDE_PATH)
+  set(PORTAL_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src")
+  message(STATUS "PORTAL_INCLUDE_PATH set to ${PORTAL_INCLUDE_PATH}")
 endif()
 
 # Print the path info
