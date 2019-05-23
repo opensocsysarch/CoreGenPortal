@@ -65,7 +65,8 @@ message(STATUS "COREGEN_INSTALL_PATH set to ${COREGEN_INSTALL_PATH}")
 #-- Target Link Libraries
 #------------------------------------------------------------------------
 message( STATUS "CMAKE SYSTEM NAME IS ${CMAKE_SYSTEM_NAME}")
-if( ${CMAKE_SYSTEM_NAME} EQUAL "Linux" )
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+#if( ${CMAKE_SYSTEM_NAME} EQUAL "Linux" )
   find_file (DEBIAN_FOUND debian_version debconf.conf
       PATHS /etc
   )
