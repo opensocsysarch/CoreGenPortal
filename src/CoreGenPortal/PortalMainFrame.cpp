@@ -99,6 +99,16 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->Append(wxID_SAVEAS);
 
   //-- Build Menu
+  BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
+  BuildMenu->Append( ID_BUILD_CODEGEN,      wxT("&Execute CoreGen Codegen"));
+  BuildMenu->Append( ID_BUILD_SIGMAP,       wxT("&Generate Signal Map"));
+  BuildMenu->Append( ID_BUILD_STONECUTTER,  wxT("&Build StoneCutter"));
+  BuildMenu->Append( ID_BUILD_VERILOG,      wxT("&Build Verilog"));
+  BuildMenu->Append( ID_BUILD_COMPILER,     wxT("&Build Compiler"));
+  BuildMenu->Append( ID_BUILD_SIM,          wxT("&Build Simulator"));
+  BuildMenu->AppendSeparator();
+  BuildMenu->Append( ID_COMPILE_SIM,        wxT("&Compile Simulator"));
+  BuildMenu->Append( ID_COMPILE_COMPILER,   wxT("&Compiler Compiler"));
 
   //-- Help Menu
   HelpMenu->Append(wxID_ABOUT);

@@ -95,7 +95,16 @@ private:
 enum
 {
   MARGIN_LINE_NUMBERS,
-  ID_PROJNEW            = 10
+  ID_PROJNEW            = 10,
+  ID_BUILD_VERIFY       = 20,
+  ID_BUILD_CODEGEN      = 21,
+  ID_BUILD_SIGMAP       = 22,
+  ID_BUILD_STONECUTTER  = 23,
+  ID_BUILD_VERILOG      = 24,
+  ID_BUILD_COMPILER     = 25,
+  ID_BUILD_SIM          = 26,
+  ID_COMPILE_SIM        = 27,
+  ID_COMPILE_COMPILER   = 28
 };
 
 #endif
