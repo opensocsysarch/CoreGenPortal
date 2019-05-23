@@ -26,24 +26,12 @@ IF(wxWidgets_FOUND)
   include_directories (${COREGEN_INSTALL_PATH}/include)
   include_directories (${PORTAL_INCLUDE_PATH})
   link_directories (${COREGEN_INSTALL_PATH}/lib)
+  link_directories (${COREGEN_INSTALL_PATH}/lib64)
   link_directories (${COREGEN_INSTALL_PATH}/lib/clasp-3.3.4)
   link_directories (${COREGEN_INSTALL_PATH}/lib/potassco-1.0)
   add_executable( CoreGenPortal ${CGPortalSrcs}
                                 $<TARGET_OBJECTS:PortalCoreObjs> )
-  TARGET_LINK_LIBRARIES( CoreGenPortal SCComp
-                                       CoreGenBackend
-                                       CoreGenCodegen
-                                       CoreGenPluginImpl
-                                       yaml-cpp
-                                       clingo
-                                       gringo
-                                       clasp
-                                       pyclingo
-                                       luaclingo
-                                       potassco
-                                       reify
-                                       lua
-                                       ${wxWidgets_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( CoreGenPortal ${COREGEN_LINK_LIBS} ${wxWidgets_LIBRARIES} )
   install(TARGETS CoreGenPortal DESTINATION bin)
 ELSE(wxWidgets_FOUND)
   MESSAGE("wxWidgets not found!")

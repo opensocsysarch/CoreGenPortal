@@ -62,6 +62,25 @@ endif()
 message(STATUS "COREGEN_INSTALL_PATH set to ${COREGEN_INSTALL_PATH}")
 
 #------------------------------------------------------------------------
+#-- Target Link Libraries
+#------------------------------------------------------------------------
+if( ${CMAKE_SYSTEM_NAME} EQUAL "Linux" )
+  find_file (DEBIAN_FOUND debian_version debconf.conf
+      PATHS /etc
+  )
+  if( DEBIAN_FOUND )
+    #-- ubuntu or debian system
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua5.3" )
+  else()
+    #-- centos system
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua" )
+  endif()
+else()
+  set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua" )
+endif()
+message(STATUS "COREGEN_LINK_LIBS set to ${COREGEN_LINK_LIBS}")
+
+#------------------------------------------------------------------------
 #-- TESTING
 #------------------------------------------------------------------------
 # Enable testing
