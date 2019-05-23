@@ -289,6 +289,7 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   dial->SetExtendedMessage( wxT("Built with CoreGen Version " ) + MaStr + "." + MiStr );
   dial->ShowModal();
   delete dial;
+  delete CGA;
 }
 
 // EOF
