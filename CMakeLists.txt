@@ -70,9 +70,11 @@ if( ${CMAKE_SYSTEM_NAME} EQUAL "Linux" )
   )
   if( DEBIAN_FOUND )
     #-- ubuntu or debian system
+    message(STATUS "BUILDING FOR DEBIAN/UBUNTU PLATFORM")
     set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua5.3 -ldl" )
   else()
     #-- centos system
+    message(STATUS "BUILDING FOR CENTOS PLATFORM")
     set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua -ldl" )
   endif()
 else()
