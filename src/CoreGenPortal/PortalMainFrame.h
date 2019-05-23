@@ -39,6 +39,8 @@
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalCore/CoreErrorDiag.h"
 #include "CoreGenPortal/PortalCore/CoreStoneCutterEditor.h"
+#include "CoreGenPortal/PortalCore/CoreUserConfig.h"
+#include "CoreGenPortal/PortalCore/CoreConsts.h"
 
 #include <stdlib.h>
 
@@ -54,10 +56,8 @@ public:
   ~PortalMainFrame();
 
 private:
-  // CoreGenPortal constants
-  const std::string L0KeyWords = "Registers RegClasses ISAs InstFormats Insts PseudoInsts Caches Scratchpads MemoryControllers Extensions Cores Socs";
-  const std::string L1KeyWords = "RegName RegisterClassName ISAName InstFormatName Inst PseudoInst Cache Scratchpad MemoryController MajorVersion MinorVersion Type Extension Core Soc";
-  const std::string L2KeyWords = "Width Index PseudoName IsFixedValue IsSIMD RWReg ROReg CSRReg AMSReg Shared Registers ISA FormatWidth Fields FieldName FieldType FieldWidth StartBit EndBit MandatoryField InstFormat Encodings EncodingField EncodingWidth EncodingValue Sets Ways SubLevel MemSize RqstPorts RspPorts StartAddr Ports RTLFile RegClass";
+  // data handlers
+  CoreUserConfig *UserConfig;
 
   // top level manager
   wxAuiManager Mgr;

@@ -12,8 +12,13 @@
 
 CoreUserConfig::CoreUserConfig()
   : isValidConfig(false) {
-  wxString LH = getenv("HOME");
-  ConfFile = LH + "/.CoreGenPortal/CoreGenPortal.conf";
+  wxString OverrideConfig = getenv(PORTAL_ENV_USER_CONFIG.c_str());
+  if( OverrideConfig.length() > 0 ){
+    ConfFile = OverrideConfig;
+  }else{
+    wxString LH = getenv("HOME");
+    ConfFile = LH + wxT("/") + PORTAL_USER_CONFIG;
+  }
   ReadConfigFile();
 }
 
@@ -56,7 +61,7 @@ bool CoreUserConfig::ReadConfigFile(){
   // stage 2: check to see if the config file exists
   if( !wxFileExists(ConfFile) ){
     // file does not exist, create it
-    wxFileName UC(Home+wxT("/.CoreGenPortal/CoreGenPortal.conf"),"");
+    wxFileName UC(Home+wxT("/")+PORTAL_USER_DIR,"");
     if( !UC.Mkdir( wxS_DIR_DEFAULT, 0 ) )
       return false;
     // directory created, build a default config file

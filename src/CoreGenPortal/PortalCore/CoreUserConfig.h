@@ -22,6 +22,9 @@
 #include <wx/wx.h>
 #endif
 
+// portal headers
+#include "CoreGenPortal/PortalCore/CoreConsts.h"
+
 // standard C++ headers
 #include <string>
 
@@ -54,6 +57,9 @@ public:
 
   /// Default destructor
   ~CoreUserConfig();
+
+  /// Determine if the configuration data was successfully validated
+  bool isValid() { return isValidConfig; }
 
   /// Retrieve the user's home directory as a wxString
   wxString wxGetHomeDir() { return HomeDir; }

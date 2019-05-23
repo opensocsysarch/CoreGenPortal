@@ -15,6 +15,7 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
                                   const wxPoint& pos,
                                   const wxSize& size )
   : wxFrame( NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE ),
+    UserConfig(nullptr),
     MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), ProjectMenu(NULL),
     BuildMenu(NULL), PluginMenu(NULL), HelpMenu(NULL), ToolBar(NULL),
     LogPane(NULL), ModulesNotebook(NULL), ModuleBox(NULL), PluginBox(NULL),
@@ -38,6 +39,15 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
 
   // update the aui manager
   UpdateAuiMgr();
+
+  // read the user configuration data
+  UserConfig = new CoreUserConfig();
+  if( UserConfig->isValid() )
+    LogPane->AppendText("Read user configuration data; ConfigFile="
+                        + UserConfig->wxGetConfFile());
+  else
+    LogPane->AppendText("Error reading user configuration data; ConfigFile="
+                        + UserConfig->wxGetConfFile());
 }
 
 // PortalMainFrame::~PortalMainFrame
