@@ -29,6 +29,8 @@ IF(wxWidgets_FOUND)
   link_directories (${COREGEN_INSTALL_PATH}/lib64)
   link_directories (${COREGEN_INSTALL_PATH}/lib/clasp-3.3.4)
   link_directories (${COREGEN_INSTALL_PATH}/lib/potassco-1.0)
+  link_directories (${COREGEN_INSTALL_PATH}/lib64/clasp-3.3.4)
+  link_directories (${COREGEN_INSTALL_PATH}/lib64/potassco-1.0)
   add_executable( CoreGenPortal ${CGPortalSrcs}
                                 $<TARGET_OBJECTS:PortalCoreObjs> )
   TARGET_LINK_LIBRARIES( CoreGenPortal ${COREGEN_LINK_LIBS} ${wxWidgets_LIBRARIES} )
