@@ -70,10 +70,10 @@ if( ${CMAKE_SYSTEM_NAME} EQUAL "Linux" )
   )
   if( DEBIAN_FOUND )
     #-- ubuntu or debian system
-    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua5.3" )
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua5.3 -ldl" )
   else()
     #-- centos system
-    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua" )
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua -ldl" )
   endif()
 else()
   set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua" )
