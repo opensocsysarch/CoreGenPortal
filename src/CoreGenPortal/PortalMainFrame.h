@@ -42,6 +42,9 @@
 #include "CoreGenPortal/PortalCore/CoreUserConfig.h"
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
 
+//-- COREGEN HEADERS
+#include "CoreGen/CoreGenBackend/CoreGenBackend.h"
+
 #include <stdlib.h>
 
 #ifndef WX_PRECOMP
@@ -90,6 +93,12 @@ private:
   void CreateMenuBar();
   void CreatePortalToolBar();
   void CreateWindowLayout();
+
+  void CloseProject();
+
+  // menu handlers
+  void OnQuit(wxCommandEvent& event);
+  void OnAbout(wxCommandEvent& event);
 };
 
 enum

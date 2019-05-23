@@ -124,6 +124,19 @@ void PortalMainFrame::CreateMenuBar(){
   SetMenuBar(MenuBar);
 
   // connect all the handlers
+  //-- file menu
+  Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnQuit));
+
+  //-- edit menu
+
+  //-- project menu
+
+  //-- build menu
+
+  //-- help menu
+  Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnAbout));
 
   // center the main frame
   Centre();
@@ -235,6 +248,47 @@ void PortalMainFrame::CreateWindowLayout(){
   Mgr.AddPane( LogPane,         wxBOTTOM, wxT("CoreGenPortal Log"));
   Mgr.AddPane( EditorNotebook,  wxCENTER);
   Mgr.GetPane( EditorNotebook ).CloseButton(false);
+}
+
+// PortalMainFrame::CloseProject
+// closes any open project files
+void PortalMainFrame::CloseProject(){
+}
+
+// PortalMainFrame::OnQuit
+// handles quit signals to end the application
+void PortalMainFrame::OnQuit(wxCommandEvent& event){
+  int answer = wxMessageBox("Close COreGenPortal?", "Confirm",
+                            wxYES_NO | wxCANCEL, this);
+  if( answer == wxYES ){
+    // close the project
+    CloseProject();
+    Close(true);
+  }
+}
+
+// PortalMainFrame::OnAbout
+// handles the Help->About command event
+void PortalMainFrame::OnAbout(wxCommandEvent &event){
+  CoreGenBackend *CGA = new CoreGenBackend("","","");
+  int major = -1;
+  int minor = -1;
+  wxString MaStr;
+  wxString MiStr;
+  CGA->CoreGenVersion( &major, &minor );
+  MaStr << major;
+  MiStr << minor;
+
+  wxMessageDialog *dial = new wxMessageDialog(NULL,
+                                              wxT("CoreGenPortal Version ") +
+                                                PORTAL_VERSION +
+                                                wxT(" \n") +
+                                                PORTAL_COPYRIGHT,
+                                              wxT("About CoreGenPortal"),
+                                              wxOK | wxICON_INFORMATION);
+  dial->SetExtendedMessage( wxT("Built with CoreGen Version " ) + MaStr + "." + MiStr );
+  dial->ShowModal();
+  delete dial;
 }
 
 // EOF

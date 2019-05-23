@@ -9,6 +9,7 @@
 
 cmake_minimum_required(VERSION 3.4.3)
 project(CoreGenPortal)
+set(VERSION "0.2.0")
 
 #------------------------------------------------------------------------
 #-- EXTERNAL CMAKE SCRIPTS
@@ -112,7 +113,7 @@ if(COREGEN_BUILD_DEB)
   set(CPACK_PACKAGE_VERSION ${VERSION})
   set(CPACK_GENERATOR "DEB")
   set(CPACK_PACKAGE_NAME "CoreGenPortal")
-  set(CPACK_PACKAGE_RELEASE 1)
+  set(CPACK_PACKAGE_RELEASE 2)
   set(CPACK_PACKAGE_CONTACT "John Leidel")
   set(CPACK_PACKAGE_VENDOR "Tactical Computing Laboratories, LLC")
   set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
@@ -125,7 +126,7 @@ if(COREGEN_BUILD_TGZ)
   set(CPACK_PACKAGE_VERSION ${VERSION})
   set(CPACK_GENERATOR "TGZ")
   set(CPACK_PACKAGE_NAME "CoreGenPortal")
-  set(CPACK_PACKAGE_RELEASE 1)
+  set(CPACK_PACKAGE_RELEASE 2)
   set(CPACK_PACKAGE_CONTACT "John Leidel")
   set(CPACK_PACKAGE_VENDOR "Tactical Computing Laboratories, LLC")
   set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
