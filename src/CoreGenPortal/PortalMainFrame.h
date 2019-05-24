@@ -69,6 +69,7 @@ private:
   wxMenuBar *MenuBar;
   wxMenu *FileMenu;
   wxMenu *EditMenu;
+  wxMenu *PrefMenu;
   wxMenu *ProjectMenu;
   wxMenu *BuildMenu;
   wxMenu *PluginMenu;
@@ -112,8 +113,11 @@ enum
   ID_BUILD_VERILOG      = 24,
   ID_BUILD_COMPILER     = 25,
   ID_BUILD_SIM          = 26,
-  ID_COMPILE_SIM        = 27,
-  ID_COMPILE_COMPILER   = 28
+  ID_COMPILE_SIM        = 30,
+  ID_COMPILE_COMPILER   = 31,
+  ID_PREF_USER          = 40,
+  ID_PREF_VERIF         = 41,
+  ID_PREF_STONECUTTER   = 42
 };
 
 #endif

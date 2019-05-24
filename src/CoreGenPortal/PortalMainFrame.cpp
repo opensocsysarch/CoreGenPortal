@@ -16,7 +16,7 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
                                   const wxSize& size )
   : wxFrame( NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE ),
     UserConfig(nullptr),
-    MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), ProjectMenu(NULL),
+    MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), PrefMenu(NULL), ProjectMenu(NULL),
     BuildMenu(NULL), PluginMenu(NULL), HelpMenu(NULL), ToolBar(NULL),
     LogPane(NULL), ModulesNotebook(NULL), ModuleBox(NULL), PluginBox(NULL),
     ProjDir(NULL), EditorNotebook(NULL), IRPane(NULL) {
@@ -75,6 +75,7 @@ void PortalMainFrame::CreateMenuBar(){
   MenuBar = new wxMenuBar;
   FileMenu = new wxMenu();
   EditMenu = new wxMenu();
+  PrefMenu = new wxMenu();
   ProjectMenu = new wxMenu();
   BuildMenu = new wxMenu();
   PluginMenu = new wxMenu();
@@ -88,6 +89,11 @@ void PortalMainFrame::CreateMenuBar(){
   EditMenu->Append(wxID_COPY);
   EditMenu->Append(wxID_PASTE);
   EditMenu->Append(wxID_SELECTALL);
+
+  //-- Preferences Menu
+  PrefMenu->Append( ID_PREF_USER,           wxT("&User Preferences"));
+  PrefMenu->Append( ID_PREF_VERIF,          wxT("&Verification Preferences"));
+  PrefMenu->Append( ID_PREF_STONECUTTER,    wxT("&StoneCutter Preferences"));
 
   //-- Project Menu
   ProjectMenu->Append( ID_PROJNEW, wxT("&New Project"));
@@ -116,6 +122,7 @@ void PortalMainFrame::CreateMenuBar(){
   // enable all the menus
   MenuBar->Append( FileMenu,    wxT("&File") );
   MenuBar->Append( EditMenu,    wxT("&Edit") );
+  MenuBar->Append( PrefMenu,    wxT("&Preferences") );
   MenuBar->Append( ProjectMenu, wxT("&Project") );
   MenuBar->Append( BuildMenu,   wxT("&Build") );
   MenuBar->Append( PluginMenu,  wxT("&Plugins") );
