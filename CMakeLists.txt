@@ -9,6 +9,7 @@
 
 cmake_minimum_required(VERSION 3.4.3)
 project(CoreGenPortal)
+set(VERSION "0.2.0")
 
 #------------------------------------------------------------------------
 #-- EXTERNAL CMAKE SCRIPTS
@@ -59,6 +60,29 @@ endif()
 
 # Print the path info
 message(STATUS "COREGEN_INSTALL_PATH set to ${COREGEN_INSTALL_PATH}")
+
+#------------------------------------------------------------------------
+#-- Target Link Libraries
+#------------------------------------------------------------------------
+message( STATUS "CMAKE SYSTEM NAME IS ${CMAKE_SYSTEM_NAME}")
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+#if( ${CMAKE_SYSTEM_NAME} EQUAL "Linux" )
+  find_file (DEBIAN_FOUND debian_version debconf.conf
+      PATHS /etc
+  )
+  if( DEBIAN_FOUND )
+    #-- ubuntu or debian system
+    message(STATUS "BUILDING FOR DEBIAN/UBUNTU PLATFORM")
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua5.3 -ldl" )
+  else()
+    #-- centos system
+    message(STATUS "BUILDING FOR CENTOS PLATFORM")
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua -ldl" )
+  endif()
+else()
+  set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua" )
+endif()
+message(STATUS "COREGEN_LINK_LIBS set to ${COREGEN_LINK_LIBS}")
 
 #------------------------------------------------------------------------
 #-- TESTING
@@ -112,7 +136,7 @@ if(COREGEN_BUILD_DEB)
   set(CPACK_PACKAGE_VERSION ${VERSION})
   set(CPACK_GENERATOR "DEB")
   set(CPACK_PACKAGE_NAME "CoreGenPortal")
-  set(CPACK_PACKAGE_RELEASE 1)
+  set(CPACK_PACKAGE_RELEASE 2)
   set(CPACK_PACKAGE_CONTACT "John Leidel")
   set(CPACK_PACKAGE_VENDOR "Tactical Computing Laboratories, LLC")
   set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
@@ -125,7 +149,7 @@ if(COREGEN_BUILD_TGZ)
   set(CPACK_PACKAGE_VERSION ${VERSION})
   set(CPACK_GENERATOR "TGZ")
   set(CPACK_PACKAGE_NAME "CoreGenPortal")
-  set(CPACK_PACKAGE_RELEASE 1)
+  set(CPACK_PACKAGE_RELEASE 2)
   set(CPACK_PACKAGE_CONTACT "John Leidel")
   set(CPACK_PACKAGE_VENDOR "Tactical Computing Laboratories, LLC")
   set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})

@@ -15,7 +15,8 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
                                   const wxPoint& pos,
                                   const wxSize& size )
   : wxFrame( NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE ),
-    MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), ProjectMenu(NULL),
+    UserConfig(nullptr),
+    MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), PrefMenu(NULL), ProjectMenu(NULL),
     BuildMenu(NULL), PluginMenu(NULL), HelpMenu(NULL), ToolBar(NULL),
     LogPane(NULL), ModulesNotebook(NULL), ModuleBox(NULL), PluginBox(NULL),
     ProjDir(NULL), EditorNotebook(NULL), IRPane(NULL) {
@@ -38,6 +39,15 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
 
   // update the aui manager
   UpdateAuiMgr();
+
+  // read the user configuration data
+  UserConfig = new CoreUserConfig();
+  if( UserConfig->isValid() )
+    LogPane->AppendText("Read user configuration data; ConfigFile="
+                        + UserConfig->wxGetConfFile());
+  else
+    LogPane->AppendText("Error reading user configuration data; ConfigFile="
+                        + UserConfig->wxGetConfFile());
 }
 
 // PortalMainFrame::~PortalMainFrame
@@ -65,6 +75,7 @@ void PortalMainFrame::CreateMenuBar(){
   MenuBar = new wxMenuBar;
   FileMenu = new wxMenu();
   EditMenu = new wxMenu();
+  PrefMenu = new wxMenu();
   ProjectMenu = new wxMenu();
   BuildMenu = new wxMenu();
   PluginMenu = new wxMenu();
@@ -79,6 +90,11 @@ void PortalMainFrame::CreateMenuBar(){
   EditMenu->Append(wxID_PASTE);
   EditMenu->Append(wxID_SELECTALL);
 
+  //-- Preferences Menu
+  PrefMenu->Append( ID_PREF_USER,           wxT("&User Preferences"));
+  PrefMenu->Append( ID_PREF_VERIF,          wxT("&Verification Preferences"));
+  PrefMenu->Append( ID_PREF_STONECUTTER,    wxT("&StoneCutter Preferences"));
+
   //-- Project Menu
   ProjectMenu->Append( ID_PROJNEW, wxT("&New Project"));
   ProjectMenu->AppendSeparator();
@@ -89,6 +105,16 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->Append(wxID_SAVEAS);
 
   //-- Build Menu
+  BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
+  BuildMenu->Append( ID_BUILD_CODEGEN,      wxT("&Execute CoreGen Codegen"));
+  BuildMenu->Append( ID_BUILD_SIGMAP,       wxT("&Generate Signal Map"));
+  BuildMenu->Append( ID_BUILD_STONECUTTER,  wxT("&Build StoneCutter"));
+  BuildMenu->Append( ID_BUILD_VERILOG,      wxT("&Build Verilog"));
+  BuildMenu->Append( ID_BUILD_COMPILER,     wxT("&Build Compiler"));
+  BuildMenu->Append( ID_BUILD_SIM,          wxT("&Build Simulator"));
+  BuildMenu->AppendSeparator();
+  BuildMenu->Append( ID_COMPILE_SIM,        wxT("&Compile Simulator"));
+  BuildMenu->Append( ID_COMPILE_COMPILER,   wxT("&Compiler Compiler"));
 
   //-- Help Menu
   HelpMenu->Append(wxID_ABOUT);
@@ -96,6 +122,7 @@ void PortalMainFrame::CreateMenuBar(){
   // enable all the menus
   MenuBar->Append( FileMenu,    wxT("&File") );
   MenuBar->Append( EditMenu,    wxT("&Edit") );
+  MenuBar->Append( PrefMenu,    wxT("&Preferences") );
   MenuBar->Append( ProjectMenu, wxT("&Project") );
   MenuBar->Append( BuildMenu,   wxT("&Build") );
   MenuBar->Append( PluginMenu,  wxT("&Plugins") );
@@ -104,6 +131,19 @@ void PortalMainFrame::CreateMenuBar(){
   SetMenuBar(MenuBar);
 
   // connect all the handlers
+  //-- file menu
+  Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnQuit));
+
+  //-- edit menu
+
+  //-- project menu
+
+  //-- build menu
+
+  //-- help menu
+  Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnAbout));
 
   // center the main frame
   Centre();
@@ -215,6 +255,48 @@ void PortalMainFrame::CreateWindowLayout(){
   Mgr.AddPane( LogPane,         wxBOTTOM, wxT("CoreGenPortal Log"));
   Mgr.AddPane( EditorNotebook,  wxCENTER);
   Mgr.GetPane( EditorNotebook ).CloseButton(false);
+}
+
+// PortalMainFrame::CloseProject
+// closes any open project files
+void PortalMainFrame::CloseProject(){
+}
+
+// PortalMainFrame::OnQuit
+// handles quit signals to end the application
+void PortalMainFrame::OnQuit(wxCommandEvent& event){
+  int answer = wxMessageBox("Close COreGenPortal?", "Confirm",
+                            wxYES_NO | wxCANCEL, this);
+  if( answer == wxYES ){
+    // close the project
+    CloseProject();
+    Close(true);
+  }
+}
+
+// PortalMainFrame::OnAbout
+// handles the Help->About command event
+void PortalMainFrame::OnAbout(wxCommandEvent &event){
+  CoreGenBackend *CGA = new CoreGenBackend("","","");
+  int major = -1;
+  int minor = -1;
+  wxString MaStr;
+  wxString MiStr;
+  CGA->CoreGenVersion( &major, &minor );
+  MaStr << major;
+  MiStr << minor;
+
+  wxMessageDialog *dial = new wxMessageDialog(NULL,
+                                              wxT("CoreGenPortal Version ") +
+                                                PORTAL_VERSION +
+                                                wxT(" \n") +
+                                                PORTAL_COPYRIGHT,
+                                              wxT("About CoreGenPortal"),
+                                              wxOK | wxICON_INFORMATION);
+  dial->SetExtendedMessage( wxT("Built with CoreGen Version " ) + MaStr + "." + MiStr );
+  dial->ShowModal();
+  delete dial;
+  delete CGA;
 }
 
 // EOF
