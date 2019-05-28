@@ -61,4 +61,42 @@ bool CoreVerifConfig::IsPassEnabled( wxString P ){
   return false;
 }
 
+bool CoreVerifConfig::EnablePass( unsigned i ){
+  if( i > (Passes.size()-1) )
+    return false;
+
+  Passes[i].second = true;
+  return true;
+}
+
+bool CoreVerifConfig::EnablePass( wxString P){
+  std::string S = std::string(P.mb_str());
+  for( unsigned i=0; i<Passes.size(); i++ ){
+    if( Passes[i].first == S ){
+      Passes[i].second = true;
+      return true;
+    }
+  }
+  return false;
+}
+
+bool CoreVerifConfig::DisablePass( unsigned i ){
+  if( i > (Passes.size()-1) )
+    return false;
+
+  Passes[i].second = false;
+  return true;
+}
+
+bool CoreVerifConfig::DisablePass( wxString P){
+  std::string S = std::string(P.mb_str());
+  for( unsigned i=0; i<Passes.size(); i++ ){
+    if( Passes[i].first == S ){
+      Passes[i].second = false;
+      return true;
+    }
+  }
+  return false;
+}
+
 // EOF

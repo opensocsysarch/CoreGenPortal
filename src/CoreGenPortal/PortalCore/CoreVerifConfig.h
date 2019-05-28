@@ -72,6 +72,18 @@ public:
 
   /// Determine if the config is valid
   bool isValid() { return IsValid; }
+
+  /// Set the target pass to be enabled
+  bool EnablePass( unsigned i );
+
+  /// Set the target pass to be enabled
+  bool EnablePass( wxString P );
+
+  /// Set the target pass to be disabled
+  bool DisablePass( unsigned i );
+
+  /// Set the target pass to be disabled
+  bool DisablePass( wxString P );
 };
 
 #endif
