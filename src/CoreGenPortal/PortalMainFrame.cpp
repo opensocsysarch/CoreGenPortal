@@ -147,6 +147,8 @@ void PortalMainFrame::CreateMenuBar(){
   //-- edit menu
 
   //-- preferences menu
+  Connect(ID_PREF_VERIF, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnVerifPref));
 
   //-- project menu
 
@@ -308,6 +310,22 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   dial->ShowModal();
   delete dial;
   delete CGA;
+}
+
+// PortalMainFraml::OnVerifPref
+void PortalMainFrame::OnVerifPref(wxCommandEvent &event){
+  LogPane->AppendText("Loading verification preferences...\n");
+  PortalVerifPrefWin *VP = new PortalVerifPrefWin(this,
+                                                  wxID_ANY,
+                                                  wxT("Verification Preferences"),
+                                                  wxDefaultPosition,
+                                                  wxSize(500,500),
+                                                  wxDEFAULT_DIALOG_STYLE|wxVSCROLL,
+                                                  VerifConfig);
+  if( VP->ShowModal() == wxID_OK ){
+    LogPane->AppendText("Committed verification preferences\n");
+  }
+  VP->Destroy();
 }
 
 // EOF
