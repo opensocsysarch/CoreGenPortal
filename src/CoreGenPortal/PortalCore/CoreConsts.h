@@ -25,10 +25,6 @@
 // standard C++ headers
 #include <string>
 
-//-- Version Information
-const wxString PORTAL_VERSION = "0.2.0";
-const wxString PORTAL_COPYRIGHT = "Copyright 2017-2019 Tactical Computing Laboratories, LLC";
-
 //-- Environment Variables
 const std::string PORTAL_ENV_USER_CONFIG = "COREGENPORTAL_CONFIG";
 

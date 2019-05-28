@@ -137,6 +137,8 @@ void PortalMainFrame::CreateMenuBar(){
 
   //-- edit menu
 
+  //-- preferences menu
+
   //-- project menu
 
   //-- build menu
@@ -265,7 +267,7 @@ void PortalMainFrame::CloseProject(){
 // PortalMainFrame::OnQuit
 // handles quit signals to end the application
 void PortalMainFrame::OnQuit(wxCommandEvent& event){
-  int answer = wxMessageBox("Close COreGenPortal?", "Confirm",
+  int answer = wxMessageBox("Close CoreGenPortal?", "Confirm",
                             wxYES_NO | wxCANCEL, this);
   if( answer == wxYES ){
     // close the project
@@ -288,7 +290,7 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
 
   wxMessageDialog *dial = new wxMessageDialog(NULL,
                                               wxT("CoreGenPortal Version ") +
-                                                PORTAL_VERSION +
+                                                PORTAL_VERSION_WX +
                                                 wxT(" \n") +
                                                 PORTAL_COPYRIGHT,
                                               wxT("About CoreGenPortal"),

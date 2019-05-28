@@ -37,6 +37,7 @@
 #include <wx/stc/stc.h>
 
 //-- PORTAL HEADERS
+#include "CoreGenPortal/PortalConsts.h"
 #include "CoreGenPortal/PortalCore/CoreErrorDiag.h"
 #include "CoreGenPortal/PortalCore/CoreStoneCutterEditor.h"
 #include "CoreGenPortal/PortalCore/CoreUserConfig.h"
