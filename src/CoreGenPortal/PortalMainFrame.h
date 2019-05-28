@@ -41,6 +41,7 @@
 #include "CoreGenPortal/PortalCore/CoreErrorDiag.h"
 #include "CoreGenPortal/PortalCore/CoreStoneCutterEditor.h"
 #include "CoreGenPortal/PortalCore/CoreUserConfig.h"
+#include "CoreGenPortal/PortalCore/CoreVerifConfig.h"
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
 
 //-- COREGEN HEADERS
@@ -62,6 +63,7 @@ public:
 private:
   // data handlers
   CoreUserConfig *UserConfig;
+  CoreVerifConfig *VerifConfig;
 
   // top level manager
   wxAuiManager Mgr;

@@ -11,6 +11,7 @@ set(CGPortalCoreSrcs
 CoreStoneCutterEditor.cpp
 CoreErrorDiag.cpp
 CoreUserConfig.cpp
+CoreVerifConfig.cpp
 )
 
 #-- target deps

@@ -15,7 +15,7 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
                                   const wxPoint& pos,
                                   const wxSize& size )
   : wxFrame( NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE ),
-    UserConfig(nullptr),
+    UserConfig(nullptr),VerifConfig(nullptr),
     MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), PrefMenu(NULL), ProjectMenu(NULL),
     BuildMenu(NULL), PluginMenu(NULL), HelpMenu(NULL), ToolBar(NULL),
     LogPane(NULL), ModulesNotebook(NULL), ModuleBox(NULL), PluginBox(NULL),
@@ -44,15 +44,24 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   UserConfig = new CoreUserConfig();
   if( UserConfig->isValid() )
     LogPane->AppendText("Read user configuration data; ConfigFile="
-                        + UserConfig->wxGetConfFile());
+                        + UserConfig->wxGetConfFile() + "\n");
   else
     LogPane->AppendText("Error reading user configuration data; ConfigFile="
-                        + UserConfig->wxGetConfFile());
+                        + UserConfig->wxGetConfFile() + "\n");
+
+  // initialize the verification configuration data
+  VerifConfig = new CoreVerifConfig();
+  if( VerifConfig->isValid() )
+    LogPane->AppendText("Initialized the verification pass preferences\n");
+  else
+    LogPane->AppendText("Error initializing the verification pass preferences\n");
 }
 
 // PortalMainFrame::~PortalMainFrame
 PortalMainFrame::~PortalMainFrame(){
   Mgr.UnInit();
+  delete UserConfig;
+  delete VerifConfig;
 }
 
 // PortalMainFrame::InitAuiMgr
