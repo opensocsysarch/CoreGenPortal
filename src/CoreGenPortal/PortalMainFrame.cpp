@@ -285,7 +285,14 @@ void PortalMainFrame::CloseProject(){
 
   LogPane->AppendText("Closing open project...\n");
 
+  // save the IR file
   IRPane->SaveFile(IRFileName);
+
+  // close out all the modules
+  // TODO
+
+  // reset the file browser window
+  ProjDir->SetPath(UserConfig->wxGetProjectDir());
 }
 
 // PortalMainFrame::OnQuit
@@ -370,6 +377,7 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event){
 
   if( NP->ShowModal() == wxID_OK ){
     CGProject = NP->GetCoreGenPtr();
+    IRFileName = NP->GetIRFileName();
     NP->Destroy();
   }
 }
