@@ -155,6 +155,8 @@ void PortalMainFrame::CreateMenuBar(){
   //-- project menu
   Connect(ID_PROJNEW, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjNew));
+  Connect(wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjOpen));
 
   //-- build menu
 
@@ -363,6 +365,48 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event){
     CGProject = NP->GetCoreGenPtr();
     NP->Destroy();
   }
+}
+
+void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
+  // stage 1, decide whether we need to close the current project
+
+  // stage 2, prompt the user to select the new yaml input file
+  wxFileDialog* OpenDialog = new wxFileDialog( this,
+                                               _("Choose a YAML IR file to open"),
+                                               UserConfig->wxGetProjectDir(),
+                                               wxEmptyString,
+                                               _("IR Files (*.yaml)|*.yaml"),
+                                               wxFD_OPEN, wxDefaultPosition );
+
+  wxString NP;
+  if( OpenDialog->ShowModal() == wxID_OK ){
+    NP = OpenDialog->GetPath();
+    LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
+    wxFileName NPF(NP);
+
+    // create a new coregen object
+    CGProject = new CoreGenBackend( std::string(NPF.GetName().mb_str()),
+                                    std::string(NPF.GetPath().mb_str()),
+                                    UserConfig->GetArchiveDir() );
+    if( CGProject == nullptr ){
+      LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
+      OpenDialog->Destroy();
+    }
+
+    // read the ir
+    if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
+      LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
+      OpenDialog->Destroy();
+    }
+
+    // load the ir into the ir pane
+    IRPane->LoadFile(NP);
+
+    LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
+  }
+
+  // clean up the dialog box
+  OpenDialog->Destroy();
 }
 
 // EOF

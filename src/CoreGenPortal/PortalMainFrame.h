@@ -35,6 +35,7 @@
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/stc/stc.h>
+#include <wx/filedlg.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -112,6 +113,7 @@ private:
   void OnVerifPref(wxCommandEvent& event);
   void OnUserPref(wxCommandEvent& event);
   void OnProjNew(wxCommandEvent& event);
+  void OnProjOpen(wxCommandEvent& event);
 };
 
 enum
