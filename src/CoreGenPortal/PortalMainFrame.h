@@ -39,6 +39,7 @@
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
 #include "CoreGenPortal/PortalVerifPrefWin.h"
+#include "CoreGenPortal/PortalUserPrefWin.h"
 #include "CoreGenPortal/PortalCore/CoreErrorDiag.h"
 #include "CoreGenPortal/PortalCore/CoreStoneCutterEditor.h"
 #include "CoreGenPortal/PortalCore/CoreUserConfig.h"
@@ -105,6 +106,7 @@ private:
   void OnQuit(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
   void OnVerifPref(wxCommandEvent& event);
+  void OnUserPref(wxCommandEvent& event);
 };
 
 enum

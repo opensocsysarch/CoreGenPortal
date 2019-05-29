@@ -18,6 +18,8 @@ PortalVersion.h
 PortalMainFrame.h
 PortalVerifPrefWin.cpp
 PortalVerifPrefWin.h
+PortalUserPrefWin.cpp
+PortalUserPrefWin.h
 )
 
 #-- target deps

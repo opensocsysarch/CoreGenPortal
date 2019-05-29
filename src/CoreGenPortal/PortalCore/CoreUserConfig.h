@@ -14,6 +14,7 @@
 // wxWidgets headers
 #include <wx/wxprec.h>
 #include <wx/file.h>
+#include <wx/utils.h>
 #include <wx/filename.h>
 #include <wx/stdpaths.h>
 #include <wx/textfile.h>
@@ -96,6 +97,9 @@ public:
 
   /// Sets the user's archive directory
   bool SetArchiveDir( wxString S );
+
+  /// Writes the configuration out to the file
+  bool WriteConfig();
 };
 
 #endif

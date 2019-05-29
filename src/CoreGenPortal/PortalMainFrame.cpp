@@ -149,6 +149,8 @@ void PortalMainFrame::CreateMenuBar(){
   //-- preferences menu
   Connect(ID_PREF_VERIF, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnVerifPref));
+  Connect(ID_PREF_USER, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnUserPref));
 
   //-- project menu
 
@@ -326,6 +328,21 @@ void PortalMainFrame::OnVerifPref(wxCommandEvent &event){
     LogPane->AppendText("Committed verification preferences\n");
   }
   VP->Destroy();
+}
+
+void PortalMainFrame::OnUserPref(wxCommandEvent &event){
+  LogPane->AppendText("Loading user preferences...\n" );
+  PortalUserPrefWin *UP = new PortalUserPrefWin(this,
+                                               wxID_ANY,
+                                               wxT("User Preferences"),
+                                               wxDefaultPosition,
+                                               wxSize(500,500),
+                                               wxDEFAULT_DIALOG_STYLE|wxVSCROLL,
+                                               UserConfig);
+  if( UP->ShowModal() == wxID_OK ){
+    LogPane->AppendText("Committed user preferences\n");
+  }
+  UP->Destroy();
 }
 
 // EOF
