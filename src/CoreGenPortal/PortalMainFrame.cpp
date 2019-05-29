@@ -279,6 +279,13 @@ void PortalMainFrame::CreateWindowLayout(){
 // PortalMainFrame::CloseProject
 // closes any open project files
 void PortalMainFrame::CloseProject(){
+  if( !CGProject ){
+    return ;
+  }
+
+  LogPane->AppendText("Closing open project...\n");
+
+  IRPane->SaveFile(IRFileName);
 }
 
 // PortalMainFrame::OnQuit
@@ -369,6 +376,9 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event){
 
 void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
   // stage 1, decide whether we need to close the current project
+  if( CGProject ){
+    CloseProject();
+  }
 
   // stage 2, prompt the user to select the new yaml input file
   wxFileDialog* OpenDialog = new wxFileDialog( this,
@@ -401,6 +411,7 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
 
     // load the ir into the ir pane
     IRPane->LoadFile(NP);
+    IRFileName = NP;
 
     LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
   }

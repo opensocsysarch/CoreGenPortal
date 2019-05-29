@@ -61,6 +61,8 @@ private:
   wxTextCtrl *ProjNameCtrl;     ///< project name input box
   wxChoice *ProjType;           ///< project type selection box
 
+  wxString IRFileName;          ///< file name of the IR file
+
   // Event handler functions
   /// Declares the event table
   wxDECLARE_EVENT_TABLE();
@@ -95,6 +97,7 @@ public:
                     wxStyledTextCtrl *IRPane = nullptr,
                     CoreUserConfig *User = nullptr );
   CoreGenBackend *GetCoreGenPtr() { return CG; }
+  wxString GetIRFileName() { return IRFileName; }
   ~PortalNewProjWin();
 };
 

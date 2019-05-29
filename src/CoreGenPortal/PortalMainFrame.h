@@ -98,6 +98,8 @@ private:
   wxAuiNotebook* EditorNotebook;
   wxStyledTextCtrl *IRPane;
 
+  wxString IRFileName;
+
   // private functions
   void InitAuiMgr();
   void UpdateAuiMgr();

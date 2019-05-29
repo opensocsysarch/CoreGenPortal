@@ -188,6 +188,7 @@ void PortalNewProjWin::OnPressOk( wxCommandEvent& ok ){
   // Everything was successful, update the main window parameters
   LogPane->AppendText("Project creation was successful\n" );
   IRPane->LoadFile(IRFile);
+  IRFileName = IRFile;
   ProjDir->SetPath(FullPath);
   this->EndModal( wxID_OK );
 }
