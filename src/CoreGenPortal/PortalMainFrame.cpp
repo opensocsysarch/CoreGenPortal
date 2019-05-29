@@ -15,7 +15,7 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
                                   const wxPoint& pos,
                                   const wxSize& size )
   : wxFrame( NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE ),
-    UserConfig(nullptr),VerifConfig(nullptr),
+    CGProject(nullptr), UserConfig(nullptr),VerifConfig(nullptr),
     MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), PrefMenu(NULL), ProjectMenu(NULL),
     BuildMenu(NULL), PluginMenu(NULL), HelpMenu(NULL), ToolBar(NULL),
     LogPane(NULL), ModulesNotebook(NULL), ModuleBox(NULL), PluginBox(NULL),
@@ -153,6 +153,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnUserPref));
 
   //-- project menu
+  Connect(ID_PROJNEW, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjNew));
 
   //-- build menu
 
@@ -343,6 +345,24 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
     LogPane->AppendText("Committed user preferences\n");
   }
   UP->Destroy();
+}
+
+void PortalMainFrame::OnProjNew(wxCommandEvent &event){
+  PortalNewProjWin *NP = new PortalNewProjWin(this,
+                                              wxID_ANY,
+                                              wxT("New Project"),
+                                              wxDefaultPosition,
+                                              wxSize(500,500),
+                                              wxDEFAULT_DIALOG_STYLE|wxVSCROLL,
+                                              ProjDir,
+                                              LogPane,
+                                              IRPane,
+                                              UserConfig);
+
+  if( NP->ShowModal() == wxID_OK ){
+    CGProject = NP->GetCoreGenPtr();
+    NP->Destroy();
+  }
 }
 
 // EOF

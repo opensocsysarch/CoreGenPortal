@@ -40,6 +40,7 @@
 #include "CoreGenPortal/PortalConsts.h"
 #include "CoreGenPortal/PortalVerifPrefWin.h"
 #include "CoreGenPortal/PortalUserPrefWin.h"
+#include "CoreGenPortal/PortalNewProjWin.h"
 #include "CoreGenPortal/PortalCore/CoreErrorDiag.h"
 #include "CoreGenPortal/PortalCore/CoreStoneCutterEditor.h"
 #include "CoreGenPortal/PortalCore/CoreUserConfig.h"
@@ -63,6 +64,9 @@ public:
   ~PortalMainFrame();
 
 private:
+  // CoreGenHandlers
+  CoreGenBackend *CGProject;
+
   // data handlers
   CoreUserConfig *UserConfig;
   CoreVerifConfig *VerifConfig;
@@ -107,6 +111,7 @@ private:
   void OnAbout(wxCommandEvent& event);
   void OnVerifPref(wxCommandEvent& event);
   void OnUserPref(wxCommandEvent& event);
+  void OnProjNew(wxCommandEvent& event);
 };
 
 enum

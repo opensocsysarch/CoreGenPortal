@@ -84,7 +84,7 @@ public:
                      const wxString& title = wxT("Userication Preferences"),
                      const wxPoint& pos = wxDefaultPosition,
                      const wxSize& size = wxDefaultSize,
-                     long style = wxDEFAULT_DIALOG_STYLE|wxVSCROLL,
+                     long style = wxDEFAULT_DIALOG_STYLE,
                      CoreUserConfig *User = nullptr);
   ~PortalUserPrefWin();
 };

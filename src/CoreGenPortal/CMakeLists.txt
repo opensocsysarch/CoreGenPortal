@@ -20,6 +20,8 @@ PortalVerifPrefWin.cpp
 PortalVerifPrefWin.h
 PortalUserPrefWin.cpp
 PortalUserPrefWin.h
+PortalNewProjWin.cpp
+PortalNewProjWin.h
 )
 
 #-- target deps
