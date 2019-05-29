@@ -293,6 +293,10 @@ void PortalMainFrame::CloseProject(){
 
   // reset the file browser window
   ProjDir->SetPath(UserConfig->wxGetProjectDir());
+
+  // delete the final bits
+  delete CGProject;
+  CGProject = nullptr;
 }
 
 // PortalMainFrame::OnQuit
