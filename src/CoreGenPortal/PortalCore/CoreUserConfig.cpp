@@ -46,6 +46,23 @@ bool CoreUserConfig::BuildDefaultConfigFile(){
   return true;
 }
 
+bool CoreUserConfig::WriteConfig(){
+  wxRemoveFile(ConfFile);
+  wxTextFile file(ConfFile);
+  file.Create();
+  file.Open();
+
+  // write all the defaults
+  file.AddLine( wxT("#-- OpenSoC System Architect User Configuration File" ) );
+  file.AddLine( wxT("PROJECT_DIR = ") + ProjectDir );
+  file.AddLine( wxT("ARCHIVE_DIR = ") + ArchiveDir );
+
+  file.Write();
+  file.Close();
+
+  return true;
+}
+
 bool CoreUserConfig::ReadConfigFile(){
   if( ConfFile.length() == 0 ){
     isValidConfig = false;

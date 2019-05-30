@@ -15,7 +15,7 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
                                   const wxPoint& pos,
                                   const wxSize& size )
   : wxFrame( NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE ),
-    UserConfig(nullptr),
+    CGProject(nullptr), UserConfig(nullptr),VerifConfig(nullptr),
     MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), PrefMenu(NULL), ProjectMenu(NULL),
     BuildMenu(NULL), PluginMenu(NULL), HelpMenu(NULL), ToolBar(NULL),
     LogPane(NULL), ModulesNotebook(NULL), ModuleBox(NULL), PluginBox(NULL),
@@ -44,15 +44,24 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   UserConfig = new CoreUserConfig();
   if( UserConfig->isValid() )
     LogPane->AppendText("Read user configuration data; ConfigFile="
-                        + UserConfig->wxGetConfFile());
+                        + UserConfig->wxGetConfFile() + "\n");
   else
     LogPane->AppendText("Error reading user configuration data; ConfigFile="
-                        + UserConfig->wxGetConfFile());
+                        + UserConfig->wxGetConfFile() + "\n");
+
+  // initialize the verification configuration data
+  VerifConfig = new CoreVerifConfig();
+  if( VerifConfig->isValid() )
+    LogPane->AppendText("Initialized the verification pass preferences\n");
+  else
+    LogPane->AppendText("Error initializing the verification pass preferences\n");
 }
 
 // PortalMainFrame::~PortalMainFrame
 PortalMainFrame::~PortalMainFrame(){
   Mgr.UnInit();
+  delete UserConfig;
+  delete VerifConfig;
 }
 
 // PortalMainFrame::InitAuiMgr
@@ -137,7 +146,17 @@ void PortalMainFrame::CreateMenuBar(){
 
   //-- edit menu
 
+  //-- preferences menu
+  Connect(ID_PREF_VERIF, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnVerifPref));
+  Connect(ID_PREF_USER, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnUserPref));
+
   //-- project menu
+  Connect(ID_PROJNEW, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjNew));
+  Connect(wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjOpen));
 
   //-- build menu
 
@@ -193,8 +212,8 @@ void PortalMainFrame::CreateWindowLayout(){
                                       wxAUI_NB_TAB_MOVE |
                                       wxAUI_NB_SCROLL_BUTTONS);
 
-  ModuleBox = new wxListBox(this, wxID_ANY, wxDefaultPosition,
-                            wxDefaultSize, 0, NULL, wxLB_MULTIPLE);
+  ModuleBox = new wxTreeListCtrl(this, wxID_ANY, wxDefaultPosition,
+                                 wxDefaultSize, wxTL_MULTIPLE, wxEmptyString );
   PluginBox = new wxListBox(this, wxID_ANY, wxDefaultPosition,
                             wxDefaultSize, 0, NULL, wxLB_MULTIPLE);
   ProjDir = new wxGenericDirCtrl(this,wxID_ANY, wxEmptyString,
@@ -260,12 +279,30 @@ void PortalMainFrame::CreateWindowLayout(){
 // PortalMainFrame::CloseProject
 // closes any open project files
 void PortalMainFrame::CloseProject(){
+  if( !CGProject ){
+    return ;
+  }
+
+  LogPane->AppendText("Closing open project...\n");
+
+  // save the IR file
+  IRPane->SaveFile(IRFileName);
+
+  // close out all the modules
+  // TODO
+
+  // reset the file browser window
+  ProjDir->SetPath(UserConfig->wxGetProjectDir());
+
+  // delete the final bits
+  delete CGProject;
+  CGProject = nullptr;
 }
 
 // PortalMainFrame::OnQuit
 // handles quit signals to end the application
 void PortalMainFrame::OnQuit(wxCommandEvent& event){
-  int answer = wxMessageBox("Close COreGenPortal?", "Confirm",
+  int answer = wxMessageBox("Close CoreGenPortal?", "Confirm",
                             wxYES_NO | wxCANCEL, this);
   if( answer == wxYES ){
     // close the project
@@ -288,7 +325,7 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
 
   wxMessageDialog *dial = new wxMessageDialog(NULL,
                                               wxT("CoreGenPortal Version ") +
-                                                PORTAL_VERSION +
+                                                PORTAL_VERSION_WX +
                                                 wxT(" \n") +
                                                 PORTAL_COPYRIGHT,
                                               wxT("About CoreGenPortal"),
@@ -297,6 +334,102 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   dial->ShowModal();
   delete dial;
   delete CGA;
+}
+
+// PortalMainFraml::OnVerifPref
+void PortalMainFrame::OnVerifPref(wxCommandEvent &event){
+  LogPane->AppendText("Loading verification preferences...\n");
+  PortalVerifPrefWin *VP = new PortalVerifPrefWin(this,
+                                                  wxID_ANY,
+                                                  wxT("Verification Preferences"),
+                                                  wxDefaultPosition,
+                                                  wxSize(500,500),
+                                                  wxDEFAULT_DIALOG_STYLE|wxVSCROLL,
+                                                  VerifConfig);
+  if( VP->ShowModal() == wxID_OK ){
+    LogPane->AppendText("Committed verification preferences\n");
+  }
+  VP->Destroy();
+}
+
+void PortalMainFrame::OnUserPref(wxCommandEvent &event){
+  LogPane->AppendText("Loading user preferences...\n" );
+  PortalUserPrefWin *UP = new PortalUserPrefWin(this,
+                                               wxID_ANY,
+                                               wxT("User Preferences"),
+                                               wxDefaultPosition,
+                                               wxSize(500,500),
+                                               wxDEFAULT_DIALOG_STYLE|wxVSCROLL,
+                                               UserConfig);
+  if( UP->ShowModal() == wxID_OK ){
+    LogPane->AppendText("Committed user preferences\n");
+  }
+  UP->Destroy();
+}
+
+void PortalMainFrame::OnProjNew(wxCommandEvent &event){
+  PortalNewProjWin *NP = new PortalNewProjWin(this,
+                                              wxID_ANY,
+                                              wxT("New Project"),
+                                              wxDefaultPosition,
+                                              wxSize(500,500),
+                                              wxDEFAULT_DIALOG_STYLE|wxVSCROLL,
+                                              ProjDir,
+                                              LogPane,
+                                              IRPane,
+                                              UserConfig);
+
+  if( NP->ShowModal() == wxID_OK ){
+    CGProject = NP->GetCoreGenPtr();
+    IRFileName = NP->GetIRFileName();
+    NP->Destroy();
+  }
+}
+
+void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
+  // stage 1, decide whether we need to close the current project
+  if( CGProject ){
+    CloseProject();
+  }
+
+  // stage 2, prompt the user to select the new yaml input file
+  wxFileDialog* OpenDialog = new wxFileDialog( this,
+                                               _("Choose a YAML IR file to open"),
+                                               UserConfig->wxGetProjectDir(),
+                                               wxEmptyString,
+                                               _("IR Files (*.yaml)|*.yaml"),
+                                               wxFD_OPEN, wxDefaultPosition );
+
+  wxString NP;
+  if( OpenDialog->ShowModal() == wxID_OK ){
+    NP = OpenDialog->GetPath();
+    LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
+    wxFileName NPF(NP);
+
+    // create a new coregen object
+    CGProject = new CoreGenBackend( std::string(NPF.GetName().mb_str()),
+                                    std::string(NPF.GetPath().mb_str()),
+                                    UserConfig->GetArchiveDir() );
+    if( CGProject == nullptr ){
+      LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
+      OpenDialog->Destroy();
+    }
+
+    // read the ir
+    if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
+      LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
+      OpenDialog->Destroy();
+    }
+
+    // load the ir into the ir pane
+    IRPane->LoadFile(NP);
+    IRFileName = NP;
+
+    LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
+  }
+
+  // clean up the dialog box
+  OpenDialog->Destroy();
 }
 
 // EOF

@@ -35,11 +35,18 @@
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/stc/stc.h>
+#include <wx/filedlg.h>
+#include <wx/treelist.h>
 
 //-- PORTAL HEADERS
+#include "CoreGenPortal/PortalConsts.h"
+#include "CoreGenPortal/PortalVerifPrefWin.h"
+#include "CoreGenPortal/PortalUserPrefWin.h"
+#include "CoreGenPortal/PortalNewProjWin.h"
 #include "CoreGenPortal/PortalCore/CoreErrorDiag.h"
 #include "CoreGenPortal/PortalCore/CoreStoneCutterEditor.h"
 #include "CoreGenPortal/PortalCore/CoreUserConfig.h"
+#include "CoreGenPortal/PortalCore/CoreVerifConfig.h"
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
 
 //-- COREGEN HEADERS
@@ -59,8 +66,12 @@ public:
   ~PortalMainFrame();
 
 private:
+  // CoreGenHandlers
+  CoreGenBackend *CGProject;
+
   // data handlers
   CoreUserConfig *UserConfig;
+  CoreVerifConfig *VerifConfig;
 
   // top level manager
   wxAuiManager Mgr;
@@ -81,12 +92,14 @@ private:
   // layout items
   wxTextCtrl *LogPane;
   wxAuiNotebook* ModulesNotebook;
-  wxListBox *ModuleBox;
+  wxTreeListCtrl *ModuleBox;
   wxListBox *PluginBox;
   wxGenericDirCtrl *ProjDir;
 
   wxAuiNotebook* EditorNotebook;
   wxStyledTextCtrl *IRPane;
+
+  wxString IRFileName;
 
   // private functions
   void InitAuiMgr();
@@ -100,6 +113,10 @@ private:
   // menu handlers
   void OnQuit(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
+  void OnVerifPref(wxCommandEvent& event);
+  void OnUserPref(wxCommandEvent& event);
+  void OnProjNew(wxCommandEvent& event);
+  void OnProjOpen(wxCommandEvent& event);
 };
 
 enum
