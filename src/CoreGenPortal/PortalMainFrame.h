@@ -36,6 +36,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/stc/stc.h>
 #include <wx/filedlg.h>
+#include <wx/treelist.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -91,7 +92,7 @@ private:
   // layout items
   wxTextCtrl *LogPane;
   wxAuiNotebook* ModulesNotebook;
-  wxListBox *ModuleBox;
+  wxTreeListCtrl *ModuleBox;
   wxListBox *PluginBox;
   wxGenericDirCtrl *ProjDir;
 

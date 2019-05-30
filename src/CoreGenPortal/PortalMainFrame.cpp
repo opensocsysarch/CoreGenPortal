@@ -212,8 +212,8 @@ void PortalMainFrame::CreateWindowLayout(){
                                       wxAUI_NB_TAB_MOVE |
                                       wxAUI_NB_SCROLL_BUTTONS);
 
-  ModuleBox = new wxListBox(this, wxID_ANY, wxDefaultPosition,
-                            wxDefaultSize, 0, NULL, wxLB_MULTIPLE);
+  ModuleBox = new wxTreeListCtrl(this, wxID_ANY, wxDefaultPosition,
+                                 wxDefaultSize, wxTL_MULTIPLE, wxEmptyString );
   PluginBox = new wxListBox(this, wxID_ANY, wxDefaultPosition,
                             wxDefaultSize, 0, NULL, wxLB_MULTIPLE);
   ProjDir = new wxGenericDirCtrl(this,wxID_ANY, wxEmptyString,
