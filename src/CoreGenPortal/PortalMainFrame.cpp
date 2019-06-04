@@ -237,7 +237,8 @@ void PortalMainFrame::CreateWindowLayout(){
 
   //-- setup the IR editor
   IRPane = new wxStyledTextCtrl(this, wxID_ANY);
-  IRPane->SetMarginWidth (MARGIN_LINE_NUMBERS, 10);
+  IRPane->StyleClearAll();
+  IRPane->SetMarginWidth(MARGIN_LINE_NUMBERS, 50);
   IRPane->SetTabWidth(3);
   IRPane->SetIndent(3);
   IRPane->SetUseTabs(false);
@@ -245,7 +246,6 @@ void PortalMainFrame::CreateWindowLayout(){
   IRPane->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour (220, 220, 220));
   IRPane->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
   IRPane->SetWrapMode(wxSTC_WRAP_WORD);
-  IRPane->StyleClearAll();
   IRPane->SetLexer(wxSTC_LEX_YAML);
 
   // -- set all the colors
