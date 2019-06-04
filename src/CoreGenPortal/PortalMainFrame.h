@@ -101,12 +101,18 @@ private:
 
   wxString IRFileName;
 
+  std::vector<wxTreeListItem> TreeItems;
+  std::vector<wxTreeListItem> NodeItems;
+  std::vector<wxTreeListItem> EncItems;
+
   // private functions
   void InitAuiMgr();
   void UpdateAuiMgr();
   void CreateMenuBar();
   void CreatePortalToolBar();
   void CreateWindowLayout();
+  void SetupModuleBox();
+  void LoadModuleBox();
 
   void CloseProject();
 
@@ -135,6 +141,24 @@ enum
   ID_PREF_USER          = 40,
   ID_PREF_VERIF         = 41,
   ID_PREF_STONECUTTER   = 42
+};
+
+enum{
+  TREE_NODE_CACHE       = 0,
+  TREE_NODE_COMM        = 1,
+  TREE_NODE_CORE        = 2,
+  TREE_NODE_EXT         = 3,
+  TREE_NODE_ISA         = 4,
+  TREE_NODE_INST        = 5,
+  TREE_NODE_INSTFORMAT  = 6,
+  TREE_NODE_MCTRL       = 7,
+  TREE_NODE_PLUGIN      = 8,
+  TREE_NODE_PSEUDOINST  = 9,
+  TREE_NODE_REG         = 10,
+  TREE_NODE_REGCLASS    = 11,
+  TREE_NODE_SOC         = 12,
+  TREE_NODE_SPAD        = 13,
+  TREE_NODE_VTP         = 14
 };
 
 #endif

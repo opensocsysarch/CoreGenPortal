@@ -214,6 +214,8 @@ void PortalMainFrame::CreateWindowLayout(){
 
   ModuleBox = new wxTreeListCtrl(this, wxID_ANY, wxDefaultPosition,
                                  wxDefaultSize, wxTL_MULTIPLE, wxEmptyString );
+  SetupModuleBox();
+
   PluginBox = new wxListBox(this, wxID_ANY, wxDefaultPosition,
                             wxDefaultSize, 0, NULL, wxLB_MULTIPLE);
   ProjDir = new wxGenericDirCtrl(this,wxID_ANY, wxEmptyString,
@@ -274,6 +276,218 @@ void PortalMainFrame::CreateWindowLayout(){
   Mgr.AddPane( LogPane,         wxBOTTOM, wxT("CoreGenPortal Log"));
   Mgr.AddPane( EditorNotebook,  wxCENTER);
   Mgr.GetPane( EditorNotebook ).CloseButton(false);
+}
+
+// PortalMainFrame::SetupModuleBox
+// initializes the modulebox tree hierarchy
+void PortalMainFrame::SetupModuleBox(){
+  ModuleBox->AppendColumn(wxT("Modules"),
+                          wxCOL_WIDTH_AUTOSIZE,
+                          wxALIGN_LEFT,
+                          wxCOL_RESIZABLE|wxCOL_SORTABLE);
+  ModuleBox->AppendColumn(wxT("Nodes"),
+                          wxCOL_WIDTH_AUTOSIZE,
+                          wxALIGN_LEFT,
+                          wxCOL_RESIZABLE|wxCOL_SORTABLE);
+  ModuleBox->AppendColumn(wxT("Encoding"),
+                          wxCOL_WIDTH_AUTOSIZE,
+                          wxALIGN_LEFT,
+                          wxCOL_RESIZABLE|wxCOL_SORTABLE);
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("Cache"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("Comm"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("Core"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("Ext"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("ISA"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("Inst"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("InstFormat"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("MCtrl"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("Plugin"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("PseudoInst"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("Reg"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("RegClass"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("SoC"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("Spad"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ModuleBox->GetRootItem(),
+                                              wxT("VTP"),
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              wxTreeListCtrl::NO_IMAGE,
+                                              NULL ) );
+}
+
+// PortalMainFrame::LoadModuleBox
+// loads all the module box items
+void PortalMainFrame::LoadModuleBox(){
+  CoreGenNode *Top = CGProject->GetTop();
+
+  if( Top == nullptr ){
+    LogPane->AppendText("Error loading modules...\n");
+    return ;
+  }
+
+  LogPane->AppendText("Loading modules...\n" );
+
+  for( unsigned i=0; i<Top->GetNumChild(); i++ ){
+    switch( Top->GetChild(i)->GetType() ){
+    case CGSoc:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_SOC],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGCore:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_CORE],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGInstF:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_INSTFORMAT],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGInst:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_INST],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGPInst:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_PSEUDOINST],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGRegC:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_REGCLASS],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGReg:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_REG],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGISA:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_ISA],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGCache:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_CACHE],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGComm:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_COMM],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGSpad:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_SPAD],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGMCtrl:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_MCTRL],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGVTP:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_VTP],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    case CGPlugin:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_PLUGIN],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
+    default:
+      LogPane->AppendText("Error loading module: " +
+                          wxString(Top->GetChild(i)->GetName()) + "\n");
+      break;
+    }
+  }
 }
 
 // PortalMainFrame::CloseProject
@@ -424,6 +638,9 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
     // load the ir into the ir pane
     IRPane->LoadFile(NP);
     IRFileName = NP;
+
+    // load all the modules into the modulebox
+    LoadModuleBox();
 
     LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
   }
