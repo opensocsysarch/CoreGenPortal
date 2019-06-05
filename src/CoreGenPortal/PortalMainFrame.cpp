@@ -157,6 +157,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjNew));
   Connect(wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjOpen));
+  Connect(wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjClose));
 
   //-- build menu
 
@@ -361,6 +363,9 @@ void PortalMainFrame::SetupModuleBox(){
                                               -1,
                                               -1,
                                               NULL ) );
+
+  // connect the module box window handlers
+  Bind(wxEVT_TREE_ITEM_ACTIVATED, &PortalMainFrame::OnSelectNode, this);
 }
 
 // PortalMainFrame::LoadModuleBox
@@ -541,7 +546,12 @@ void PortalMainFrame::CloseProject(){
   IRPane->ClearAll();
 
   // close out all the modules
-  // TODO
+  NodeItems.clear();
+  EncItems.clear();
+  for( unsigned i=0; i<TreeItems.size(); i++ ){
+    ModuleBox->CollapseAndReset( TreeItems[i] );
+  }
+  ModuleBox->Collapse(ParentModule);
 
   // reset the file browser window
   ProjDir->SetPath(UserConfig->wxGetProjectDir());
@@ -588,7 +598,12 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   delete CGA;
 }
 
-// PortalMainFraml::OnVerifPref
+// PortalMainFrame::OnSelectNode
+void PortalMainFrame::OnSelectNode(wxTreeEvent &event){
+  LogPane->AppendText("selected a node");
+}
+
+// PortalMainFrame::OnVerifPref
 void PortalMainFrame::OnVerifPref(wxCommandEvent &event){
   LogPane->AppendText("Loading verification preferences...\n");
   PortalVerifPrefWin *VP = new PortalVerifPrefWin(this,
@@ -604,6 +619,7 @@ void PortalMainFrame::OnVerifPref(wxCommandEvent &event){
   VP->Destroy();
 }
 
+// PortalMainFrame::OnUserPref
 void PortalMainFrame::OnUserPref(wxCommandEvent &event){
   LogPane->AppendText("Loading user preferences...\n" );
   PortalUserPrefWin *UP = new PortalUserPrefWin(this,
@@ -619,6 +635,7 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
   UP->Destroy();
 }
 
+// PortalMainFrame::OnProjNew
 void PortalMainFrame::OnProjNew(wxCommandEvent &event){
   PortalNewProjWin *NP = new PortalNewProjWin(this,
                                               wxID_ANY,
@@ -638,6 +655,12 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event){
   }
 }
 
+// PortalMainFrame::OnProjClose
+void PortalMainFrame::OnProjClose(wxCommandEvent& WXUNUSED(event)){
+  CloseProject();
+}
+
+// PortalMainFrame::OnProjOpen
 void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
   // stage 1, decide whether we need to close the current project
   if( CGProject ){

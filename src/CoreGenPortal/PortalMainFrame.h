@@ -127,6 +127,8 @@ private:
   void OnUserPref(wxCommandEvent& event);
   void OnProjNew(wxCommandEvent& event);
   void OnProjOpen(wxCommandEvent& event);
+  void OnProjClose(wxCommandEvent& event);
+  void OnSelectNode(wxTreeEvent& event);
 };
 
 enum
@@ -144,7 +146,8 @@ enum
   ID_COMPILE_COMPILER   = 31,
   ID_PREF_USER          = 40,
   ID_PREF_VERIF         = 41,
-  ID_PREF_STONECUTTER   = 42
+  ID_PREF_STONECUTTER   = 42,
+  ID_TREE_SELECTNODE    = 50
 };
 
 enum{
