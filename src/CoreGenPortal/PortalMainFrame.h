@@ -37,6 +37,7 @@
 #include <wx/stc/stc.h>
 #include <wx/filedlg.h>
 #include <wx/treelist.h>
+#include <wx/treectrl.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -92,7 +93,7 @@ private:
   // layout items
   wxTextCtrl *LogPane;
   wxAuiNotebook* ModulesNotebook;
-  wxTreeListCtrl *ModuleBox;
+  wxTreeCtrl *ModuleBox;
   wxListBox *PluginBox;
   wxGenericDirCtrl *ProjDir;
 
@@ -101,9 +102,10 @@ private:
 
   wxString IRFileName;
 
-  std::vector<wxTreeListItem> TreeItems;
-  std::vector<wxTreeListItem> NodeItems;
-  std::vector<wxTreeListItem> EncItems;
+  wxTreeItemId ParentModule;
+  std::vector<wxTreeItemId> TreeItems;
+  std::vector<wxTreeItemId> NodeItems;
+  std::vector<wxTreeItemId> EncItems;
 
   // private functions
   void InitAuiMgr();
