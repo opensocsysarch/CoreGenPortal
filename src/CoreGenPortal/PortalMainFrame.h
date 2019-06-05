@@ -104,8 +104,8 @@ private:
 
   wxTreeItemId ParentModule;
   std::vector<wxTreeItemId> TreeItems;
-  std::vector<wxTreeItemId> NodeItems;
-  std::vector<wxTreeItemId> EncItems;
+  std::vector<std::pair<wxTreeItemId,CoreGenNode *>> NodeItems;
+  std::vector<std::pair<wxTreeItemId,CoreGenEncoding *>> EncItems;
 
   // private functions
   void InitAuiMgr();
@@ -117,8 +117,9 @@ private:
   void LoadModuleBox();
   void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
   void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
-
   void CloseProject();
+
+  wxString FindNodeStr(CoreGenNode *Parent);
 
   // menu handlers
   void OnQuit(wxCommandEvent& event);
@@ -129,6 +130,8 @@ private:
   void OnProjOpen(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
+  void OnRightClickNode(wxTreeEvent& event);
+  void OnMiddleClickNode(wxTreeEvent& event);
 };
 
 enum

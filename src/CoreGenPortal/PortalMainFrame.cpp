@@ -366,6 +366,64 @@ void PortalMainFrame::SetupModuleBox(){
 
   // connect the module box window handlers
   Bind(wxEVT_TREE_ITEM_ACTIVATED, &PortalMainFrame::OnSelectNode, this);
+  Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, &PortalMainFrame::OnRightClickNode, this);
+  Bind(wxEVT_TREE_ITEM_MIDDLE_CLICK, &PortalMainFrame::OnMiddleClickNode, this);
+}
+
+// PortalMainFrame::FindNodeStr
+// converts a node name into its appropriate Yaml text for searching
+wxString PortalMainFrame::FindNodeStr( CoreGenNode *Parent ){
+  switch( Parent->GetType() ){
+  case CGSoc:
+    return wxT("- Soc: ") + wxString(Parent->GetName());
+    break;
+  case CGCore:
+    return wxT("- Core: ") + wxString(Parent->GetName());
+    break;
+  case CGInstF:
+    return wxT("- InstFormatName: ") + wxString(Parent->GetName());
+    break;
+  case CGInst:
+    return wxT("- Inst: ") + wxString(Parent->GetName());
+    break;
+  case CGPInst:
+    return wxT("- PseudoInst: ") + wxString(Parent->GetName());
+    break;
+  case CGRegC:
+    return wxT("- RegisterClassname: ") + wxString(Parent->GetName());
+    break;
+  case CGReg:
+    return wxT("- RegName: ") + wxString(Parent->GetName());
+    break;
+  case CGISA:
+    return wxT("- ISAName: ") + wxString(Parent->GetName());
+    break;
+  case CGCache:
+    return wxT("- Cache: ") + wxString(Parent->GetName());
+    break;
+  case CGExt:
+    return wxT("- Extension: ") + wxString(Parent->GetName());
+    break;
+  case CGComm:
+    return wxT("- Comm: ") + wxString(Parent->GetName());
+    break;
+  case CGSpad:
+    return wxT("- Scratchpad: ") + wxString(Parent->GetName());
+    break;
+  case CGMCtrl:
+    return wxT("- MemoryController: ") + wxString(Parent->GetName());
+    break;
+  case CGVTP:
+    return wxT("- VTP: ") + wxString(Parent->GetName());
+    break;
+  case CGPlugin:
+    return wxT("- Plugin: ") + wxString(Parent->GetName());
+    break;
+  default:
+    return wxString(Parent->GetName());
+    break;
+  }
+  return wxString(Parent->GetName());
 }
 
 // PortalMainFrame::LoadModuleBox
@@ -383,113 +441,113 @@ void PortalMainFrame::LoadModuleBox(){
   for( unsigned i=0; i<Top->GetNumChild(); i++ ){
     switch( Top->GetChild(i)->GetType() ){
     case CGSoc:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_SOC],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_SOC],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGCore:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_CORE],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_CORE],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGInstF:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_INSTFORMAT],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_INSTFORMAT],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGInst:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_INST],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_INST],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
-      LoadInstEncodings( NodeItems[NodeItems.size()-1],
+                                                NULL ),Top->GetChild(i)) );
+      LoadInstEncodings( NodeItems[NodeItems.size()-1].first,
                          static_cast<CoreGenInst *>(Top->GetChild(i)));
       break;
     case CGPInst:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_PSEUDOINST],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_PSEUDOINST],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
-      LoadPInstEncodings( NodeItems[NodeItems.size()-1],
+                                                NULL ),Top->GetChild(i)) );
+      LoadPInstEncodings( NodeItems[NodeItems.size()-1].first,
                          static_cast<CoreGenPseudoInst *>(Top->GetChild(i)));
       break;
     case CGRegC:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_REGCLASS],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_REGCLASS],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGReg:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_REG],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_REG],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGISA:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_ISA],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_ISA],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGCache:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_CACHE],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_CACHE],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGComm:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_COMM],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_COMM],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGSpad:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_SPAD],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_SPAD],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGMCtrl:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_MCTRL],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_MCTRL],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGVTP:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_VTP],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_VTP],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
                                                 -1,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGPlugin:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_PLUGIN],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_PLUGIN],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 wxTreeListCtrl::NO_IMAGE,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     case CGExt:
-      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_EXT],
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_EXT],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 wxTreeListCtrl::NO_IMAGE,
-                                                NULL ) );
+                                                NULL ),Top->GetChild(i)) );
       break;
     default:
       LogPane->AppendText("Error loading node: " +
@@ -508,11 +566,11 @@ void PortalMainFrame::LoadInstEncodings( wxTreeItemId Parent,
                                          CoreGenInst *Inst ){
   for( unsigned j=0; j<Inst->GetNumEncodings(); j++ ){
     CoreGenEncoding *E = Inst->GetEncoding(j);
-    EncItems.push_back( ModuleBox->AppendItem( Parent,
+    EncItems.push_back( std::make_pair(ModuleBox->AppendItem( Parent,
                                                wxString(E->GetName()),
                                                -1,
                                                -1,
-                                               NULL ) );
+                                               NULL ),E) );
   }
 }
 
@@ -522,11 +580,11 @@ void PortalMainFrame::LoadPInstEncodings( wxTreeItemId Parent,
                                          CoreGenPseudoInst *PInst ){
   for( unsigned j=0; j<PInst->GetNumEncodings(); j++ ){
     CoreGenEncoding *E = PInst->GetEncoding(j);
-    EncItems.push_back( ModuleBox->AppendItem( Parent,
+    EncItems.push_back( std::make_pair(ModuleBox->AppendItem( Parent,
                                                wxString(E->GetName()),
                                                -1,
                                                -1,
-                                               NULL ) );
+                                               NULL ),E) );
   }
 }
 
@@ -596,6 +654,55 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   dial->ShowModal();
   delete dial;
   delete CGA;
+}
+
+// PortalMainFrame::OnRightClickNode
+void PortalMainFrame::OnRightClickNode(wxTreeEvent &event){
+}
+
+// PortalMainFrame::OnMiddleClickNode
+void PortalMainFrame::OnMiddleClickNode(wxTreeEvent &event){
+  // retrieve the name of the selection and search for it
+  // in the IRPane, then refocus the IRPane on the target node
+  wxTreeItemId SelId = ModuleBox->GetFocusedItem();
+
+  if( !SelId.IsOk() ){
+    LogPane->AppendText("Error: Could not select node\n");
+    return ;
+  }
+
+  bool done = false;
+
+  // we have a valid node, search for its corresponding object
+  for( unsigned i=0; i<NodeItems.size(); i++ ){
+    if( NodeItems[i].first == SelId ){
+      done = true;
+      int pos = IRPane->FindText(0,IRPane->GetLastPosition(),
+                                 FindNodeStr(NodeItems[i].second), 0 );
+      IRPane->GotoPos(pos);
+    }
+  }
+
+  if( !done ){
+    // we need to search the encoding blocks and retrieve the parent
+    for( unsigned i=0; i<EncItems.size(); i++ ){
+      if( EncItems[i].first == SelId ){
+        wxTreeItemId ParentId = ModuleBox->GetItemParent(EncItems[i].first);
+        for( unsigned j=0; j<NodeItems.size(); j++ ){
+          if( NodeItems[j].first == ParentId ){
+            done = true;
+            int pos = IRPane->FindText(0,IRPane->GetLastPosition(),
+                                 FindNodeStr(NodeItems[j].second), 0 );
+            IRPane->GotoPos(pos);
+          }
+        }
+      }
+    }
+  }
+
+  if( !done ){
+    LogPane->AppendText("Error: Could not retrieve appropriate node object\n" );
+  }
 }
 
 // PortalMainFrame::OnSelectNode
