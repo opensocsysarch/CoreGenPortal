@@ -11,6 +11,6 @@
 file (COPY logo.png DESTINATION .)
 
 #-- install files
-install (FILES logo.png DESTINATION .)
+install (FILES logo.png DESTINATION bin/imgs/)
 
 #-- EOF
