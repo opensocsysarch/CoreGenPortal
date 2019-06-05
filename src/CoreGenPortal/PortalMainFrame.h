@@ -118,8 +118,13 @@ private:
   void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
   void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
   void CloseProject();
+  void OpenNodeInfoWin(CoreGenNode *N);
+  void OpenNodeEditWin(CoreGenNode *N);
+  void DeleteNode(CoreGenNode *N);
+  void AddNodeWin();
 
   wxString FindNodeStr(CoreGenNode *Parent);
+  CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
 
   // menu handlers
   void OnQuit(wxCommandEvent& event);
@@ -132,6 +137,7 @@ private:
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
   void OnMiddleClickNode(wxTreeEvent& event);
+  void OnPopupNode(wxCommandEvent &event);
 };
 
 enum
@@ -150,7 +156,11 @@ enum
   ID_PREF_USER          = 40,
   ID_PREF_VERIF         = 41,
   ID_PREF_STONECUTTER   = 42,
-  ID_TREE_SELECTNODE    = 50
+  ID_TREE_SELECTNODE    = 50,
+  ID_TREE_INFONODE      = 51,
+  ID_TREE_EDITNODE      = 52,
+  ID_TREE_ADDNODE       = 53,
+  ID_TREE_DELNODE       = 54
 };
 
 enum{

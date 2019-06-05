@@ -656,8 +656,89 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   delete CGA;
 }
 
+// PortalMainFrame::OpenNodeInfoWin
+void PortalMainFrame::OpenNodeInfoWin( CoreGenNode *Node ){
+  LogPane->AppendText("OpenNodeInfoWin\n");
+}
+
+// PortalMainFrame::OpenNodeEditWin
+void PortalMainFrame::OpenNodeEditWin( CoreGenNode *Node ){
+  LogPane->AppendText("OpenNodeEditWin\n");
+}
+
+// PortalMainFrame::DeleteNode
+void PortalMainFrame::DeleteNode(CoreGenNode *Node){
+  LogPane->AppendText("DeleteNode()\n");
+}
+
+// PortalMainFrame::AddNodeWin
+void PortalMainFrame::AddNodeWin(){
+  LogPane->AppendText("AddNodeWin\n");
+}
+
+// PortalMainFrame::OnPopupNode
+void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
+  switch(event.GetId()){
+  case ID_TREE_INFONODE:
+    // open a node info window
+    OpenNodeInfoWin(GetNodeFromItem(ModuleBox->GetFocusedItem()));
+    break;
+  case ID_TREE_EDITNODE:
+    // open an editor for the target node
+    OpenNodeEditWin(GetNodeFromItem(ModuleBox->GetFocusedItem()));
+    break;
+  case ID_TREE_DELNODE:
+    DeleteNode(GetNodeFromItem(ModuleBox->GetFocusedItem()));
+    break;
+  case ID_TREE_ADDNODE:
+    AddNodeWin();
+    break;
+  }
+}
+
 // PortalMainFrame::OnRightClickNode
 void PortalMainFrame::OnRightClickNode(wxTreeEvent &event){
+  wxMenu mnu;
+  if( ModuleBox->GetItemParent(ModuleBox->GetFocusedItem()) == ParentModule ){
+    // this is a node descriptor type
+    mnu.Append( ID_TREE_ADDNODE, "Add Node" );
+  }else{
+    // this is an actual node
+    mnu.Append( ID_TREE_INFONODE, "Node Info" );
+    mnu.Append( ID_TREE_EDITNODE, "Edit Node" );
+    mnu.Append( ID_TREE_DELNODE, "Delete Node" );
+  }
+  mnu.Connect( wxEVT_COMMAND_MENU_SELECTED,
+               wxCommandEventHandler(PortalMainFrame::OnPopupNode),
+               NULL,
+               this );
+  PopupMenu(&mnu);
+}
+
+// PortalMainFrame::GetNodeFromItem
+CoreGenNode *PortalMainFrame::GetNodeFromItem( wxTreeItemId SelId ){
+  if( !SelId.IsOk() ){
+    LogPane->AppendText("Error: could not derive node from selection\n");
+    return nullptr;
+  }
+
+  // walk the main nodes
+  for( unsigned i=0; i<NodeItems.size(); i++ ){
+    if( NodeItems[i].first == SelId )
+      return NodeItems[i].second;
+  }
+
+  // walk the encoding nodes
+  for( unsigned i=0; i<EncItems.size(); i++ ){
+    if( EncItems[i].first == SelId ){
+      wxTreeItemId ParentId = ModuleBox->GetItemParent(EncItems[i].first);
+      for( unsigned j=0; j<NodeItems.size(); j++ ){
+        if( NodeItems[j].first == ParentId )
+          return NodeItems[j].second;
+      }
+    }
+  }
+  return nullptr;
 }
 
 // PortalMainFrame::OnMiddleClickNode
@@ -671,38 +752,15 @@ void PortalMainFrame::OnMiddleClickNode(wxTreeEvent &event){
     return ;
   }
 
-  bool done = false;
-
   // we have a valid node, search for its corresponding object
-  for( unsigned i=0; i<NodeItems.size(); i++ ){
-    if( NodeItems[i].first == SelId ){
-      done = true;
-      int pos = IRPane->FindText(0,IRPane->GetLastPosition(),
-                                 FindNodeStr(NodeItems[i].second), 0 );
-      IRPane->GotoPos(pos);
-    }
+  CoreGenNode *Node = GetNodeFromItem(SelId);
+  if( Node == nullptr ){
+    LogPane->AppendText("Error : node object is null\n" );
+    return ;
   }
-
-  if( !done ){
-    // we need to search the encoding blocks and retrieve the parent
-    for( unsigned i=0; i<EncItems.size(); i++ ){
-      if( EncItems[i].first == SelId ){
-        wxTreeItemId ParentId = ModuleBox->GetItemParent(EncItems[i].first);
-        for( unsigned j=0; j<NodeItems.size(); j++ ){
-          if( NodeItems[j].first == ParentId ){
-            done = true;
-            int pos = IRPane->FindText(0,IRPane->GetLastPosition(),
-                                 FindNodeStr(NodeItems[j].second), 0 );
-            IRPane->GotoPos(pos);
-          }
-        }
-      }
-    }
-  }
-
-  if( !done ){
-    LogPane->AppendText("Error: Could not retrieve appropriate node object\n" );
-  }
+  int pos = IRPane->FindText(0,IRPane->GetLastPosition(),
+                             FindNodeStr(Node), 0 );
+  IRPane->GotoPos(pos);
 }
 
 // PortalMainFrame::OnSelectNode
