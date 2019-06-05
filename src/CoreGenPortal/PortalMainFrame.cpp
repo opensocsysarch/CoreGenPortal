@@ -404,6 +404,8 @@ void PortalMainFrame::LoadModuleBox(){
                                                 -1,
                                                 -1,
                                                 NULL ) );
+      LoadInstEncodings( NodeItems[NodeItems.size()-1],
+                         static_cast<CoreGenInst *>(Top->GetChild(i)));
       break;
     case CGPInst:
       NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_PSEUDOINST],
@@ -411,6 +413,8 @@ void PortalMainFrame::LoadModuleBox(){
                                                 -1,
                                                 -1,
                                                 NULL ) );
+      LoadPInstEncodings( NodeItems[NodeItems.size()-1],
+                         static_cast<CoreGenPseudoInst *>(Top->GetChild(i)));
       break;
     case CGRegC:
       NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_REGCLASS],
@@ -420,7 +424,6 @@ void PortalMainFrame::LoadModuleBox(){
                                                 NULL ) );
       break;
     case CGReg:
-      LogPane->AppendText("Loading registers...\n" );
       NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_REG],
                                                 wxString(Top->GetChild(i)->GetName()),
                                                 -1,
@@ -476,11 +479,49 @@ void PortalMainFrame::LoadModuleBox(){
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 NULL ) );
       break;
+    case CGExt:
+      NodeItems.push_back( ModuleBox->AppendItem( TreeItems[TREE_NODE_EXT],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                wxTreeListCtrl::NO_IMAGE,
+                                                NULL ) );
+      break;
     default:
-      LogPane->AppendText("Error loading module: " +
+      LogPane->AppendText("Error loading node: " +
                           wxString(Top->GetChild(i)->GetName()) + "\n");
       break;
     }
+  }
+
+  // expand the parent module
+  ModuleBox->Expand(ParentModule);
+}
+
+// PortalMainFrame::LoadInstEncodings
+// loads the wxTreeCtrl Inst node with its child encodings
+void PortalMainFrame::LoadInstEncodings( wxTreeItemId Parent,
+                                         CoreGenInst *Inst ){
+  for( unsigned j=0; j<Inst->GetNumEncodings(); j++ ){
+    CoreGenEncoding *E = Inst->GetEncoding(j);
+    EncItems.push_back( ModuleBox->AppendItem( Parent,
+                                               wxString(E->GetName()),
+                                               -1,
+                                               -1,
+                                               NULL ) );
+  }
+}
+
+// PortalMainFrame::LoadPInstEncodings
+// loads the wxTreeCtrl PInst node with its child encodings
+void PortalMainFrame::LoadPInstEncodings( wxTreeItemId Parent,
+                                         CoreGenPseudoInst *PInst ){
+  for( unsigned j=0; j<PInst->GetNumEncodings(); j++ ){
+    CoreGenEncoding *E = PInst->GetEncoding(j);
+    EncItems.push_back( ModuleBox->AppendItem( Parent,
+                                               wxString(E->GetName()),
+                                               -1,
+                                               -1,
+                                               NULL ) );
   }
 }
 

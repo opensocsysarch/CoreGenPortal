@@ -115,6 +115,8 @@ private:
   void CreateWindowLayout();
   void SetupModuleBox();
   void LoadModuleBox();
+  void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
+  void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
 
   void CloseProject();
 
