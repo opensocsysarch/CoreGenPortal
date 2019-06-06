@@ -38,6 +38,7 @@
 #include "CoreGenPortal/PortalCore/CoreSocInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreCoreInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreInstFormatInfoWin.h"
+#include "CoreGenPortal/PortalCore/CoreInstInfoWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"

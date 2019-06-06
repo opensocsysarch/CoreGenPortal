@@ -1,5 +1,5 @@
 //
-// _CORECOREINFOWIN_H_
+// _COREINSTINFOWIN_H_
 //
 // Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,8 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#ifndef _CORECOREINFOWIN_H_
-#define _CORECOREINFOWIN_H_
+#ifndef _COREINSTINFOWIN_H_
+#define _COREINSTINFOWIN_H_
 
 //-- WX HEADERS
 #include <wx/artprov.h>
@@ -34,17 +34,18 @@
 #include <wx/checkbox.h>
 #include <wx/msgdlg.h>
 #include <wx/textctrl.h>
+#include <wx/scrolwin.h>
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
-class CoreCoreInfoWin : public wxDialog {
+class CoreInstInfoWin : public wxDialog {
 public:
-  CoreCoreInfoWin( wxWindow* parent,
+  CoreInstInfoWin( wxWindow* parent,
                  wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Core Node"),
-                 CoreGenCore *Node = nullptr);
-  ~CoreCoreInfoWin();
+                 const wxString& title = wxT("Inst Node"),
+                 CoreGenInst *Node = nullptr);
+  ~CoreInstInfoWin();
 
   // Event handler functions
   /// Declares the event table
@@ -55,24 +56,28 @@ public:
 
 protected:
   // window handlers
-  wxPanel *m_panel1;              ///< main panel
+  wxScrolledWindow *Wnd;         ///< scrolling window handler
+
+  // box sizers
+  wxBoxSizer *OuterSizer;         ///< outer sizer
+  wxBoxSizer *InnerSizer;         ///< inner sizer
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
 
-  wxStaticText *CoreNameText;     ///< static text for SoC name
-  wxStaticText *ThreadUnitText;   ///< static text for thread units name
-  wxStaticText *ISANameText;      ///< static text for isa name
-  wxStaticText *CacheNameText;    ///< static text for cache name
-  wxStaticText *RegClassNameText; ///< static text for register class name
-  wxStaticText *ExtNameText;      ///< static text for extension name
+  wxStaticText *InstNameText;     ///< static text for SoC name
+  wxStaticText *InstFNameText;    ///< static text for inst format
+  wxStaticText *ISANameText;      ///< static text for isa format
+  wxStaticText *SyntaxText;       ///< static text for syntax
+  wxStaticText *StoneCText;       ///< static text for stonecutter
+  wxStaticText *EncText;          ///< static text for encodings
 
-  wxTextCtrl *CoreNameCtrl;       ///< name of the SoC
-  wxTextCtrl *ThreadUnitCtrl;     ///< number of thread units
-  wxTextCtrl *ISACtrl;            ///< name of the ISA
-  wxTextCtrl *CacheCtrl;          ///< name of the primary cache layer
-  wxTextCtrl *RegClassCtrl;       ///< name of the register classes
-  wxTextCtrl *ExtCtrl;            ///< name of the extensions
+  wxTextCtrl *InstNameCtrl;       ///< instruction name
+  wxTextCtrl *InstFNameCtrl;      ///< instruction format name
+  wxTextCtrl *ISANameCtrl;        ///< instruction set name
+  wxTextCtrl *SyntaxCtrl;         ///< instruction syntax (asm)
+  wxTextCtrl *StoneCCtrl;         ///< StoneCutter syntax
+  wxTextCtrl *EncCtrl;            ///< StoneCutter syntax
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer

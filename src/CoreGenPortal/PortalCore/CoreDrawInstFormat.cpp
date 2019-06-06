@@ -33,6 +33,7 @@ void CoreDrawInstFormat::paintNow(){
   dc->GetLogicalOrigin(&X,&Y);
   dc->DrawText(wxString(IF->GetName()),X,Y);
 #if 0
+  // TODO: draw all the rectangles
   dc->SetBrush(*wxBLUE_BRUSH); // blue filling
   dc->SetPen( wxPen( wxColor(255,175,175), 10 ) ); // 10-pixels-thick pink outline
   dc->DrawRectangle( 300, 100, 400, 200 );

@@ -17,6 +17,7 @@ CoreSocInfoWin.cpp
 CoreCoreInfoWin.cpp
 CoreInstFormatInfoWin.cpp
 CoreDrawInstFormat.cpp
+CoreInstInfoWin.cpp
 )
 
 #-- target deps
