@@ -14,6 +14,7 @@ CoreUserConfig.cpp
 CoreVerifConfig.cpp
 CoreInfoWin.cpp
 CoreSocInfoWin.cpp
+CoreCoreInfoWin.cpp
 )
 
 #-- target deps

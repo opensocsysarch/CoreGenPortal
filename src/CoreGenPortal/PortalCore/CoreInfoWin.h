@@ -36,6 +36,7 @@
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalCore/CoreSocInfoWin.h"
+#include "CoreGenPortal/PortalCore/CoreCoreInfoWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
