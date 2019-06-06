@@ -1,5 +1,5 @@
 //
-// _COREINFOWIN_H_
+// _COREDRAWINSTFORMAT_H_
 //
 // Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,8 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#ifndef _COREINFOWIN_H_
-#define _COREINFOWIN_H_
+#ifndef _COREDRAWINSTFORMAT_H_
+#define _COREDRAWINSTFORMAT_H_
 
 //-- WX HEADERS
 #include <wx/artprov.h>
@@ -33,24 +33,27 @@
 #include <wx/dialog.h>
 #include <wx/checkbox.h>
 #include <wx/msgdlg.h>
-
-//-- PORTAL HEADERS
-#include "CoreGenPortal/PortalCore/CoreSocInfoWin.h"
-#include "CoreGenPortal/PortalCore/CoreCoreInfoWin.h"
-#include "CoreGenPortal/PortalCore/CoreInstFormatInfoWin.h"
+#include <wx/dcclient.h>
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
-class CoreInfoWin{
+class CoreDrawInstFormat : public wxPanel {
 public:
-  CoreInfoWin( wxWindow* parent,
-               wxWindowID id = wxID_ANY,
-               CoreGenNode *Node = nullptr);
-  ~CoreInfoWin();
+  CoreDrawInstFormat( wxWindow *parent,
+                      wxWindowID id = wxID_ANY,
+                      const wxString& title = wxT("Inst Format Figure"),
+                      CoreGenInstFormat *Node = nullptr);
+  ~CoreDrawInstFormat();
+
+  void paintEvent(wxPaintEvent& evt);
+  void paintNow();
+
+  DECLARE_EVENT_TABLE();
 
 protected:
 private:
+  CoreGenInstFormat *IF;    //< handler for the instruction format
 };
 
 #endif

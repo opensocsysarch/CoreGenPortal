@@ -15,6 +15,8 @@ CoreVerifConfig.cpp
 CoreInfoWin.cpp
 CoreSocInfoWin.cpp
 CoreCoreInfoWin.cpp
+CoreInstFormatInfoWin.cpp
+CoreDrawInstFormat.cpp
 )
 
 #-- target deps

@@ -26,6 +26,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGInstF ){
+    CoreInstFormatInfoWin *Win = new CoreInstFormatInfoWin(parent, id,
+                                                           wxString(Node->GetName()),
+                                                           static_cast<CoreGenInstFormat *>(Node));
+    Win->ShowModal();
+    delete Win;
   }else if( Node->GetType() == CGInst ){
   }else if( Node->GetType() == CGPInst ){
   }else if( Node->GetType() == CGRegC ){
