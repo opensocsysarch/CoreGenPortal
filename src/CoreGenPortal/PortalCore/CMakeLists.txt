@@ -12,6 +12,8 @@ CoreStoneCutterEditor.cpp
 CoreErrorDiag.cpp
 CoreUserConfig.cpp
 CoreVerifConfig.cpp
+CoreInfoWin.cpp
+CoreSocInfoWin.cpp
 )
 
 #-- target deps

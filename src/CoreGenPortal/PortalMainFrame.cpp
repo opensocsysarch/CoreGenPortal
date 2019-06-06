@@ -656,11 +656,6 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   delete CGA;
 }
 
-// PortalMainFrame::OpenNodeInfoWin
-void PortalMainFrame::OpenNodeInfoWin( CoreGenNode *Node ){
-  LogPane->AppendText("OpenNodeInfoWin\n");
-}
-
 // PortalMainFrame::OpenNodeEditWin
 void PortalMainFrame::OpenNodeEditWin( CoreGenNode *Node ){
   LogPane->AppendText("OpenNodeEditWin\n");
@@ -678,10 +673,13 @@ void PortalMainFrame::AddNodeWin(){
 
 // PortalMainFrame::OnPopupNode
 void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
+  CoreInfoWin *InfoWin = nullptr;
   switch(event.GetId()){
   case ID_TREE_INFONODE:
-    // open a node info window
-    OpenNodeInfoWin(GetNodeFromItem(ModuleBox->GetFocusedItem()));
+    // open a node info window: TODO: change this to permit multiple selections
+    InfoWin = new CoreInfoWin(NULL,wxID_ANY,
+                              GetNodeFromItem(ModuleBox->GetFocusedItem()));
+    delete InfoWin;
     break;
   case ID_TREE_EDITNODE:
     // open an editor for the target node

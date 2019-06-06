@@ -49,6 +49,7 @@
 #include "CoreGenPortal/PortalCore/CoreUserConfig.h"
 #include "CoreGenPortal/PortalCore/CoreVerifConfig.h"
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
+#include "CoreGenPortal/PortalCore/CoreInfoWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
@@ -118,7 +119,6 @@ private:
   void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
   void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
   void CloseProject();
-  void OpenNodeInfoWin(CoreGenNode *N);
   void OpenNodeEditWin(CoreGenNode *N);
   void DeleteNode(CoreGenNode *N);
   void AddNodeWin();

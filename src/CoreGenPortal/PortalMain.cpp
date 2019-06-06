@@ -54,7 +54,7 @@ bool CoreGenPortal::OnInit(){
   // Setup the main frame
   PortalMainFrame *MainFrame = new PortalMainFrame( "CoreGenPortal",
                                                     wxPoint(50,50),
-                                                    wxSize(1280,1024));
+                                                    wxSize(1024,768));
   MainFrame->Show( true );
   return true;
 }
