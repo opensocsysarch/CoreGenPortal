@@ -29,7 +29,6 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
   // create the box sizers
-  wxBoxSizer *bSizer1 = new wxBoxSizer( wxVERTICAL );
   wxBoxSizer *bSizer2 = new wxBoxSizer( wxVERTICAL );
 
   m_panel1 = new wxPanel( this,
@@ -91,8 +90,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
                                       wxDefaultPosition,
                                       wxDefaultSize,
                                       wxLI_HORIZONTAL );
-  bSizer2->Add( FinalStaticLine, 1, wxEXPAND|wxALL, 5 );
-  bSizer1->Add( bSizer2, 1, wxEXPAND, 5 );
+  bSizer2->Add( FinalStaticLine, 1, wxSHAPED|wxALL, 5 );
 
   // setup all the buttons
   wxBoxSizer *bSizer3 = new wxBoxSizer( wxVERTICAL );
@@ -102,13 +100,13 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   m_socbuttonsizer->AddButton( m_userOK );
   m_socbuttonsizer->Realize();
 
-  bSizer3->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
-  bSizer1->Add( bSizer3, 1, wxEXPAND, 5 );
+  bSizer3->Add( m_socbuttonsizer, 1, wxSHAPED, 5 );
+  bSizer2->Add( bSizer3, 1, wxSHAPED, 5 );
 
   // draw the dialog box until we get more info
-  this->SetSizer( bSizer1 );
+  this->SetSizer( bSizer2 );
   this->Layout();
-  bSizer1->Fit(this);
+  bSizer2->Fit(this);
   this->Centre(wxBOTH);
 }
 
