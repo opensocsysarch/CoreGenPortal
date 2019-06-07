@@ -167,7 +167,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
     wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
                                     Inst->GetEncoding(i)->GetEncoding() );
     EncCtrl->AppendText(wxString(Inst->GetEncoding(i)->GetField()) +
-                        wxT(" = ") + tmp );
+                        wxT(" = ") + tmp + wxT("\n"));
   }
   InnerSizer->Add( EncCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
 

@@ -40,6 +40,7 @@
 #include "CoreGenPortal/PortalCore/CoreInstFormatInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreInstInfoWin.h"
 #include "CoreGenPortal/PortalCore/CorePInstInfoWin.h"
+#include "CoreGenPortal/PortalCore/CoreRegClassInfoWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
