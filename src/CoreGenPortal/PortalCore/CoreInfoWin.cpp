@@ -68,6 +68,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGEnc ){
+    CoreEncodingInfoWin *Win = new CoreEncodingInfoWin( parent, id,
+                                              wxString(Node->GetName()),
+                                              static_cast<CoreGenEncoding *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }else if( Node->GetType() == CGExt ){
   }else if( Node->GetType() == CGComm ){
   }else if( Node->GetType() == CGSpad ){

@@ -44,6 +44,7 @@
 #include "CoreGenPortal/PortalCore/CoreRegInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreISAInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreCacheInfoWin.h"
+#include "CoreGenPortal/PortalCore/CoreEncodingInfoWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
