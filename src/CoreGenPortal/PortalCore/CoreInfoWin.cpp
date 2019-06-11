@@ -92,6 +92,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGMCtrl ){
+    CoreMCtrlInfoWin *Win = new CoreMCtrlInfoWin( parent, id,
+                                              wxString(Node->GetName()),
+                                              static_cast<CoreGenMCtrl *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }else if( Node->GetType() == CGVTP ){
   }else if( Node->GetType() == CGPlugin ){
   }

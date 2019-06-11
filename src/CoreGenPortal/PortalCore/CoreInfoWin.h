@@ -48,6 +48,7 @@
 #include "CoreGenPortal/PortalCore/CoreExtInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreCommInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreSpadInfoWin.h"
+#include "CoreGenPortal/PortalCore/CoreMCtrlInfoWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
