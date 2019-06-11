@@ -43,7 +43,7 @@ class CoreExtInfoWin : public wxDialog {
 public:
   CoreExtInfoWin( wxWindow* parent,
                  wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Inst Node"),
+                 const wxString& title = wxT("Ext Node"),
                  CoreGenExt *Node = nullptr);
   ~CoreExtInfoWin();
 

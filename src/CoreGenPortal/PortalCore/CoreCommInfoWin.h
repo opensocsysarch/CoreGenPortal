@@ -1,5 +1,5 @@
 //
-// _CORECACHEINFOWIN_H_
+// _CORECOMMINFOWIN_H_
 //
 // Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,8 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#ifndef _CORECACHEINFOWIN_H_
-#define _CORECACHEINFOWIN_H_
+#ifndef _CORECOMMINFOWIN_H_
+#define _CORECOMMINFOWIN_H_
 
 //-- WX HEADERS
 #include <wx/artprov.h>
@@ -39,13 +39,13 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
-class CoreCacheInfoWin : public wxDialog {
+class CoreCommInfoWin : public wxDialog {
 public:
-  CoreCacheInfoWin( wxWindow* parent,
+  CoreCommInfoWin( wxWindow* parent,
                  wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Cache Node"),
-                 CoreGenCache *Node = nullptr);
-  ~CoreCacheInfoWin();
+                 const wxString& title = wxT("Comm Node"),
+                 CoreGenComm *Node = nullptr);
+  ~CoreCommInfoWin();
 
   // Event handler functions
   /// Declares the event table
@@ -65,17 +65,15 @@ protected:
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
 
-  wxStaticText *CacheNameText;    ///< static text for cache name
-  wxStaticText *SetsText;         ///< static text for cache sets
-  wxStaticText *WaysText;         ///< static text for cache ways
-  wxStaticText *ParentCacheText;  ///< static text for parent cache
-  wxStaticText *ChildCacheText;   ///< static text for child cache
+  wxStaticText *CommNameText;     ///< static text for SoC name
+  wxStaticText *CommTypeText;     ///< static text for inst format
+  wxStaticText *WidthText;        ///< static text for width
+  wxStaticText *EndpointText;     ///< static text for endpoints
 
-  wxTextCtrl *CacheNameCtrl;      ///< cache name
-  wxTextCtrl *SetsCtrl;           ///< cache sets
-  wxTextCtrl *WaysCtrl;           ///< cache ways
-  wxTextCtrl *ParentCacheCtrl;    ///< parent cache
-  wxTextCtrl *ChildCacheCtrl;     ///< child cache
+  wxTextCtrl *CommNameCtrl;       ///< comm name
+  wxTextCtrl *CommTypeCtrl;       ///< comm type
+  wxTextCtrl *WidthCtrl;          ///< width
+  wxTextCtrl *EndpointCtrl;       ///< endpoints
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer

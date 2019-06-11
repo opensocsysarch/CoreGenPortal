@@ -80,6 +80,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGComm ){
+    CoreCommInfoWin *Win = new CoreCommInfoWin( parent, id,
+                                              wxString(Node->GetName()),
+                                              static_cast<CoreGenComm *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }else if( Node->GetType() == CGSpad ){
   }else if( Node->GetType() == CGMCtrl ){
   }else if( Node->GetType() == CGVTP ){

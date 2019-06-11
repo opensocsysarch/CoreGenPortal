@@ -43,7 +43,7 @@ class CoreISAInfoWin : public wxDialog {
 public:
   CoreISAInfoWin( wxWindow* parent,
                  wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Inst Node"),
+                 const wxString& title = wxT("ISA Node"),
                  CoreGenISA *Node = nullptr);
   ~CoreISAInfoWin();
 

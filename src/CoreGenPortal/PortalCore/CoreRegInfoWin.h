@@ -43,7 +43,7 @@ class CoreRegInfoWin : public wxDialog {
 public:
   CoreRegInfoWin( wxWindow* parent,
                  wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Inst Node"),
+                 const wxString& title = wxT("Reg Node"),
                  CoreGenReg *Node = nullptr);
   ~CoreRegInfoWin();
 

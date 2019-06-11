@@ -45,7 +45,7 @@ class CoreInstFormatInfoWin : public wxDialog {
 public:
   CoreInstFormatInfoWin( wxWindow* parent,
                  wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Core Node"),
+                 const wxString& title = wxT("Inst Format Node"),
                  CoreGenInstFormat *Node = nullptr);
   ~CoreInstFormatInfoWin();
 

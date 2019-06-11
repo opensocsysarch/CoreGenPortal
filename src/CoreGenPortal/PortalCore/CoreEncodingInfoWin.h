@@ -43,7 +43,7 @@ class CoreEncodingInfoWin : public wxDialog {
 public:
   CoreEncodingInfoWin( wxWindow* parent,
                  wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Inst Node"),
+                 const wxString& title = wxT("Encoding Node"),
                  CoreGenEncoding *Node = nullptr);
   ~CoreEncodingInfoWin();
 
