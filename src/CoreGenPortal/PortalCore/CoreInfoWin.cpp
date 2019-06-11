@@ -86,6 +86,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGSpad ){
+    CoreSpadInfoWin *Win = new CoreSpadInfoWin( parent, id,
+                                              wxString(Node->GetName()),
+                                              static_cast<CoreGenSpad *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }else if( Node->GetType() == CGMCtrl ){
   }else if( Node->GetType() == CGVTP ){
   }else if( Node->GetType() == CGPlugin ){
