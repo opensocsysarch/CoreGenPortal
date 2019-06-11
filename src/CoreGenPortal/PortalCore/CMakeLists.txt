@@ -20,6 +20,7 @@ CoreDrawInstFormat.cpp
 CoreInstInfoWin.cpp
 CorePInstInfoWin.cpp
 CoreRegClassInfoWin.cpp
+CoreRegInfoWin.cpp
 )
 
 #-- target deps

@@ -50,6 +50,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGReg ){
+    CoreRegInfoWin *Win = new CoreRegInfoWin( parent, id,
+                                              wxString(Node->GetName()),
+                                              static_cast<CoreGenReg *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }else if( Node->GetType() == CGISA ){
   }else if( Node->GetType() == CGCache ){
   }else if( Node->GetType() == CGEnc ){
