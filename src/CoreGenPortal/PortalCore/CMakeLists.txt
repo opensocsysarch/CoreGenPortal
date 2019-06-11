@@ -24,6 +24,7 @@ CoreRegInfoWin.cpp
 CoreISAInfoWin.cpp
 CoreCacheInfoWin.cpp
 CoreEncodingInfoWin.cpp
+CoreExtInfoWin.cpp
 )
 
 #-- target deps
