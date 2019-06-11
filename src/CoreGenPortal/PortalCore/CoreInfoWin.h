@@ -50,6 +50,7 @@
 #include "CoreGenPortal/PortalCore/CoreSpadInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreMCtrlInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreVTPInfoWin.h"
+#include "CoreGenPortal/PortalCore/CorePluginInfoWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"

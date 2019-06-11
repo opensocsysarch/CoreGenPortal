@@ -29,6 +29,7 @@ CoreCommInfoWin.cpp
 CoreSpadInfoWin.cpp
 CoreMCtrlInfoWin.cpp
 CoreVTPInfoWin.cpp
+CorePluginInfoWin.cpp
 )
 
 #-- target deps

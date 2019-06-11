@@ -104,6 +104,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGPlugin ){
+    CorePluginInfoWin *Win = new CorePluginInfoWin( parent, id,
+                                              wxString(Node->GetName()),
+                                              static_cast<CoreGenPlugin *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }
 }
 
