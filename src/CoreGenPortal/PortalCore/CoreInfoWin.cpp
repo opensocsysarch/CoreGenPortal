@@ -98,6 +98,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGVTP ){
+    CoreVTPInfoWin *Win = new CoreVTPInfoWin( parent, id,
+                                              wxString(Node->GetName()),
+                                              static_cast<CoreGenVTP *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }else if( Node->GetType() == CGPlugin ){
   }
 }

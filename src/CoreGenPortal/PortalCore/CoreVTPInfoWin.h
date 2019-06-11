@@ -1,5 +1,5 @@
 //
-// _COREMCTRLINFOWIN_H_
+// _COREVTPINFOWIN_H_
 //
 // Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,8 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#ifndef _COREMCTRLINFOWIN_H_
-#define _COREMCTRLINFOWIN_H_
+#ifndef _COREVTPINFOWIN_H_
+#define _COREVTPINFOWIN_H_
 
 //-- WX HEADERS
 #include <wx/artprov.h>
@@ -39,13 +39,13 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
-class CoreMCtrlInfoWin : public wxDialog {
+class CoreVTPInfoWin : public wxDialog {
 public:
-  CoreMCtrlInfoWin( wxWindow* parent,
+  CoreVTPInfoWin( wxWindow* parent,
                  wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Memory Controller Node"),
-                 CoreGenMCtrl *Node = nullptr);
-  ~CoreMCtrlInfoWin();
+                 const wxString& title = wxT("Virtual-to-Physical Node"),
+                 CoreGenVTP *Node = nullptr);
+  ~CoreVTPInfoWin();
 
   // Event handler functions
   /// Declares the event table
@@ -65,11 +65,9 @@ protected:
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
 
-  wxStaticText *MCtrlNameText;    ///< static text for memory controller name
-  wxStaticText *InputPortText;    ///< static text for input ports
+  wxStaticText *VTPNameText;      ///< static text for vtp name
 
-  wxTextCtrl *MCtrlCtrl;          ///< memory controller name
-  wxTextCtrl *InputPortCtrl;      ///< input ports for memory controller
+  wxTextCtrl *VTPCtrl;            ///< vtp name
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
