@@ -56,6 +56,11 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Node->GetType() == CGISA ){
+    CoreISAInfoWin *Win = new CoreISAInfoWin( parent, id,
+                                              wxString(Node->GetName()),
+                                              static_cast<CoreGenISA *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }else if( Node->GetType() == CGCache ){
   }else if( Node->GetType() == CGEnc ){
   }else if( Node->GetType() == CGExt ){
