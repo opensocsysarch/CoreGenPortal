@@ -12,6 +12,24 @@ CoreStoneCutterEditor.cpp
 CoreErrorDiag.cpp
 CoreUserConfig.cpp
 CoreVerifConfig.cpp
+CoreInfoWin.cpp
+CoreSocInfoWin.cpp
+CoreCoreInfoWin.cpp
+CoreInstFormatInfoWin.cpp
+CoreDrawInstFormat.cpp
+CoreInstInfoWin.cpp
+CorePInstInfoWin.cpp
+CoreRegClassInfoWin.cpp
+CoreRegInfoWin.cpp
+CoreISAInfoWin.cpp
+CoreCacheInfoWin.cpp
+CoreEncodingInfoWin.cpp
+CoreExtInfoWin.cpp
+CoreCommInfoWin.cpp
+CoreSpadInfoWin.cpp
+CoreMCtrlInfoWin.cpp
+CoreVTPInfoWin.cpp
+CorePluginInfoWin.cpp
 )
 
 #-- target deps
