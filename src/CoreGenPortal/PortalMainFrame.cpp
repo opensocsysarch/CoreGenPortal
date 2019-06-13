@@ -761,6 +761,265 @@ void PortalMainFrame::LoadExtNodes( wxTreeItemId Parent,
 // loads the wxTreeCtrl Plugin node with child nodes
 void PortalMainFrame::LoadPluginNodes( wxTreeItemId Parent,
                                        CoreGenPlugin *Plugin ){
+  std::vector<wxTreeItemId> wxPluginItems;
+  wxTreeItemId TmpItem;
+
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Cache"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Core"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Inst"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("PseudoInst"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Reg"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("RegClass"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("SoC"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("ISA"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Ext"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Comm"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Spad"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("MCtrl"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("VTP"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+
+  //-- cache
+  std::vector<CoreGenCache *> CacheVect = Plugin->GetCacheVect();
+  for( unsigned i=0; i<CacheVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(CacheVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_CACHE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- core
+  std::vector<CoreGenCore *> CoreVect = Plugin->GetCoreVect();
+  for( unsigned i=0; i<CoreVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(CoreVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_CORE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- inst
+  std::vector<CoreGenInst *> InstVect = Plugin->GetInstVect();
+  for( unsigned i=0; i<InstVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(InstVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_INST],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+    TmpItem = std::get<0>(PluginItems[PluginItems.size()-1]);
+    LoadInstEncodings(TmpItem,
+                      static_cast<CoreGenInst *>(Child));
+  }
+
+  //-- pinst
+  std::vector<CoreGenPseudoInst *> PInstVect = Plugin->GetPseudoInstVect();
+  for( unsigned i=0; i<PInstVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(PInstVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_PINST],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+    TmpItem = std::get<0>(PluginItems[PluginItems.size()-1]);
+    LoadPInstEncodings(TmpItem,
+                      static_cast<CoreGenPseudoInst *>(Child));
+  }
+
+  //-- instformat
+  std::vector<CoreGenInstFormat *> InstFVect = Plugin->GetInstFormatVect();
+  for( unsigned i=0; i<InstFVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(InstFVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_INSTFORMAT],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- reg
+  std::vector<CoreGenReg *> RegVect = Plugin->GetRegVect();
+  for( unsigned i=0; i<RegVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(RegVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_REG],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- regclass
+  std::vector<CoreGenRegClass *> RegCVect = Plugin->GetRegClassVect();
+  for( unsigned i=0; i<RegCVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(RegCVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_REGCLASS],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- soc
+  std::vector<CoreGenSoC *> SocVect = Plugin->GetSocVect();
+  for( unsigned i=0; i<SocVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(SocVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_SOC],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- isa
+  std::vector<CoreGenISA *> ISAVect = Plugin->GetISAVect();
+  for( unsigned i=0; i<ISAVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(ISAVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_ISA],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- ext
+  std::vector<CoreGenExt *> ExtVect = Plugin->GetExtVect();
+  for( unsigned i=0; i<ExtVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(ExtVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_EXT],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+    TmpItem = std::get<0>(PluginItems[PluginItems.size()-1]);
+    LoadExtNodes( TmpItem,
+                  static_cast<CoreGenExt *>(Child) );
+  }
+
+  //-- comm
+  std::vector<CoreGenComm *> CommVect = Plugin->GetCommVect();
+  for( unsigned i=0; i<CommVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(CommVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_COMM],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- spad
+  std::vector<CoreGenSpad *> SpadVect = Plugin->GetSpadVect();
+  for( unsigned i=0; i<SpadVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(SpadVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_SPAD],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- mctrl
+  std::vector<CoreGenMCtrl *> MCtrlVect = Plugin->GetMCtrlVect();
+  for( unsigned i=0; i<MCtrlVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(MCtrlVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_MCTRL],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- vtp
+  std::vector<CoreGenVTP *> VTPVect = Plugin->GetVTPVect();
+  for( unsigned i=0; i<VTPVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(VTPVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_VTP],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
 }
 
 // PortalMainFrame::LoadInstEncodings
@@ -949,6 +1208,13 @@ CoreGenNode *PortalMainFrame::GetNodeFromItem( wxTreeItemId SelId ){
   }
 
   // walk the plugin nodes
+  for( unsigned i=0; i<PluginItems.size(); i++ ){
+    wxTreeItemId TmpItem = std::get<0>(PluginItems[i]);
+    if( TmpItem == SelId ){
+      return std::get<2>(PluginItems[i]);
+    }
+  }
+
   return nullptr;
 }
 
