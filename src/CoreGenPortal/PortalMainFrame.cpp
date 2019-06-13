@@ -541,6 +541,8 @@ void PortalMainFrame::LoadModuleBox(){
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 NULL ),Top->GetChild(i)) );
+      LoadPluginNodes( NodeItems[NodeItems.size()-1].first,
+                         static_cast<CoreGenPlugin *>(Top->GetChild(i)));
       break;
     case CGExt:
       NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_EXT],
@@ -548,6 +550,8 @@ void PortalMainFrame::LoadModuleBox(){
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 NULL ),Top->GetChild(i)) );
+      LoadExtNodes( NodeItems[NodeItems.size()-1].first,
+                    static_cast<CoreGenExt *>(Top->GetChild(i)));
       break;
     default:
       LogPane->AppendText("Error loading node: " +
@@ -558,6 +562,205 @@ void PortalMainFrame::LoadModuleBox(){
 
   // expand the parent module
   ModuleBox->Expand(ParentModule);
+}
+
+// PortalMainFrame::LoadExtNodes
+// loads the wxTreeCtrl Ext node with child nodes
+void PortalMainFrame::LoadExtNodes( wxTreeItemId Parent,
+                                    CoreGenExt *Ext ){
+  std::vector<wxTreeItemId> wxExtItems;
+  wxTreeItemId TmpItem;
+
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Cache"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Comm"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Core"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Ext"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("ISA"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Inst"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("PseudoInst"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("InstFormat"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("MCtrl"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Reg"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("RegClass"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Spad"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+
+  // retrieve all the children from the ext and insert them
+  // into the appropriate slot
+  for( unsigned i=0; i<Ext->GetNumChild(); i++ ){
+    CoreGenNode *Child = Ext->GetChild(i);
+    switch( Child->GetType() ){
+    case CGCache:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_CACHE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGExt:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_EXT],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGInst:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_INST],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      TmpItem = std::get<0>(ExtItems[ExtItems.size()-1]);
+      LoadInstEncodings(TmpItem,
+                        static_cast<CoreGenInst *>(Child));
+    case CGPInst:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_PINST],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      TmpItem = std::get<0>(ExtItems[ExtItems.size()-1]);
+      LoadPInstEncodings(TmpItem,
+                        static_cast<CoreGenPseudoInst *>(Child));
+      break;
+    case CGInstF:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_INSTFORMAT],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGReg:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_REG],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGRegC:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_REGCLASS],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGISA:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_ISA],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGComm:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_COMM],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGSpad:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_SPAD],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGMCtrl:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_MCTRL],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGCore:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_CORE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    default:
+      LogPane->AppendText("Unable to load Ext child node into module tree\n");
+      break;
+    }
+  }
+}
+
+// PortalMainFrame::LoadPluginNodes
+// loads the wxTreeCtrl Plugin node with child nodes
+void PortalMainFrame::LoadPluginNodes( wxTreeItemId Parent,
+                                       CoreGenPlugin *Plugin ){
 }
 
 // PortalMainFrame::LoadInstEncodings
@@ -736,6 +939,16 @@ CoreGenNode *PortalMainFrame::GetNodeFromItem( wxTreeItemId SelId ){
       }
     }
   }
+
+  // walk the Ext nodes
+  for( unsigned i=0; i<ExtItems.size(); i++ ){
+    wxTreeItemId TmpItem = std::get<0>(ExtItems[i]);
+    if( TmpItem == SelId ){
+      return std::get<2>(ExtItems[i]);
+    }
+  }
+
+  // walk the plugin nodes
   return nullptr;
 }
 

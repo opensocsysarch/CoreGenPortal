@@ -54,7 +54,10 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+//-- STANDARD HEADERS
 #include <stdlib.h>
+#include <vector>
+#include <tuple>
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -107,6 +110,8 @@ private:
   std::vector<wxTreeItemId> TreeItems;
   std::vector<std::pair<wxTreeItemId,CoreGenNode *>> NodeItems;
   std::vector<std::pair<wxTreeItemId,CoreGenEncoding *>> EncItems;
+  std::vector<std::tuple<wxTreeItemId,CoreGenExt *,CoreGenNode *>> ExtItems;
+  std::vector<std::tuple<wxTreeItemId,CoreGenPlugin *,CoreGenNode *>> PluginItems;
 
   // private functions
   void InitAuiMgr();
@@ -116,6 +121,8 @@ private:
   void CreateWindowLayout();
   void SetupModuleBox();
   void LoadModuleBox();
+  void LoadExtNodes(wxTreeItemId, CoreGenExt *Ext);
+  void LoadPluginNodes(wxTreeItemId, CoreGenPlugin *Plugin);
   void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
   void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
   void CloseProject();
@@ -179,6 +186,21 @@ enum{
   TREE_NODE_SOC         = 12,
   TREE_NODE_SPAD        = 13,
   TREE_NODE_VTP         = 14
+};
+
+enum{
+  TREE_EXT_NODE_CACHE       = 0,
+  TREE_EXT_NODE_COMM        = 1,
+  TREE_EXT_NODE_CORE        = 2,
+  TREE_EXT_NODE_EXT         = 3,
+  TREE_EXT_NODE_ISA         = 4,
+  TREE_EXT_NODE_INST        = 5,
+  TREE_EXT_NODE_PINST       = 6,
+  TREE_EXT_NODE_INSTFORMAT  = 7,
+  TREE_EXT_NODE_MCTRL       = 8,
+  TREE_EXT_NODE_REG         = 9,
+  TREE_EXT_NODE_REGCLASS    = 10,
+  TREE_EXT_NODE_SPAD        = 11
 };
 
 #endif

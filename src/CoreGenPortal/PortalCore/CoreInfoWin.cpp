@@ -110,6 +110,8 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }
+
+  // TODO: print an error dialog box
 }
 
 CoreInfoWin::~CoreInfoWin(){
