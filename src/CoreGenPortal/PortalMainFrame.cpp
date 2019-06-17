@@ -1125,7 +1125,94 @@ void PortalMainFrame::OpenNodeEditWin( CoreGenNode *Node ){
 
 // PortalMainFrame::DeleteNode
 void PortalMainFrame::DeleteNode(CoreGenNode *Node){
-  LogPane->AppendText("DeleteNode()\n");
+  //delete from UI
+  //ModuleBox->DeleteChildren(ModuleBox->GetFocusedItem());
+  //ModuleBox->Delete(ModuleBox->GetFocusedItem());
+
+  //delete from IR text
+  int pos = IRPane->FindText(0,IRPane->GetLastPosition(),
+                             FindNodeStr(Node), 0 );
+  IRPane->GotoPos(pos);
+  wxString line = IRPane->GetCurLine();
+  unsigned int i;
+  for(i = 0; i < line.size() && line[i] != '-'; i++);
+  do{
+    IRPane->LineDelete();
+    line = IRPane->GetCurLine();
+  } while(line[i] != '-' && isspace(line[i]));
+  IRPane->PageDown();
+  IRPane->LineUp();
+  IRPane->EnsureCaretVisible();
+
+  /*
+  switch(Node->GetType()){
+    case CGSoc:
+      LogPane->AppendText("CGSoc ");
+      break;
+    case CGCore:
+      LogPane->AppendText("CGCore ");
+      break;
+    case CGInstF:
+      LogPane->AppendText("CGInstF ");
+      break;
+    case CGInst:
+      LogPane->AppendText("CGInst ");
+      break;
+    case CGPInst:
+      LogPane->AppendText("CGPInst ");
+      break;
+    case CGRegC:
+      LogPane->AppendText("CGRegC ");
+      break;
+    case CGReg:
+      LogPane->AppendText("CGReg ");
+      break;
+    case CGISA:
+      LogPane->AppendText("CGISA ");
+      break;
+    case CGCache:
+      //CGProject->DeleteCacheNode(static_cast<CoreGenCache *>(Node));
+      LogPane->AppendText("CGCache ");
+      break;
+    case CGEnc:
+      LogPane->AppendText("CGEnc ");
+      break;
+    case CGExt:
+      LogPane->AppendText("CGExt ");
+      break;
+    case CGComm:
+      LogPane->AppendText("CGComm ");
+      break;
+    case CGSpad:
+      LogPane->AppendText("CGSpad ");
+      break;
+    case CGMCtrl:
+      LogPane->AppendText("CGMCtrl ");
+      break;
+    case CGVTP:
+      LogPane->AppendText("CGVTP ");
+      break;
+    case CGPlugin:
+      LogPane->AppendText("CGPlugin ");
+      break;
+    case CGTop:
+      LogPane->AppendText("CGTop ");
+      break;
+  }
+  */
+
+  //delete from backend
+  CGProject->DeleteNode(Node);
+  CGProject->BuildDAG();
+
+  //delete from UI
+  ModuleBox->DeleteAllItems();
+  TreeItems.clear();
+  NodeItems.clear();
+  SetupModuleBox();
+  LoadModuleBox();
+
+  LogPane->AppendText(Node->GetName() + " deleted.\n");
 }
 
 // PortalMainFrame::AddNodeWin
