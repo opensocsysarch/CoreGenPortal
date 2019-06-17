@@ -1212,7 +1212,7 @@ void PortalMainFrame::DeleteNode(CoreGenNode *Node){
   SetupModuleBox();
   LoadModuleBox();
 
-  LogPane->AppendText(wxT(Node->GetName()) + " deleted.\n");
+  LogPane->AppendText(wxString(Node->GetName()) + wxT(" deleted.\n"));
 }
 
 // PortalMainFrame::AddNodeWin
