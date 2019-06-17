@@ -1202,6 +1202,7 @@ void PortalMainFrame::DeleteNode(CoreGenNode *Node){
   */
 
   //delete from backend
+  wxString Dnode(Node->GetName());
   CGProject->DeleteNode(Node);
   CGProject->BuildDAG();
 
@@ -1212,7 +1213,7 @@ void PortalMainFrame::DeleteNode(CoreGenNode *Node){
   SetupModuleBox();
   LoadModuleBox();
 
-  LogPane->AppendText(wxString(Node->GetName()) + wxT(" deleted.\n"));
+  LogPane->AppendText(Dnode + wxT(" was deleted.\n"));
 }
 
 // PortalMainFrame::AddNodeWin
