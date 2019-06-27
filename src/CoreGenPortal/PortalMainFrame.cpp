@@ -112,6 +112,8 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->AppendSeparator();
   ProjectMenu->Append(wxID_SAVE);
   ProjectMenu->Append(wxID_SAVEAS);
+  ProjectMenu->AppendSeparator();
+  ProjectMenu->Append( ID_PROJSCOPEN, wxT("&Open StoneCutter"));
 
   //-- Build Menu
   BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
@@ -159,6 +161,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjOpen));
   Connect(wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjClose));
+  Connect(ID_PROJSCOPEN, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjSCOpen));
 
   //-- build menu
 
@@ -1390,12 +1394,76 @@ void PortalMainFrame::OnProjClose(wxCommandEvent& WXUNUSED(event)){
   CloseProject();
 }
 
+// PortalMainFrame::OnProjSCOpen
+void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
+  if( !CGProject ){
+    LogPane->AppendText( "No project open\n" );
+    return ;
+  }
+
+  wxFileDialog* OpenDialog = new wxFileDialog( this,
+                                               _("Choose a StoneCutter file to open"),
+                                               UserConfig->wxGetProjectDir(),
+                                               wxEmptyString,
+                                               _("SC Files (*.sc)|*.sc"),
+                                               wxFD_OPEN, wxDefaultPosition );
+
+  wxString NP;
+  if( OpenDialog->ShowModal() == wxID_OK ){
+    NP = OpenDialog->GetPath();
+
+    // derive the file name
+    wxFileName NPF(NP);
+
+    LogPane->AppendText( "Opening StoneCutter file at " + NP + wxT("\n") );
+
+    wxStyledTextCtrl *SCPane = new wxStyledTextCtrl(this, wxID_ANY);
+    SCPane->StyleClearAll();
+    SCPane->SetMarginWidth(MARGIN_LINE_NUMBERS, 50);
+    SCPane->SetTabWidth(3);
+    SCPane->SetIndent(3);
+    SCPane->SetUseTabs(false);
+    SCPane->StyleSetForeground(wxSTC_STYLE_LINENUMBER, wxColour (75, 75, 75) );
+    SCPane->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour (220, 220, 220));
+    SCPane->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
+    SCPane->SetWrapMode(wxSTC_WRAP_WORD);
+    SCPane->SetLexer(wxSTC_LEX_CPP);
+
+    SCPane->StyleSetForeground (wxSTC_C_STRING,            wxColour(150,0,0));
+    SCPane->StyleSetForeground (wxSTC_C_PREPROCESSOR,      wxColour(165,105,0));
+    SCPane->StyleSetForeground (wxSTC_C_IDENTIFIER,        wxColour(40,0,60));
+    SCPane->StyleSetForeground (wxSTC_C_NUMBER,            wxColour(0,150,0));
+    SCPane->StyleSetForeground (wxSTC_C_CHARACTER,         wxColour(150,0,0));
+    SCPane->StyleSetForeground (wxSTC_C_WORD,              wxColour(0,0,150));
+    SCPane->StyleSetForeground (wxSTC_C_WORD2,             wxColour(0,150,0));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENT,           wxColour(150,150,150));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENTLINE,       wxColour(150,150,150));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOC,        wxColour(150,150,150));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOCKEYWORD, wxColour(0,0,200));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0,0,200));
+    SCPane->StyleSetBold(wxSTC_C_WORD, true);
+    SCPane->StyleSetBold(wxSTC_C_WORD2, true);
+    SCPane->StyleSetBold(wxSTC_C_COMMENTDOCKEYWORD, true);
+
+    // the laod file
+    SCPane->LoadFile(NP);
+
+    // add it to our vector
+    SCPanes.push_back(std::make_pair(SCPane,NPF.GetFullName()));
+
+    // add the file to the editor network
+    EditorNotebook->AddPage( SCPane, NP, true, wxBookCtrlBase::NO_IMAGE );
+  }
+
+  // clean up the dialog box
+  OpenDialog->Destroy();
+}
+
 // PortalMainFrame::OnProjOpen
 void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
   // stage 1, decide whether we need to close the current project
-  if( CGProject ){
+  if( CGProject )
     CloseProject();
-  }
 
   // stage 2, prompt the user to select the new yaml input file
   wxFileDialog* OpenDialog = new wxFileDialog( this,

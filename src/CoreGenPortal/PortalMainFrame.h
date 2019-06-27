@@ -103,6 +103,7 @@ private:
 
   wxAuiNotebook* EditorNotebook;
   wxStyledTextCtrl *IRPane;
+  std::vector<std::pair<wxStyledTextCtrl *,wxString>> SCPanes;
 
   wxString IRFileName;
 
@@ -140,6 +141,7 @@ private:
   void OnUserPref(wxCommandEvent& event);
   void OnProjNew(wxCommandEvent& event);
   void OnProjOpen(wxCommandEvent& event);
+  void OnProjSCOpen(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
@@ -151,6 +153,7 @@ enum
 {
   MARGIN_LINE_NUMBERS,
   ID_PROJNEW            = 10,
+  ID_PROJSCOPEN         = 11,
   ID_BUILD_VERIFY       = 20,
   ID_BUILD_CODEGEN      = 21,
   ID_BUILD_SIGMAP       = 22,
