@@ -55,6 +55,9 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
     LogPane->AppendText("Initialized the verification pass preferences\n");
   else
     LogPane->AppendText("Error initializing the verification pass preferences\n");
+
+  // set the default path in the project window
+  ProjDir->SetPath(UserConfig->wxGetProjectDir());
 }
 
 // PortalMainFrame::~PortalMainFrame
@@ -242,8 +245,7 @@ void PortalMainFrame::CreateWindowLayout(){
                                       wxSize(300,300),
                                       wxAUI_NB_TOP |
                                       wxAUI_NB_TAB_SPLIT |
-                                      wxAUI_NB_TAB_MOVE |
-                                      wxAUI_NB_SCROLL_BUTTONS);
+                                      wxAUI_NB_SCROLL_BUTTONS );
 
   //-- setup the IR editor
   IRPane = new wxStyledTextCtrl(this, wxID_ANY);
@@ -1069,6 +1071,15 @@ void PortalMainFrame::CloseProject(){
   // clear the IR pane
   IRPane->ClearAll();
 
+  // close out all the StoneCutter windows
+  size_t NPages = EditorNotebook->GetPageCount();
+  for( size_t i=1; i<(NPages-1); i++ ){
+    EditorNotebook->RemovePage(i);
+    EditorNotebook->DeletePage(i);
+  }
+
+  SCPanes.clear();
+
   // close out all the modules
   NodeItems.clear();
   EncItems.clear();
@@ -1401,9 +1412,10 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
     return ;
   }
 
+  wxFileName CurProj(IRFileName);
   wxFileDialog* OpenDialog = new wxFileDialog( this,
                                                _("Choose a StoneCutter file to open"),
-                                               UserConfig->wxGetProjectDir(),
+                                               CurProj.GetPath(),
                                                wxEmptyString,
                                                _("SC Files (*.sc)|*.sc"),
                                                wxFD_OPEN, wxDefaultPosition );
@@ -1453,6 +1465,10 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
 
     // add the file to the editor network
     EditorNotebook->AddPage( SCPane, NP, true, wxBookCtrlBase::NO_IMAGE );
+
+    // reset the tab title
+    EditorNotebook->SetPageText( EditorNotebook->GetPageCount()-1,
+                                 NPF.GetName() );
   }
 
   // clean up the dialog box
@@ -1503,6 +1519,9 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
     // load the ir into the ir pane
     IRPane->LoadFile(NP);
     IRFileName = NP;
+
+    // switch the directory tree to the project directory
+    ProjDir->SetPath(NPF.GetPath());
 
     // load all the modules into the modulebox
     LoadModuleBox();
