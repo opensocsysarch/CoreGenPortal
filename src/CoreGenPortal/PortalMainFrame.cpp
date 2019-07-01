@@ -1072,12 +1072,16 @@ void PortalMainFrame::CloseProject(){
   IRPane->ClearAll();
 
   // close out all the StoneCutter windows
-  size_t NPages = EditorNotebook->GetPageCount();
-  for( size_t i=1; i<(NPages-1); i++ ){
-    EditorNotebook->RemovePage(i);
-    EditorNotebook->DeletePage(i);
+  for( size_t i=1; i<EditorNotebook->GetPageCount(); i++ ){
+    LogPane->AppendText("Removing Pages\n" );
+    if( !EditorNotebook->RemovePage(i) )
+      LogPane->AppendText("Error removing page\n" );
   }
 
+  for( unsigned i=0; i<SCPanes.size(); i++ ){
+    wxStyledTextCtrl *TmpCtrl = std::get<0>(SCPanes[i]);
+    delete TmpCtrl;
+  }
   SCPanes.clear();
 
   // close out all the modules
@@ -1429,46 +1433,61 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
 
     LogPane->AppendText( "Opening StoneCutter file at " + NP + wxT("\n") );
 
-    wxStyledTextCtrl *SCPane = new wxStyledTextCtrl(this, wxID_ANY);
-    SCPane->StyleClearAll();
-    SCPane->SetMarginWidth(MARGIN_LINE_NUMBERS, 50);
-    SCPane->SetTabWidth(3);
-    SCPane->SetIndent(3);
-    SCPane->SetUseTabs(false);
-    SCPane->StyleSetForeground(wxSTC_STYLE_LINENUMBER, wxColour (75, 75, 75) );
-    SCPane->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour (220, 220, 220));
-    SCPane->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
-    SCPane->SetWrapMode(wxSTC_WRAP_WORD);
-    SCPane->SetLexer(wxSTC_LEX_CPP);
+    // check to see if the window is already open
+    wxString TmpName = NPF.GetFullName();
+    size_t TmpPage = -1;
+    for( unsigned i = 0; i<SCPanes.size(); i++ ){
+      if( std::get<1>(SCPanes[i]) == TmpName )
+        TmpPage = i+1;
+    }
 
-    SCPane->StyleSetForeground (wxSTC_C_STRING,            wxColour(150,0,0));
-    SCPane->StyleSetForeground (wxSTC_C_PREPROCESSOR,      wxColour(165,105,0));
-    SCPane->StyleSetForeground (wxSTC_C_IDENTIFIER,        wxColour(40,0,60));
-    SCPane->StyleSetForeground (wxSTC_C_NUMBER,            wxColour(0,150,0));
-    SCPane->StyleSetForeground (wxSTC_C_CHARACTER,         wxColour(150,0,0));
-    SCPane->StyleSetForeground (wxSTC_C_WORD,              wxColour(0,0,150));
-    SCPane->StyleSetForeground (wxSTC_C_WORD2,             wxColour(0,150,0));
-    SCPane->StyleSetForeground (wxSTC_C_COMMENT,           wxColour(150,150,150));
-    SCPane->StyleSetForeground (wxSTC_C_COMMENTLINE,       wxColour(150,150,150));
-    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOC,        wxColour(150,150,150));
-    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOCKEYWORD, wxColour(0,0,200));
-    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0,0,200));
-    SCPane->StyleSetBold(wxSTC_C_WORD, true);
-    SCPane->StyleSetBold(wxSTC_C_WORD2, true);
-    SCPane->StyleSetBold(wxSTC_C_COMMENTDOCKEYWORD, true);
+    if( TmpPage != -1 ){
+      // page already exists, refocus to the target tab
+      LogPane->AppendText("File is already open... refocusing to the appropriate tab\n" );
+      EditorNotebook->SetSelection(TmpPage);
+    }else{
+      // create a new window
+      wxStyledTextCtrl *SCPane = new wxStyledTextCtrl(this, wxID_ANY);
+      SCPane->StyleClearAll();
+      SCPane->SetMarginWidth(MARGIN_LINE_NUMBERS, 50);
+      SCPane->SetTabWidth(3);
+      SCPane->SetIndent(3);
+      SCPane->SetUseTabs(false);
+      SCPane->StyleSetForeground(wxSTC_STYLE_LINENUMBER, wxColour (75, 75, 75) );
+      SCPane->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour (220, 220, 220));
+      SCPane->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
+      SCPane->SetWrapMode(wxSTC_WRAP_WORD);
+      SCPane->SetLexer(wxSTC_LEX_CPP);
 
-    // the laod file
-    SCPane->LoadFile(NP);
+      SCPane->StyleSetForeground (wxSTC_C_STRING,            wxColour(150,0,0));
+      SCPane->StyleSetForeground (wxSTC_C_PREPROCESSOR,      wxColour(165,105,0));
+      SCPane->StyleSetForeground (wxSTC_C_IDENTIFIER,        wxColour(40,0,60));
+      SCPane->StyleSetForeground (wxSTC_C_NUMBER,            wxColour(0,150,0));
+      SCPane->StyleSetForeground (wxSTC_C_CHARACTER,         wxColour(150,0,0));
+      SCPane->StyleSetForeground (wxSTC_C_WORD,              wxColour(0,0,150));
+      SCPane->StyleSetForeground (wxSTC_C_WORD2,             wxColour(0,150,0));
+      SCPane->StyleSetForeground (wxSTC_C_COMMENT,           wxColour(150,150,150));
+      SCPane->StyleSetForeground (wxSTC_C_COMMENTLINE,       wxColour(150,150,150));
+      SCPane->StyleSetForeground (wxSTC_C_COMMENTDOC,        wxColour(150,150,150));
+      SCPane->StyleSetForeground (wxSTC_C_COMMENTDOCKEYWORD, wxColour(0,0,200));
+      SCPane->StyleSetForeground (wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0,0,200));
+      SCPane->StyleSetBold(wxSTC_C_WORD, true);
+      SCPane->StyleSetBold(wxSTC_C_WORD2, true);
+      SCPane->StyleSetBold(wxSTC_C_COMMENTDOCKEYWORD, true);
 
-    // add it to our vector
-    SCPanes.push_back(std::make_pair(SCPane,NPF.GetFullName()));
+      // the load file
+      SCPane->LoadFile(NP);
 
-    // add the file to the editor network
-    EditorNotebook->AddPage( SCPane, NP, true, wxBookCtrlBase::NO_IMAGE );
+      // add it to our vector
+      SCPanes.push_back(std::make_pair(SCPane,NPF.GetFullName()));
 
-    // reset the tab title
-    EditorNotebook->SetPageText( EditorNotebook->GetPageCount()-1,
-                                 NPF.GetName() );
+      // add the file to the editor network
+      EditorNotebook->AddPage( SCPane, NP, true, wxBookCtrlBase::NO_IMAGE );
+
+      // reset the tab title
+      EditorNotebook->SetPageText( EditorNotebook->GetPageCount()-1,
+                                   NPF.GetName() );
+    }
   }
 
   // clean up the dialog box
