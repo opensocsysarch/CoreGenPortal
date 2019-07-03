@@ -130,6 +130,8 @@ private:
   void OpenNodeEditWin(CoreGenNode *N);
   void DeleteNode(CoreGenNode *N);
   void AddNodeWin();
+  void OpenFileFromWin(wxString Path);
+  void OpenSCFile(wxString NP, wxFileName NPF);
 
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
