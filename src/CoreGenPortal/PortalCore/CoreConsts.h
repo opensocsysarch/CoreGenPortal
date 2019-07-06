@@ -27,6 +27,7 @@
 
 //-- Environment Variables
 const std::string PORTAL_ENV_USER_CONFIG = "COREGENPORTAL_CONFIG";
+const std::string PORTAL_ENV_PLUGIN_CONFIG = "COREGENPORTAL_PLUGIN";
 
 //-- Standard File Locations
 const wxString PORTAL_USER_DIR = ".CoreGenPortal";

@@ -121,6 +121,7 @@ private:
   void CreatePortalToolBar();
   void CreateWindowLayout();
   void SetupModuleBox();
+  void SetupPluginBox();
   void LoadModuleBox();
   void LoadExtNodes(wxTreeItemId, CoreGenExt *Ext);
   void LoadPluginNodes(wxTreeItemId, CoreGenPlugin *Plugin);

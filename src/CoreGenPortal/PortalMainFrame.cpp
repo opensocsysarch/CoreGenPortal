@@ -225,10 +225,12 @@ void PortalMainFrame::CreateWindowLayout(){
                              wxDefaultSize,
                              wxTR_HAS_BUTTONS|wxTR_MULTIPLE,
                              wxDefaultValidator, wxEmptyString );
-  SetupModuleBox();
+  SetupModuleBox(); // setup the module box
 
   PluginBox = new wxListBox(this, wxID_ANY, wxDefaultPosition,
                             wxDefaultSize, 0, NULL, wxLB_MULTIPLE);
+  SetupPluginBox(); // setup the plugin box
+
   ProjDir = new wxGenericDirCtrl(this,wxID_ANY, wxEmptyString,
                                  wxDefaultPosition, wxDefaultSize,
                                  wxDIRCTRL_3D_INTERNAL|wxSUNKEN_BORDER,
@@ -286,6 +288,13 @@ void PortalMainFrame::CreateWindowLayout(){
   Mgr.AddPane( LogPane,         wxBOTTOM, wxT("CoreGenPortal Log"));
   Mgr.AddPane( EditorNotebook,  wxCENTER);
   Mgr.GetPane( EditorNotebook ).CloseButton(false);
+}
+
+// PortalMainFrame::SetupPluginBox
+// initializes the plugin box
+void PortalMainFrame::SetupPluginBox(){
+  // walk the plugin directory and derive our installed
+  // set of plugins
 }
 
 // PortalMainFrame::SetupModuleBox
