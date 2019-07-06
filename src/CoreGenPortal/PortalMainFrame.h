@@ -26,6 +26,7 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/sizer.h>
+#include <wx/dir.h>
 #include <wx/dirctrl.h>
 #include <wx/stattext.h>
 #include <wx/frame.h>
@@ -104,6 +105,7 @@ private:
   wxAuiNotebook* EditorNotebook;
   wxStyledTextCtrl *IRPane;
   std::vector<std::pair<wxStyledTextCtrl *,wxString>> SCPanes;
+  std::vector<std::pair<wxString,wxString>> PluginPanes;
 
   wxString IRFileName;
 

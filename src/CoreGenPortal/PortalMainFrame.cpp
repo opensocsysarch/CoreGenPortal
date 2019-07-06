@@ -40,6 +40,7 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   // update the aui manager
   UpdateAuiMgr();
 
+#if 0
   // read the user configuration data
   UserConfig = new CoreUserConfig();
   if( UserConfig->isValid() )
@@ -48,7 +49,7 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   else
     LogPane->AppendText("Error reading user configuration data; ConfigFile="
                         + UserConfig->wxGetConfFile() + "\n");
-
+#endif
   // initialize the verification configuration data
   VerifConfig = new CoreVerifConfig();
   if( VerifConfig->isValid() )
@@ -212,6 +213,15 @@ void PortalMainFrame::CreateWindowLayout(){
                              wxDefaultPosition, wxSize(200,100),
                              wxNO_BORDER | wxTE_MULTILINE);
 
+  // read the user configuration data
+  UserConfig = new CoreUserConfig();
+  if( UserConfig->isValid() )
+    LogPane->AppendText("Read user configuration data; ConfigFile="
+                        + UserConfig->wxGetConfFile() + "\n");
+  else
+    LogPane->AppendText("Error reading user configuration data; ConfigFile="
+                        + UserConfig->wxGetConfFile() + "\n");
+
   // Modules Ribbons
   ModulesNotebook = new wxAuiNotebook(this, wxID_ANY,
                                       wxDefaultPosition,
@@ -295,6 +305,25 @@ void PortalMainFrame::CreateWindowLayout(){
 void PortalMainFrame::SetupPluginBox(){
   // walk the plugin directory and derive our installed
   // set of plugins
+  wxDir PluginDir(UserConfig->wxGetPluginDir());
+  if( !PluginDir.IsOpened() ){
+    LogPane->AppendText("Could not open plugin directory at " +
+                        UserConfig->wxGetPluginDir() + "\n" );
+  }else{
+    LogPane->AppendText("Initializing plugin directories\n");
+    wxString filename;
+    unsigned pos = 0;
+    bool cont = PluginDir.GetFirst(&filename,wxEmptyString,wxDIR_DIRS);
+    while( cont ){
+      PluginPanes.push_back(std::make_pair(filename,
+                                           UserConfig->wxGetPluginDir() +
+                                           wxT("/") +
+                                           filename ));
+      PluginBox->InsertItems(1,&filename,pos);
+      pos = pos+1;
+      cont = PluginDir.GetNext(&filename);
+    }
+  }
 }
 
 // PortalMainFrame::SetupModuleBox
