@@ -409,6 +409,7 @@ void PortalMainFrame::SetupModuleBox(){
                                               NULL ) );
 
   // connect the module box window handlers
+  Bind(wxEVT_LISTBOX_DCLICK, &PortalMainFrame::OnSelectPlugin, this);
   Bind(wxEVT_TREE_ITEM_ACTIVATED, &PortalMainFrame::OnSelectNode, this);
   Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, &PortalMainFrame::OnRightClickNode, this);
   Bind(wxEVT_TREE_ITEM_MIDDLE_CLICK, &PortalMainFrame::OnMiddleClickNode, this);
@@ -1458,6 +1459,19 @@ void PortalMainFrame::OpenSCFile(wxString NP, wxFileName NPF){
     // reset the tab title
     EditorNotebook->SetPageText( EditorNotebook->GetPageCount()-1,
                                  NPF.GetName() );
+  }
+}
+
+// PortalMainFrame::OnSelectPlugin
+void PortalMainFrame::OnSelectPlugin(wxCommandEvent& event){
+  int Plugin = PluginBox->GetSelection();
+  if( (unsigned)(Plugin) > (PluginPanes.size()-1) ){
+    LogPane->AppendText("Invalid plugin item\n");
+  }else{
+    wxString PName = std::get<0>(PluginPanes[(unsigned)(Plugin)]);
+    LogPane->AppendText("Opening plugin: " + PName + wxT("\n"));
+
+    // open a new plugin information window
   }
 }
 

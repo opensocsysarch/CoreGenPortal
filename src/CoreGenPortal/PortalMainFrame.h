@@ -148,6 +148,7 @@ private:
   void OnProjOpen(wxCommandEvent& event);
   void OnProjSCOpen(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
+  void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
   void OnMiddleClickNode(wxTreeEvent& event);
