@@ -59,6 +59,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <tuple>
+#include <string>
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -70,6 +71,9 @@ public:
                    const wxPoint& pos,
                    const wxSize& size );
   ~PortalMainFrame();
+
+  // node info update handlers
+  void OnPressEnter(wxCommandEvent &event, CoreGenNode *node, int InfoWinType);
 
 private:
   // CoreGenHandlers

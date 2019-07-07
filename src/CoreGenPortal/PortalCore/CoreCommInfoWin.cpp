@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreCommInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreCommInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreCommInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
@@ -20,10 +21,12 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenComm *Comm )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,350), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
   if( Comm == nullptr ){
     this->EndModal(wxID_OK);
   }
+
+  this->CommNode = Comm;
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -45,41 +48,44 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
 
   // add all the interior data
   //-- comm
+  CommNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CommNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
-                                   wxT("Communication Node Name"),
+                                   wxT("Comm Node Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   CommNameText->Wrap(-1);
-  InnerSizer->Add( CommNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  CommNameSizer->Add( CommNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   CommNameCtrl = new wxTextCtrl( Wnd,
-                                 wxID_ANY,
+                                 0,
                                  wxString(Comm->GetName()),
                                  wxDefaultPosition,
-                                 wxSize(400,25),
-                                 wxTE_READONLY,
+                                 wxSize(320,25),
+                                 wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("CommName") );
-  InnerSizer->Add( CommNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  CommNameSizer->Add( CommNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( CommNameSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   //-- comm type
+  CommTypeSizer = new wxBoxSizer( wxHORIZONTAL );
   CommTypeText = new wxStaticText( Wnd,
                                    wxID_ANY,
-                                   wxT("Communication Node Type"),
+                                   wxT("Comm Node Type"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   CommTypeText->Wrap(-1);
-  InnerSizer->Add( CommTypeText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  CommTypeSizer->Add( CommTypeText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   CommTypeCtrl = new wxTextCtrl( Wnd,
-                                 wxID_ANY,
+                                 1,
                                  wxEmptyString,
                                  wxDefaultPosition,
-                                 wxSize(400,25),
-                                 wxTE_READONLY,
+                                 wxSize(320,25),
+                                 wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("CommType") );
   switch( Comm->GetCommType() ){
@@ -97,51 +103,61 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
     CommTypeCtrl->AppendText(wxT("Unknown"));
     break;
   }
-  InnerSizer->Add( CommTypeCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  CommTypeSizer->Add( CommTypeCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( CommTypeSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   //-- width
+  CommWidthSizer = new wxBoxSizer( wxHORIZONTAL );
   WidthText = new wxStaticText( Wnd,
                                    wxID_ANY,
-                                   wxT("Communication Channel Width"),
+                                   wxT("Comm Channel Width"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   WidthText->Wrap(-1);
-  InnerSizer->Add( CommNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  CommWidthSizer->Add( WidthText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   WidthCtrl = new wxTextCtrl( Wnd,
-                              wxID_ANY,
+                              2,
                               wxString::Format(wxT("%i"),Comm->GetWidth()),
                               wxDefaultPosition,
-                              wxSize(400,25),
-                              wxTE_READONLY,
+                              wxSize(320,25),
+                              wxTE_PROCESS_ENTER,
                               wxDefaultValidator,
                               wxT("CommWidth") );
-  InnerSizer->Add( WidthCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  CommWidthSizer->Add( WidthCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( CommWidthSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- endpoints
+  CommEndpointSizer = new wxBoxSizer( wxHORIZONTAL );
   EndpointText = new wxStaticText( Wnd,
                               wxID_ANY,
                               wxT("Endpoints"),
                               wxDefaultPosition,
-                              wxDefaultSize,
+                              wxSize(160,-1),
                               0 );
   EndpointText->Wrap(-1);
-  InnerSizer->Add( EndpointText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  CommEndpointSizer->Add( EndpointText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   EndpointCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            3,
                             wxEmptyString,
                             wxDefaultPosition,
-                            wxSize(400,100),
-                            wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL,
+                            wxSize(320,100),
+                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("endpoints") );
 
   for( unsigned i=0; i<Comm->GetNumEndpoints(); i++ ){
     EndpointCtrl->AppendText(wxString(Comm->GetEndpoint(i)->GetName())+wxT("\n") );
   }
-  InnerSizer->Add( EndpointCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  CommEndpointSizer->Add( EndpointCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( CommEndpointSizer, 0, wxALIGN_CENTER|wxALL, 5 );
+
+  // add space between info items and static line
+  SpacerPanelSizer = new wxBoxSizer( wxVERTICAL );
+  SpacerPanelSizer->Add( new wxPanel(this), 1, wxEXPAND, 0 );
+  InnerSizer->Add(SpacerPanelSizer, 1, wxEXPAND, 0);
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -170,8 +186,13 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   this->Layout();
 }
 
-void CoreCommInfoWin::OnPressOk(wxCommandEvent& ok){
+void CoreCommInfoWin::OnPressOk( wxCommandEvent& ok ){
   this->EndModal(wxID_OK);
+}
+
+void CoreCommInfoWin::OnPressEnter( wxCommandEvent& enter ){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->CommNode, CGComm);
 }
 
 CoreCommInfoWin::~CoreCommInfoWin(){
