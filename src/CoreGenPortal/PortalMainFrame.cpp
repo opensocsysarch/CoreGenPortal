@@ -37,6 +37,8 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   CreateStatusBar();
   SetStatusText( "Welcome to CoreGenPortal!" );
 
+  //Bind(wxEVT_TEXT_ENTER, &PortalMainFrame::OnPressEnter, this);
+
   // update the aui manager
   UpdateAuiMgr();
 
@@ -1197,67 +1199,10 @@ void PortalMainFrame::DeleteNode(CoreGenNode *Node){
   do{
     IRPane->LineDelete();
     line = IRPane->GetCurLine();
-  } while(line[i] != '-' && isspace(line[i]));
+  } while(line.size() > 0 && line[i] != '-' && isspace(line[i]));
   IRPane->PageDown();
   IRPane->LineUp();
   IRPane->EnsureCaretVisible();
-
-  /*
-  switch(Node->GetType()){
-    case CGSoc:
-      LogPane->AppendText("CGSoc ");
-      break;
-    case CGCore:
-      LogPane->AppendText("CGCore ");
-      break;
-    case CGInstF:
-      LogPane->AppendText("CGInstF ");
-      break;
-    case CGInst:
-      LogPane->AppendText("CGInst ");
-      break;
-    case CGPInst:
-      LogPane->AppendText("CGPInst ");
-      break;
-    case CGRegC:
-      LogPane->AppendText("CGRegC ");
-      break;
-    case CGReg:
-      LogPane->AppendText("CGReg ");
-      break;
-    case CGISA:
-      LogPane->AppendText("CGISA ");
-      break;
-    case CGCache:
-      //CGProject->DeleteCacheNode(static_cast<CoreGenCache *>(Node));
-      LogPane->AppendText("CGCache ");
-      break;
-    case CGEnc:
-      LogPane->AppendText("CGEnc ");
-      break;
-    case CGExt:
-      LogPane->AppendText("CGExt ");
-      break;
-    case CGComm:
-      LogPane->AppendText("CGComm ");
-      break;
-    case CGSpad:
-      LogPane->AppendText("CGSpad ");
-      break;
-    case CGMCtrl:
-      LogPane->AppendText("CGMCtrl ");
-      break;
-    case CGVTP:
-      LogPane->AppendText("CGVTP ");
-      break;
-    case CGPlugin:
-      LogPane->AppendText("CGPlugin ");
-      break;
-    case CGTop:
-      LogPane->AppendText("CGTop ");
-      break;
-  }
-  */
 
   //delete from backend
   wxString Dnode(Node->GetName());
@@ -1285,7 +1230,7 @@ void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
   switch(event.GetId()){
   case ID_TREE_INFONODE:
     // open a node info window: TODO: change this to permit multiple selections
-    InfoWin = new CoreInfoWin(NULL,wxID_ANY,
+    InfoWin = new CoreInfoWin(this,wxID_ANY,
                               GetNodeFromItem(ModuleBox->GetFocusedItem()));
     delete InfoWin;
     break;
@@ -1637,6 +1582,65 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
 
   // clean up the dialog box
   OpenDialog->Destroy();
+}
+
+void PortalMainFrame::OnPressEnter(wxCommandEvent& enter, CoreGenNode *node, int InfoWinType){
+  // get the box contents
+  wxTextCtrl *ClickedBox = (wxTextCtrl*)enter.GetEventObject();
+  std::string BoxContents = ClickedBox->GetValue().ToStdString();
+  // get the box id
+  int InfoBoxIndex = ClickedBox->GetId();
+
+  //TODO: handle invalid inputs
+  // update yaml
+  switch(InfoWinType){
+    case CGCache:{
+      // TODO: handle adding parent and child caches
+      CoreGenCache *CacheNode = (CoreGenCache*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          CacheNode->SetName(BoxContents);
+          break;
+        case 1:
+          CacheNode->SetSets(std::stoi(BoxContents));
+          break;
+        case 2:
+          CacheNode->SetWays(std::stoi(BoxContents));
+          break;
+      }
+    }
+    break;
+    case CGComm:{
+      CoreGenComm *CommNode = (CoreGenComm*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          CommNode->SetName(BoxContents);
+          break;
+        case 1:
+          if( BoxContents.compare("Point-to-Point") == 0 ){
+            CommNode->SetCommType(CGCommP2P);
+          }
+          else if( BoxContents.compare("Bus") == 0 ){
+            CommNode->SetCommType(CGCommBus);
+          }
+          else if( BoxContents.compare("Network on Chip") == 0 ){
+            CommNode->SetCommType(CGCommNoc);
+          }
+          else{
+            CommNode->SetCommType(CGCommUnk);
+          }
+          break;
+        case 2:
+          CommNode->SetWidth(std::stoi(BoxContents));
+          break;
+      }
+    }
+    break;
+  }
+
+  CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
+  //LoadModuleBox();
+  LogPane->AppendText("Updated " + node->GetName() + " Box " + std::to_string(InfoBoxIndex) + ".\n");
 }
 
 // EOF
