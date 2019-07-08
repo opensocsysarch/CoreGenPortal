@@ -1591,7 +1591,7 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter, CoreGenNode *node, int
   // get the box id
   int InfoBoxIndex = ClickedBox->GetId();
 
-  //TODO: handle invalid inputs
+  // TODO: handle invalid inputs
   // update yaml
   switch(InfoWinType){
     case CGCache:{
@@ -1611,6 +1611,7 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter, CoreGenNode *node, int
     }
     break;
     case CGComm:{
+      // TODO: handle endpoints
       CoreGenComm *CommNode = (CoreGenComm*)node;
       switch(InfoBoxIndex){
         case 0:
@@ -1632,6 +1633,19 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter, CoreGenNode *node, int
           break;
         case 2:
           CommNode->SetWidth(std::stoi(BoxContents));
+          break;
+      }
+    }
+    break;
+    case CGCore:{
+      // TODO: Handle isa, caches, regclasses, and extensions
+      CoreGenCore *CoreNode = (CoreGenCore*)node;
+      switch(InfoBoxIndex){ 
+        case 0:
+          CoreNode->SetName(BoxContents);
+          break;
+        case 1:
+          CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
           break;
       }
     }

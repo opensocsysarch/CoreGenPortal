@@ -180,7 +180,6 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                                       wxLI_HORIZONTAL );
   InnerSizer->Add( FinalStaticLine, 0, wxEXPAND | wxALL, 5 );
 
-
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
   m_userOK = new wxButton( Wnd, wxID_OK );
