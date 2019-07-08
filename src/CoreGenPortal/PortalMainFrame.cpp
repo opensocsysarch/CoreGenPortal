@@ -1636,6 +1636,29 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter, CoreGenNode *node, int
       }
     }
     break;
+    case CGExt:{
+      CoreGenExt *ExtNode = (CoreGenExt*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          ExtNode->SetName(BoxContents);
+          break;
+        case 1:
+          if( BoxContents.compare("Template extension") == 0 ){
+            ExtNode->SetType(CGExtTemplate);
+          }
+          else if( BoxContents.compare("Module extension") == 0 ){
+            ExtNode->SetType(CGExtModule);
+          }
+          else if( BoxContents.compare("Communications extension") == 0 ){
+            ExtNode->SetType(CGExtComm);
+          }
+          else{
+            ExtNode->SetType(CGExtUnk);
+          }
+          break;
+      }
+    }
+    break;
   }
 
   CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
