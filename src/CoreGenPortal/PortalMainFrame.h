@@ -39,6 +39,7 @@
 #include <wx/filedlg.h>
 #include <wx/treelist.h>
 #include <wx/treectrl.h>
+#include <wx/textctrl.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -60,6 +61,7 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <sstream>
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -151,6 +153,7 @@ private:
   void OnProjOpen(wxCommandEvent& event);
   void OnProjSCOpen(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
+  void OnBuildVerify(wxCommandEvent& event);
   void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);

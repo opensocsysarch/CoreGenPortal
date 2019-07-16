@@ -171,6 +171,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjSCOpen));
 
   //-- build menu
+  Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildVerify));
 
   //-- help menu
   Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED,
@@ -1458,6 +1460,60 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
     LogPane->AppendText("Committed user preferences\n");
   }
   UP->Destroy();
+}
+
+// PortalMainFrame:: OnBuildVerify
+void PortalMainFrame::OnBuildVerify(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // check the verification config options
+  if( !VerifConfig ){
+    LogPane->AppendText( "Error: verification preferences are not initialized\n");
+    return ;
+  }
+
+  if( !VerifConfig->isValid() ){
+    LogPane->AppendText( "Error: verification preferences are not valid\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // init the pass manager
+  if( !CGProject->InitPassMgr() ){
+    LogPane->AppendText( "Error initializing the CoreGen pass manager\n" );
+    return ;
+  }
+
+  LogPane->AppendText( "Executing verification passes...\n" );
+
+  // setup the text redirector
+  std::streambuf *oldBuf = std::cout.rdbuf();
+  std::ostringstream newBuf;
+  std::cout.rdbuf( newBuf.rdbuf() );
+
+  // execute all the enabled passes
+  for( unsigned i=0; i<VerifConfig->GetNumPasses(); i++ ){
+    if( VerifConfig->IsPassEnabled(i) ){
+      if( !CGProject->ExecutePass(
+          std::string(VerifConfig->GetPassName(i).mb_str()) ) ){
+        LogPane->AppendText( "Error executing pass: " +
+                             VerifConfig->GetPassName(i) +
+                             wxT("\n") );
+      }
+    }
+  }
+
+  // restore the old cout buffer
+  std::cout.rdbuf( oldBuf );
+  LogPane->AppendText(wxString(newBuf.str())+wxT("\n"));
 }
 
 // PortalMainFrame::OnProjNew
