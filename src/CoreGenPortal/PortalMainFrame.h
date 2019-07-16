@@ -134,7 +134,6 @@ private:
   void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
   void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
   void CloseProject();
-  void OpenNodeEditWin(CoreGenNode *N);
   void DeleteNode(CoreGenNode *N);
   void AddNodeWin();
   void OpenFileFromWin(wxString Path);
@@ -178,9 +177,8 @@ enum
   ID_PREF_STONECUTTER   = 42,
   ID_TREE_SELECTNODE    = 50,
   ID_TREE_INFONODE      = 51,
-  ID_TREE_EDITNODE      = 52,
-  ID_TREE_ADDNODE       = 53,
-  ID_TREE_DELNODE       = 54
+  ID_TREE_ADDNODE       = 52,
+  ID_TREE_DELNODE       = 53
 };
 
 enum{

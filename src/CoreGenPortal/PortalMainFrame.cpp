@@ -1178,11 +1178,6 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   delete CGA;
 }
 
-// PortalMainFrame::OpenNodeEditWin
-void PortalMainFrame::OpenNodeEditWin( CoreGenNode *Node ){
-  LogPane->AppendText("OpenNodeEditWin\n");
-}
-
 // PortalMainFrame::DeleteNode
 void PortalMainFrame::DeleteNode(CoreGenNode *Node){
   //delete from UI
@@ -1229,14 +1224,10 @@ void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
   CoreInfoWin *InfoWin = nullptr;
   switch(event.GetId()){
   case ID_TREE_INFONODE:
-    // open a node info window: TODO: change this to permit multiple selections
+    // open tree info node
     InfoWin = new CoreInfoWin(this,wxID_ANY,
                               GetNodeFromItem(ModuleBox->GetFocusedItem()));
     delete InfoWin;
-    break;
-  case ID_TREE_EDITNODE:
-    // open an editor for the target node
-    OpenNodeEditWin(GetNodeFromItem(ModuleBox->GetFocusedItem()));
     break;
   case ID_TREE_DELNODE:
     DeleteNode(GetNodeFromItem(ModuleBox->GetFocusedItem()));
@@ -1256,8 +1247,7 @@ void PortalMainFrame::OnRightClickNode(wxTreeEvent &event){
   }else{
     // this is an actual node
     mnu.Append( ID_TREE_INFONODE, "Node Info" );
-    mnu.Append( ID_TREE_EDITNODE, "Edit Node" );
-    mnu.Append( ID_TREE_DELNODE, "Delete Node" );
+    mnu.Append( ID_TREE_DELNODE,  "Delete Node" );
   }
   mnu.Connect( wxEVT_COMMAND_MENU_SELECTED,
                wxCommandEventHandler(PortalMainFrame::OnPopupNode),
@@ -1584,7 +1574,9 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
   OpenDialog->Destroy();
 }
 
-void PortalMainFrame::OnPressEnter(wxCommandEvent& enter, CoreGenNode *node, int InfoWinType){
+void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
+                                   CoreGenNode *node,
+                                   int InfoWinType){
   // get the box contents
   wxTextCtrl *ClickedBox = (wxTextCtrl*)enter.GetEventObject();
   std::string BoxContents = ClickedBox->GetValue().ToStdString();
@@ -1640,7 +1632,7 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter, CoreGenNode *node, int
     case CGCore:{
       // TODO: Handle isa, caches, regclasses, and extensions
       CoreGenCore *CoreNode = (CoreGenCore*)node;
-      switch(InfoBoxIndex){ 
+      switch(InfoBoxIndex){
         case 0:
           CoreNode->SetName(BoxContents);
           break;
@@ -1675,9 +1667,12 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter, CoreGenNode *node, int
     break;
   }
 
-  CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
+  // write out the new IR file
+  CGProject->WriteIR(std::string(IRFileName.mb_str()));
   //LoadModuleBox();
-  LogPane->AppendText("Updated " + node->GetName() + " Box " + std::to_string(InfoBoxIndex) + ".\n");
+  LogPane->AppendText("Updated " + wxString(node->GetName()) +
+                      " Box " + wxString(std::to_string(InfoBoxIndex)) +
+                      ".\n");
 }
 
 // EOF
