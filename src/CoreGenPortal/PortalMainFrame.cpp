@@ -37,9 +37,12 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   CreateStatusBar();
   SetStatusText( "Welcome to CoreGenPortal!" );
 
+  //Bind(wxEVT_TEXT_ENTER, &PortalMainFrame::OnPressEnter, this);
+
   // update the aui manager
   UpdateAuiMgr();
 
+#if 0
   // read the user configuration data
   UserConfig = new CoreUserConfig();
   if( UserConfig->isValid() )
@@ -48,13 +51,16 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   else
     LogPane->AppendText("Error reading user configuration data; ConfigFile="
                         + UserConfig->wxGetConfFile() + "\n");
-
+#endif
   // initialize the verification configuration data
   VerifConfig = new CoreVerifConfig();
   if( VerifConfig->isValid() )
     LogPane->AppendText("Initialized the verification pass preferences\n");
   else
     LogPane->AppendText("Error initializing the verification pass preferences\n");
+
+  // set the default path in the project window
+  ProjDir->SetPath(UserConfig->wxGetProjectDir());
 }
 
 // PortalMainFrame::~PortalMainFrame
@@ -112,6 +118,8 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->AppendSeparator();
   ProjectMenu->Append(wxID_SAVE);
   ProjectMenu->Append(wxID_SAVEAS);
+  ProjectMenu->AppendSeparator();
+  ProjectMenu->Append( ID_PROJSCOPEN, wxT("&Open StoneCutter"));
 
   //-- Build Menu
   BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
@@ -159,6 +167,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjOpen));
   Connect(wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjClose));
+  Connect(ID_PROJSCOPEN, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjSCOpen));
 
   //-- build menu
 
@@ -205,6 +215,15 @@ void PortalMainFrame::CreateWindowLayout(){
                              wxDefaultPosition, wxSize(200,100),
                              wxNO_BORDER | wxTE_MULTILINE);
 
+  // read the user configuration data
+  UserConfig = new CoreUserConfig();
+  if( UserConfig->isValid() )
+    LogPane->AppendText("Read user configuration data; ConfigFile="
+                        + UserConfig->wxGetConfFile() + "\n");
+  else
+    LogPane->AppendText("Error reading user configuration data; ConfigFile="
+                        + UserConfig->wxGetConfFile() + "\n");
+
   // Modules Ribbons
   ModulesNotebook = new wxAuiNotebook(this, wxID_ANY,
                                       wxDefaultPosition,
@@ -218,10 +237,12 @@ void PortalMainFrame::CreateWindowLayout(){
                              wxDefaultSize,
                              wxTR_HAS_BUTTONS|wxTR_MULTIPLE,
                              wxDefaultValidator, wxEmptyString );
-  SetupModuleBox();
+  SetupModuleBox(); // setup the module box
 
   PluginBox = new wxListBox(this, wxID_ANY, wxDefaultPosition,
                             wxDefaultSize, 0, NULL, wxLB_MULTIPLE);
+  SetupPluginBox(); // setup the plugin box
+
   ProjDir = new wxGenericDirCtrl(this,wxID_ANY, wxEmptyString,
                                  wxDefaultPosition, wxDefaultSize,
                                  wxDIRCTRL_3D_INTERNAL|wxSUNKEN_BORDER,
@@ -238,8 +259,7 @@ void PortalMainFrame::CreateWindowLayout(){
                                       wxSize(300,300),
                                       wxAUI_NB_TOP |
                                       wxAUI_NB_TAB_SPLIT |
-                                      wxAUI_NB_TAB_MOVE |
-                                      wxAUI_NB_SCROLL_BUTTONS);
+                                      wxAUI_NB_SCROLL_BUTTONS );
 
   //-- setup the IR editor
   IRPane = new wxStyledTextCtrl(this, wxID_ANY);
@@ -280,6 +300,32 @@ void PortalMainFrame::CreateWindowLayout(){
   Mgr.AddPane( LogPane,         wxBOTTOM, wxT("CoreGenPortal Log"));
   Mgr.AddPane( EditorNotebook,  wxCENTER);
   Mgr.GetPane( EditorNotebook ).CloseButton(false);
+}
+
+// PortalMainFrame::SetupPluginBox
+// initializes the plugin box
+void PortalMainFrame::SetupPluginBox(){
+  // walk the plugin directory and derive our installed
+  // set of plugins
+  wxDir PluginDir(UserConfig->wxGetPluginDir());
+  if( !PluginDir.IsOpened() ){
+    LogPane->AppendText("Could not open plugin directory at " +
+                        UserConfig->wxGetPluginDir() + "\n" );
+  }else{
+    LogPane->AppendText("Initializing plugin directories\n");
+    wxString filename;
+    unsigned pos = 0;
+    bool cont = PluginDir.GetFirst(&filename,wxEmptyString,wxDIR_DIRS);
+    while( cont ){
+      PluginPanes.push_back(std::make_pair(filename,
+                                           UserConfig->wxGetPluginDir() +
+                                           wxT("/") +
+                                           filename ));
+      PluginBox->InsertItems(1,&filename,pos);
+      pos = pos+1;
+      cont = PluginDir.GetNext(&filename);
+    }
+  }
 }
 
 // PortalMainFrame::SetupModuleBox
@@ -365,6 +411,7 @@ void PortalMainFrame::SetupModuleBox(){
                                               NULL ) );
 
   // connect the module box window handlers
+  Bind(wxEVT_LISTBOX_DCLICK, &PortalMainFrame::OnSelectPlugin, this);
   Bind(wxEVT_TREE_ITEM_ACTIVATED, &PortalMainFrame::OnSelectNode, this);
   Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, &PortalMainFrame::OnRightClickNode, this);
   Bind(wxEVT_TREE_ITEM_MIDDLE_CLICK, &PortalMainFrame::OnMiddleClickNode, this);
@@ -541,6 +588,8 @@ void PortalMainFrame::LoadModuleBox(){
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 NULL ),Top->GetChild(i)) );
+      LoadPluginNodes( NodeItems[NodeItems.size()-1].first,
+                         static_cast<CoreGenPlugin *>(Top->GetChild(i)));
       break;
     case CGExt:
       NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_EXT],
@@ -548,6 +597,8 @@ void PortalMainFrame::LoadModuleBox(){
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 wxTreeListCtrl::NO_IMAGE,
                                                 NULL ),Top->GetChild(i)) );
+      LoadExtNodes( NodeItems[NodeItems.size()-1].first,
+                    static_cast<CoreGenExt *>(Top->GetChild(i)));
       break;
     default:
       LogPane->AppendText("Error loading node: " +
@@ -558,6 +609,464 @@ void PortalMainFrame::LoadModuleBox(){
 
   // expand the parent module
   ModuleBox->Expand(ParentModule);
+}
+
+// PortalMainFrame::LoadExtNodes
+// loads the wxTreeCtrl Ext node with child nodes
+void PortalMainFrame::LoadExtNodes( wxTreeItemId Parent,
+                                    CoreGenExt *Ext ){
+  std::vector<wxTreeItemId> wxExtItems;
+  wxTreeItemId TmpItem;
+
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Cache"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Comm"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Core"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Ext"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("ISA"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Inst"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("PseudoInst"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("InstFormat"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("MCtrl"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Reg"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("RegClass"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Spad"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+
+  // retrieve all the children from the ext and insert them
+  // into the appropriate slot
+  for( unsigned i=0; i<Ext->GetNumChild(); i++ ){
+    CoreGenNode *Child = Ext->GetChild(i);
+    switch( Child->GetType() ){
+    case CGCache:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_CACHE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGExt:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_EXT],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGInst:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_INST],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      TmpItem = std::get<0>(ExtItems[ExtItems.size()-1]);
+      LoadInstEncodings(TmpItem,
+                        static_cast<CoreGenInst *>(Child));
+    case CGPInst:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_PINST],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      TmpItem = std::get<0>(ExtItems[ExtItems.size()-1]);
+      LoadPInstEncodings(TmpItem,
+                        static_cast<CoreGenPseudoInst *>(Child));
+      break;
+    case CGInstF:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_INSTFORMAT],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGReg:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_REG],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGRegC:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_REGCLASS],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGISA:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_ISA],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGComm:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_COMM],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGSpad:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_SPAD],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGMCtrl:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_MCTRL],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    case CGCore:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_CORE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
+    default:
+      LogPane->AppendText("Unable to load Ext child node into module tree\n");
+      break;
+    }
+  }
+}
+
+// PortalMainFrame::LoadPluginNodes
+// loads the wxTreeCtrl Plugin node with child nodes
+void PortalMainFrame::LoadPluginNodes( wxTreeItemId Parent,
+                                       CoreGenPlugin *Plugin ){
+  std::vector<wxTreeItemId> wxPluginItems;
+  wxTreeItemId TmpItem;
+
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Cache"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Core"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Inst"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("PseudoInst"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Reg"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("RegClass"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("SoC"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("ISA"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Ext"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Comm"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Spad"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("MCtrl"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("VTP"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+
+  //-- cache
+  std::vector<CoreGenCache *> CacheVect = Plugin->GetCacheVect();
+  for( unsigned i=0; i<CacheVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(CacheVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_CACHE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- core
+  std::vector<CoreGenCore *> CoreVect = Plugin->GetCoreVect();
+  for( unsigned i=0; i<CoreVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(CoreVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_CORE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- inst
+  std::vector<CoreGenInst *> InstVect = Plugin->GetInstVect();
+  for( unsigned i=0; i<InstVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(InstVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_INST],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+    TmpItem = std::get<0>(PluginItems[PluginItems.size()-1]);
+    LoadInstEncodings(TmpItem,
+                      static_cast<CoreGenInst *>(Child));
+  }
+
+  //-- pinst
+  std::vector<CoreGenPseudoInst *> PInstVect = Plugin->GetPseudoInstVect();
+  for( unsigned i=0; i<PInstVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(PInstVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_PINST],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+    TmpItem = std::get<0>(PluginItems[PluginItems.size()-1]);
+    LoadPInstEncodings(TmpItem,
+                      static_cast<CoreGenPseudoInst *>(Child));
+  }
+
+  //-- instformat
+  std::vector<CoreGenInstFormat *> InstFVect = Plugin->GetInstFormatVect();
+  for( unsigned i=0; i<InstFVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(InstFVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_INSTFORMAT],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- reg
+  std::vector<CoreGenReg *> RegVect = Plugin->GetRegVect();
+  for( unsigned i=0; i<RegVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(RegVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_REG],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- regclass
+  std::vector<CoreGenRegClass *> RegCVect = Plugin->GetRegClassVect();
+  for( unsigned i=0; i<RegCVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(RegCVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_REGCLASS],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- soc
+  std::vector<CoreGenSoC *> SocVect = Plugin->GetSocVect();
+  for( unsigned i=0; i<SocVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(SocVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_SOC],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- isa
+  std::vector<CoreGenISA *> ISAVect = Plugin->GetISAVect();
+  for( unsigned i=0; i<ISAVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(ISAVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_ISA],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- ext
+  std::vector<CoreGenExt *> ExtVect = Plugin->GetExtVect();
+  for( unsigned i=0; i<ExtVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(ExtVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_EXT],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+    TmpItem = std::get<0>(PluginItems[PluginItems.size()-1]);
+    LoadExtNodes( TmpItem,
+                  static_cast<CoreGenExt *>(Child) );
+  }
+
+  //-- comm
+  std::vector<CoreGenComm *> CommVect = Plugin->GetCommVect();
+  for( unsigned i=0; i<CommVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(CommVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_COMM],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- spad
+  std::vector<CoreGenSpad *> SpadVect = Plugin->GetSpadVect();
+  for( unsigned i=0; i<SpadVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(SpadVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_SPAD],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- mctrl
+  std::vector<CoreGenMCtrl *> MCtrlVect = Plugin->GetMCtrlVect();
+  for( unsigned i=0; i<MCtrlVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(MCtrlVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_MCTRL],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- vtp
+  std::vector<CoreGenVTP *> VTPVect = Plugin->GetVTPVect();
+  for( unsigned i=0; i<VTPVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(VTPVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_VTP],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
 }
 
 // PortalMainFrame::LoadInstEncodings
@@ -602,6 +1111,19 @@ void PortalMainFrame::CloseProject(){
 
   // clear the IR pane
   IRPane->ClearAll();
+
+  // close out all the StoneCutter windows
+  for( size_t i=1; i<EditorNotebook->GetPageCount(); i++ ){
+    LogPane->AppendText("Removing Pages\n" );
+    if( !EditorNotebook->RemovePage(i) )
+      LogPane->AppendText("Error removing page\n" );
+  }
+
+  for( unsigned i=0; i<SCPanes.size(); i++ ){
+    wxStyledTextCtrl *TmpCtrl = std::get<0>(SCPanes[i]);
+    delete TmpCtrl;
+  }
+  SCPanes.clear();
 
   // close out all the modules
   NodeItems.clear();
@@ -656,14 +1178,40 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event){
   delete CGA;
 }
 
-// PortalMainFrame::OpenNodeEditWin
-void PortalMainFrame::OpenNodeEditWin( CoreGenNode *Node ){
-  LogPane->AppendText("OpenNodeEditWin\n");
-}
-
 // PortalMainFrame::DeleteNode
 void PortalMainFrame::DeleteNode(CoreGenNode *Node){
-  LogPane->AppendText("DeleteNode()\n");
+  //delete from UI
+  //ModuleBox->DeleteChildren(ModuleBox->GetFocusedItem());
+  //ModuleBox->Delete(ModuleBox->GetFocusedItem());
+
+  //delete from IR text
+  int pos = IRPane->FindText(0,IRPane->GetLastPosition(),
+                             FindNodeStr(Node), 0 );
+  IRPane->GotoPos(pos);
+  wxString line = IRPane->GetCurLine();
+  unsigned int i;
+  for(i = 0; i < line.size() && line[i] != '-'; i++);
+  do{
+    IRPane->LineDelete();
+    line = IRPane->GetCurLine();
+  } while(line.size() > 0 && line[i] != '-' && isspace(line[i]));
+  IRPane->PageDown();
+  IRPane->LineUp();
+  IRPane->EnsureCaretVisible();
+
+  //delete from backend
+  wxString Dnode(Node->GetName());
+  CGProject->DeleteNode(Node);
+  CGProject->BuildDAG();
+
+  //delete from UI
+  ModuleBox->DeleteAllItems();
+  TreeItems.clear();
+  NodeItems.clear();
+  SetupModuleBox();
+  LoadModuleBox();
+
+  LogPane->AppendText(Dnode + wxT(" was deleted.\n"));
 }
 
 // PortalMainFrame::AddNodeWin
@@ -676,14 +1224,10 @@ void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
   CoreInfoWin *InfoWin = nullptr;
   switch(event.GetId()){
   case ID_TREE_INFONODE:
-    // open a node info window: TODO: change this to permit multiple selections
-    InfoWin = new CoreInfoWin(NULL,wxID_ANY,
+    // open tree info node
+    InfoWin = new CoreInfoWin(this,wxID_ANY,
                               GetNodeFromItem(ModuleBox->GetFocusedItem()));
     delete InfoWin;
-    break;
-  case ID_TREE_EDITNODE:
-    // open an editor for the target node
-    OpenNodeEditWin(GetNodeFromItem(ModuleBox->GetFocusedItem()));
     break;
   case ID_TREE_DELNODE:
     DeleteNode(GetNodeFromItem(ModuleBox->GetFocusedItem()));
@@ -703,8 +1247,7 @@ void PortalMainFrame::OnRightClickNode(wxTreeEvent &event){
   }else{
     // this is an actual node
     mnu.Append( ID_TREE_INFONODE, "Node Info" );
-    mnu.Append( ID_TREE_EDITNODE, "Edit Node" );
-    mnu.Append( ID_TREE_DELNODE, "Delete Node" );
+    mnu.Append( ID_TREE_DELNODE,  "Delete Node" );
   }
   mnu.Connect( wxEVT_COMMAND_MENU_SELECTED,
                wxCommandEventHandler(PortalMainFrame::OnPopupNode),
@@ -736,6 +1279,23 @@ CoreGenNode *PortalMainFrame::GetNodeFromItem( wxTreeItemId SelId ){
       }
     }
   }
+
+  // walk the Ext nodes
+  for( unsigned i=0; i<ExtItems.size(); i++ ){
+    wxTreeItemId TmpItem = std::get<0>(ExtItems[i]);
+    if( TmpItem == SelId ){
+      return std::get<2>(ExtItems[i]);
+    }
+  }
+
+  // walk the plugin nodes
+  for( unsigned i=0; i<PluginItems.size(); i++ ){
+    wxTreeItemId TmpItem = std::get<0>(PluginItems[i]);
+    if( TmpItem == SelId ){
+      return std::get<2>(PluginItems[i]);
+    }
+  }
+
   return nullptr;
 }
 
@@ -761,9 +1321,111 @@ void PortalMainFrame::OnMiddleClickNode(wxTreeEvent &event){
   IRPane->GotoPos(pos);
 }
 
+// PortalMainFrame::OpenFile
+void PortalMainFrame::OpenFileFromWin(wxString Path){
+  wxFileName NPF(Path);
+  wxString Ext = NPF.GetExt();
+
+  if( Ext.IsSameAs(wxT("sc"),false) ){
+    OpenSCFile(Path,NPF);
+  }else if( Ext.IsSameAs(wxT("yaml"),false) ){
+    LogPane->AppendText("Opening Yaml file at " + Path + wxT("\n") );
+  }else{
+    LogPane->AppendText("Could not open file at " + Path + wxT("\n") );
+  }
+}
+
+// PortalMainFrame::OpenSCFile
+void PortalMainFrame::OpenSCFile(wxString NP, wxFileName NPF){
+  LogPane->AppendText( "Opening StoneCutter file at " +
+                       NPF.GetFullName() + wxT("\n") );
+
+  // check to see if the window is already open
+  wxString TmpName = NPF.GetFullName();
+  size_t TmpPage = -1;
+  for( unsigned i = 0; i<SCPanes.size(); i++ ){
+    if( std::get<1>(SCPanes[i]) == TmpName )
+      TmpPage = i+1;
+  }
+
+  if( TmpPage != -1 ){
+    // page already exists, refocus to the target tab
+    LogPane->AppendText("File is already open... refocusing to the appropriate tab\n" );
+    EditorNotebook->SetSelection(TmpPage);
+  }else{
+    // create a new window
+    wxStyledTextCtrl *SCPane = new wxStyledTextCtrl(this, wxID_ANY);
+    SCPane->StyleClearAll();
+    SCPane->SetMarginWidth(MARGIN_LINE_NUMBERS, 50);
+    SCPane->SetTabWidth(3);
+    SCPane->SetIndent(3);
+    SCPane->SetUseTabs(false);
+    SCPane->StyleSetForeground(wxSTC_STYLE_LINENUMBER, wxColour (75, 75, 75) );
+    SCPane->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour (220, 220, 220));
+    SCPane->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
+    SCPane->SetWrapMode(wxSTC_WRAP_WORD);
+    SCPane->SetLexer(wxSTC_LEX_CPP);
+
+    SCPane->StyleSetForeground (wxSTC_C_STRING,            wxColour(150,0,0));
+    SCPane->StyleSetForeground (wxSTC_C_PREPROCESSOR,      wxColour(165,105,0));
+    SCPane->StyleSetForeground (wxSTC_C_IDENTIFIER,        wxColour(40,0,60));
+    SCPane->StyleSetForeground (wxSTC_C_NUMBER,            wxColour(0,150,0));
+    SCPane->StyleSetForeground (wxSTC_C_CHARACTER,         wxColour(150,0,0));
+    SCPane->StyleSetForeground (wxSTC_C_WORD,              wxColour(0,0,150));
+    SCPane->StyleSetForeground (wxSTC_C_WORD2,             wxColour(0,150,0));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENT,           wxColour(150,150,150));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENTLINE,       wxColour(150,150,150));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOC,        wxColour(150,150,150));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOCKEYWORD, wxColour(0,0,200));
+    SCPane->StyleSetForeground (wxSTC_C_COMMENTDOCKEYWORDERROR, wxColour(0,0,200));
+    SCPane->StyleSetBold(wxSTC_C_WORD, true);
+    SCPane->StyleSetBold(wxSTC_C_WORD2, true);
+    SCPane->StyleSetBold(wxSTC_C_COMMENTDOCKEYWORD, true);
+
+    // the load file
+    SCPane->LoadFile(NP);
+
+    // add it to our vector
+    SCPanes.push_back(std::make_pair(SCPane,NPF.GetFullName()));
+
+    // add the file to the editor network
+    EditorNotebook->AddPage( SCPane, NP, true, wxBookCtrlBase::NO_IMAGE );
+
+    // reset the tab title
+    EditorNotebook->SetPageText( EditorNotebook->GetPageCount()-1,
+                                 NPF.GetName() );
+  }
+}
+
+// PortalMainFrame::OnSelectPlugin
+void PortalMainFrame::OnSelectPlugin(wxCommandEvent& event){
+  int Plugin = PluginBox->GetSelection();
+  if( (unsigned)(Plugin) > (PluginPanes.size()-1) ){
+    LogPane->AppendText("Invalid plugin item\n");
+  }else{
+    wxString PName = std::get<0>(PluginPanes[(unsigned)(Plugin)]);
+    LogPane->AppendText("Opening plugin: " + PName + wxT("\n"));
+
+    // open a new plugin information window
+  }
+}
+
 // PortalMainFrame::OnSelectNode
 void PortalMainFrame::OnSelectNode(wxTreeEvent &event){
-  LogPane->AppendText("selected a node");
+  switch( ModulesNotebook->GetSelection() ){
+  case 0:
+    LogPane->AppendText("Module node selected\n");
+    break;
+  case 1:
+    LogPane->AppendText("Plugin node selected\n");
+    break;
+  case 2:
+    OpenFileFromWin(ProjDir->GetFilePath());
+    break;
+  default:
+    LogPane->AppendText("erroneous window selections\n");
+    break;
+  }
 }
 
 // PortalMainFrame::OnVerifPref
@@ -823,12 +1485,42 @@ void PortalMainFrame::OnProjClose(wxCommandEvent& WXUNUSED(event)){
   CloseProject();
 }
 
+// PortalMainFrame::OnProjSCOpen
+void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
+  if( !CGProject ){
+    LogPane->AppendText( "No project open\n" );
+    return ;
+  }
+
+  wxFileName CurProj(IRFileName);
+  wxFileDialog* OpenDialog = new wxFileDialog( this,
+                                               _("Choose a StoneCutter file to open"),
+                                               CurProj.GetPath(),
+                                               wxEmptyString,
+                                               _("SC Files (*.sc)|*.sc"),
+                                               wxFD_OPEN, wxDefaultPosition );
+
+  wxString NP;
+  if( OpenDialog->ShowModal() == wxID_OK ){
+    NP = OpenDialog->GetPath();
+
+    // derive the file name
+    wxFileName NPF(NP);
+
+    LogPane->AppendText( "Opening StoneCutter file at " + NP + wxT("\n") );
+
+    OpenSCFile( NP, NPF );
+  }
+
+  // clean up the dialog box
+  OpenDialog->Destroy();
+}
+
 // PortalMainFrame::OnProjOpen
 void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
   // stage 1, decide whether we need to close the current project
-  if( CGProject ){
+  if( CGProject )
     CloseProject();
-  }
 
   // stage 2, prompt the user to select the new yaml input file
   wxFileDialog* OpenDialog = new wxFileDialog( this,
@@ -869,6 +1561,9 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
     IRPane->LoadFile(NP);
     IRFileName = NP;
 
+    // switch the directory tree to the project directory
+    ProjDir->SetPath(NPF.GetPath());
+
     // load all the modules into the modulebox
     LoadModuleBox();
 
@@ -877,6 +1572,107 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
 
   // clean up the dialog box
   OpenDialog->Destroy();
+}
+
+void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
+                                   CoreGenNode *node,
+                                   int InfoWinType){
+  // get the box contents
+  wxTextCtrl *ClickedBox = (wxTextCtrl*)enter.GetEventObject();
+  std::string BoxContents = ClickedBox->GetValue().ToStdString();
+  // get the box id
+  int InfoBoxIndex = ClickedBox->GetId();
+
+  // TODO: handle invalid inputs
+  // update yaml
+  switch(InfoWinType){
+    case CGCache:{
+      // TODO: handle adding parent and child caches
+      CoreGenCache *CacheNode = (CoreGenCache*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          CacheNode->SetName(BoxContents);
+          break;
+        case 1:
+          CacheNode->SetSets(std::stoi(BoxContents));
+          break;
+        case 2:
+          CacheNode->SetWays(std::stoi(BoxContents));
+          break;
+      }
+    }
+    break;
+    case CGComm:{
+      // TODO: handle endpoints
+      CoreGenComm *CommNode = (CoreGenComm*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          CommNode->SetName(BoxContents);
+          break;
+        case 1:
+          if( BoxContents.compare("Point-to-Point") == 0 ){
+            CommNode->SetCommType(CGCommP2P);
+          }
+          else if( BoxContents.compare("Bus") == 0 ){
+            CommNode->SetCommType(CGCommBus);
+          }
+          else if( BoxContents.compare("Network on Chip") == 0 ){
+            CommNode->SetCommType(CGCommNoc);
+          }
+          else{
+            CommNode->SetCommType(CGCommUnk);
+          }
+          break;
+        case 2:
+          CommNode->SetWidth(std::stoi(BoxContents));
+          break;
+      }
+    }
+    break;
+    case CGCore:{
+      // TODO: Handle isa, caches, regclasses, and extensions
+      CoreGenCore *CoreNode = (CoreGenCore*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          CoreNode->SetName(BoxContents);
+          break;
+        case 1:
+          CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
+          break;
+      }
+    }
+    break;
+    case CGExt:{
+      CoreGenExt *ExtNode = (CoreGenExt*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          ExtNode->SetName(BoxContents);
+          break;
+        case 1:
+          if( BoxContents.compare("Template extension") == 0 ){
+            ExtNode->SetType(CGExtTemplate);
+          }
+          else if( BoxContents.compare("Module extension") == 0 ){
+            ExtNode->SetType(CGExtModule);
+          }
+          else if( BoxContents.compare("Communications extension") == 0 ){
+            ExtNode->SetType(CGExtComm);
+          }
+          else{
+            ExtNode->SetType(CGExtUnk);
+          }
+          break;
+      }
+    }
+    break;
+  }
+
+  // write out the new IR file
+  CGProject->WriteIR(std::string(IRFileName.mb_str()));
+  //LoadModuleBox();
+  LogPane->AppendText("Updated " + wxString(node->GetName()) +
+                      " Box " + wxString(std::to_string(InfoBoxIndex)) +
+                      ".\n");
 }
 
 // EOF

@@ -26,6 +26,7 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/sizer.h>
+#include <wx/dir.h>
 #include <wx/dirctrl.h>
 #include <wx/stattext.h>
 #include <wx/frame.h>
@@ -54,7 +55,11 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+//-- STANDARD HEADERS
 #include <stdlib.h>
+#include <vector>
+#include <tuple>
+#include <string>
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -66,6 +71,9 @@ public:
                    const wxPoint& pos,
                    const wxSize& size );
   ~PortalMainFrame();
+
+  // node info update handlers
+  void OnPressEnter(wxCommandEvent &event, CoreGenNode *node, int InfoWinType);
 
 private:
   // CoreGenHandlers
@@ -100,6 +108,8 @@ private:
 
   wxAuiNotebook* EditorNotebook;
   wxStyledTextCtrl *IRPane;
+  std::vector<std::pair<wxStyledTextCtrl *,wxString>> SCPanes;
+  std::vector<std::pair<wxString,wxString>> PluginPanes;
 
   wxString IRFileName;
 
@@ -107,6 +117,8 @@ private:
   std::vector<wxTreeItemId> TreeItems;
   std::vector<std::pair<wxTreeItemId,CoreGenNode *>> NodeItems;
   std::vector<std::pair<wxTreeItemId,CoreGenEncoding *>> EncItems;
+  std::vector<std::tuple<wxTreeItemId,CoreGenExt *,CoreGenNode *>> ExtItems;
+  std::vector<std::tuple<wxTreeItemId,CoreGenPlugin *,CoreGenNode *>> PluginItems;
 
   // private functions
   void InitAuiMgr();
@@ -115,13 +127,17 @@ private:
   void CreatePortalToolBar();
   void CreateWindowLayout();
   void SetupModuleBox();
+  void SetupPluginBox();
   void LoadModuleBox();
+  void LoadExtNodes(wxTreeItemId, CoreGenExt *Ext);
+  void LoadPluginNodes(wxTreeItemId, CoreGenPlugin *Plugin);
   void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
   void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
   void CloseProject();
-  void OpenNodeEditWin(CoreGenNode *N);
   void DeleteNode(CoreGenNode *N);
   void AddNodeWin();
+  void OpenFileFromWin(wxString Path);
+  void OpenSCFile(wxString NP, wxFileName NPF);
 
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
@@ -133,7 +149,9 @@ private:
   void OnUserPref(wxCommandEvent& event);
   void OnProjNew(wxCommandEvent& event);
   void OnProjOpen(wxCommandEvent& event);
+  void OnProjSCOpen(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
+  void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
   void OnMiddleClickNode(wxTreeEvent& event);
@@ -144,6 +162,7 @@ enum
 {
   MARGIN_LINE_NUMBERS,
   ID_PROJNEW            = 10,
+  ID_PROJSCOPEN         = 11,
   ID_BUILD_VERIFY       = 20,
   ID_BUILD_CODEGEN      = 21,
   ID_BUILD_SIGMAP       = 22,
@@ -158,9 +177,8 @@ enum
   ID_PREF_STONECUTTER   = 42,
   ID_TREE_SELECTNODE    = 50,
   ID_TREE_INFONODE      = 51,
-  ID_TREE_EDITNODE      = 52,
-  ID_TREE_ADDNODE       = 53,
-  ID_TREE_DELNODE       = 54
+  ID_TREE_ADDNODE       = 52,
+  ID_TREE_DELNODE       = 53
 };
 
 enum{
@@ -179,6 +197,39 @@ enum{
   TREE_NODE_SOC         = 12,
   TREE_NODE_SPAD        = 13,
   TREE_NODE_VTP         = 14
+};
+
+enum{
+  TREE_EXT_NODE_CACHE       = 0,
+  TREE_EXT_NODE_COMM        = 1,
+  TREE_EXT_NODE_CORE        = 2,
+  TREE_EXT_NODE_EXT         = 3,
+  TREE_EXT_NODE_ISA         = 4,
+  TREE_EXT_NODE_INST        = 5,
+  TREE_EXT_NODE_PINST       = 6,
+  TREE_EXT_NODE_INSTFORMAT  = 7,
+  TREE_EXT_NODE_MCTRL       = 8,
+  TREE_EXT_NODE_REG         = 9,
+  TREE_EXT_NODE_REGCLASS    = 10,
+  TREE_EXT_NODE_SPAD        = 11
+};
+
+enum{
+  TREE_PLUGIN_NODE_CACHE      = 0,
+  TREE_PLUGIN_NODE_CORE       = 1,
+  TREE_PLUGIN_NODE_INST       = 2,
+  TREE_PLUGIN_NODE_PINST      = 3,
+  TREE_PLUGIN_NODE_INSTFORMAT = 4,
+  TREE_PLUGIN_NODE_REG        = 5,
+  TREE_PLUGIN_NODE_REGCLASS   = 6,
+  TREE_PLUGIN_NODE_SOC        = 7,
+  TREE_PLUGIN_NODE_ISA        = 8,
+  TREE_PLUGIN_NODE_EXT        = 9,
+  TREE_PLUGIN_NODE_COMM       = 10,
+  TREE_PLUGIN_NODE_SPAD       = 11,
+  TREE_PLUGIN_NODE_MCTRL      = 12,
+  TREE_PLUGIN_NODE_VTP        = 13
+
 };
 
 #endif

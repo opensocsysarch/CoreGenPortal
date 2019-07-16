@@ -217,7 +217,7 @@ wxString CorePluginInfoWin::GetFeatureStr( CoreGenPlugin *Plugin,
     Value = Plugin->GetFeatureValue(Idx);
     FeatureValue = wxString::Format(wxT("%i"),Value.Uint32tData);
     break;
-  case CGFint32t:
+  case CGFInt32t:
     FeatureType = wxT("int32_t");
     Value = Plugin->GetFeatureValue(Idx);
     FeatureValue = wxString::Format(wxT("%i"),Value.Int32tData);

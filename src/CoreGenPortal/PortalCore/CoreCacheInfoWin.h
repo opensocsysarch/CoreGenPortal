@@ -35,9 +35,12 @@
 #include <wx/msgdlg.h>
 #include <wx/textctrl.h>
 #include <wx/scrolwin.h>
+#include <wx/panel.h>
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
+
+#include "CoreGenPortal/PortalMainFrame.h"
 
 class CoreCacheInfoWin : public wxDialog {
 public:
@@ -47,20 +50,20 @@ public:
                  CoreGenCache *Node = nullptr);
   ~CoreCacheInfoWin();
 
-  // Event handler functions
-  /// Declares the event table
-  wxDECLARE_EVENT_TABLE();
-
-  /// handles the 'ok' button press
-  void OnPressOk( wxCommandEvent& event );
-
 protected:
+  CoreGenCache *CacheNode;        ///< the cache node associated with this info window
   // window handlers
-  wxScrolledWindow *Wnd;         ///< scrolling window handler
+  wxScrolledWindow *Wnd;          ///< scrolling window handler
 
   // box sizers
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
+  wxBoxSizer *CacheNameSizer;     ///< cache name sizer
+  wxBoxSizer *CacheSetsSizer;     ///< cache sets sizer
+  wxBoxSizer *CacheWaysSizer;     ///< cache ways sizer
+  wxBoxSizer *ParentCacheSizer;   ///< parent cache sizer
+  wxBoxSizer *ChildCacheSizer;    ///< child cache sizer
+  wxBoxSizer *SpacerPanelSizer;   ///< spacer panel for spacing at bottom
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
@@ -82,6 +85,15 @@ protected:
   wxButton *m_userOK;                         ///< ok button
 
 private:
+  // Event handler functions
+  /// Declares the event table
+  wxDECLARE_EVENT_TABLE();
+
+  /// handles the 'ok' button press
+  void OnPressOk( wxCommandEvent& event );
+  
+  /// handles 'enter' press in textctrl box
+  void OnPressEnter( wxCommandEvent& event);
 };
 
 #endif

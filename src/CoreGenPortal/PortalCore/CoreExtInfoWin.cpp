@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreExtInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreExtInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreExtInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
@@ -20,10 +21,12 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenExt *Ext )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,200), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
   if( Ext == nullptr ){
     this->EndModal(wxID_OK);
   }
+
+  this->ExtNode = Ext;
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -45,42 +48,44 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
 
   // add all the interior data
   //-- extension name
+  ExtNameSizer = new wxBoxSizer( wxHORIZONTAL );
   ExtNameText = new wxStaticText( Wnd,
                                   wxID_ANY,
                                   wxT("Extension Name"),
                                   wxDefaultPosition,
-                                  wxDefaultSize,
+                                  wxSize(160,-1),
                                   0 );
   ExtNameText->Wrap(-1);
-  InnerSizer->Add( ExtNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  ExtNameSizer->Add( ExtNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   ExtNameCtrl = new wxTextCtrl( Wnd,
-                                wxID_ANY,
+                                0,
                                 wxString(Ext->GetName()),
                                 wxDefaultPosition,
-                                wxSize(400,25),
-                                wxTE_READONLY,
+                                wxSize(320,25),
+                                wxTE_PROCESS_ENTER,
                                 wxDefaultValidator,
                                 wxT("ExtName") );
-  InnerSizer->Add( ExtNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
-
+  ExtNameSizer->Add( ExtNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( ExtNameSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   //-- extension type
+  ExtTypeSizer = new wxBoxSizer( wxHORIZONTAL );
   ExtTypeText = new wxStaticText( Wnd,
                                   wxID_ANY,
                                   wxT("Extension Type"),
                                   wxDefaultPosition,
-                                  wxDefaultSize,
+                                  wxSize(160,-1),
                                   0 );
   ExtTypeText->Wrap(-1);
-  InnerSizer->Add( ExtTypeText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  ExtTypeSizer->Add( ExtTypeText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   ExtTypeCtrl = new wxTextCtrl( Wnd,
-                                wxID_ANY,
+                                1,
                                 wxEmptyString,
                                 wxDefaultPosition,
-                                wxSize(400,25),
-                                wxTE_READONLY,
+                                wxSize(320,25),
+                                wxTE_PROCESS_ENTER,
                                 wxDefaultValidator,
                                 wxT("ExtType") );
   switch(Ext->GetType()){
@@ -98,7 +103,8 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
     ExtTypeCtrl->AppendText(wxT("Unknown extension"));
     break;
   }
-  InnerSizer->Add( ExtTypeCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  ExtTypeSizer->Add( ExtTypeCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( ExtTypeSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -129,6 +135,11 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
 
 void CoreExtInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreExtInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->ExtNode, CGExt);
 }
 
 CoreExtInfoWin::~CoreExtInfoWin(){

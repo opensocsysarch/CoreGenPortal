@@ -39,6 +39,8 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+#include "CoreGenPortal/PortalMainFrame.h"
+
 class CoreCommInfoWin : public wxDialog {
 public:
   CoreCommInfoWin( wxWindow* parent,
@@ -47,20 +49,19 @@ public:
                  CoreGenComm *Node = nullptr);
   ~CoreCommInfoWin();
 
-  // Event handler functions
-  /// Declares the event table
-  wxDECLARE_EVENT_TABLE();
-
-  /// handles the 'ok' button press
-  void OnPressOk( wxCommandEvent& event );
-
-protected:
+  protected:
+  CoreGenComm *CommNode;          ///< the comm node associated with this info window
   // window handlers
-  wxScrolledWindow *Wnd;         ///< scrolling window handler
+  wxScrolledWindow *Wnd;          ///< scrolling window handler
 
   // box sizers
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
+  wxBoxSizer *CommNameSizer;      ///< comm name sizer
+  wxBoxSizer *CommTypeSizer;      ///< comm type sizer
+  wxBoxSizer *CommWidthSizer;     ///< comm width sizer
+  wxBoxSizer *CommEndpointSizer;  ///< comm endpoint sizer
+  wxBoxSizer *SpacerPanelSizer;   ///< sizer for spance panel
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
@@ -80,6 +81,15 @@ protected:
   wxButton *m_userOK;                         ///< ok button
 
 private:
+  // Event handler functions
+  /// Declares the event table
+  wxDECLARE_EVENT_TABLE();
+
+  /// handles the 'ok' button press
+  void OnPressOk( wxCommandEvent& event );
+
+  /// handle the 'enter' key press
+  void OnPressEnter( wxCommandEvent& enter );
 };
 
 #endif

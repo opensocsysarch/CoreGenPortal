@@ -38,6 +38,8 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+#include "CoreGenPortal/PortalMainFrame.h"
+
 class CoreCoreInfoWin : public wxDialog {
 public:
   CoreCoreInfoWin( wxWindow* parent,
@@ -46,19 +48,23 @@ public:
                  CoreGenCore *Node = nullptr);
   ~CoreCoreInfoWin();
 
-  // Event handler functions
-  /// Declares the event table
-  wxDECLARE_EVENT_TABLE();
-
-  /// handles the 'ok' button press
-  void OnPressOk( wxCommandEvent& event );
-
 protected:
+  CoreGenCore *CoreNode;
   // window handlers
-  wxPanel *m_panel1;              ///< main panel
+  wxScrolledWindow *Wnd;          ///< scrolling window handler
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
+
+  // box sizers
+  wxBoxSizer *OuterSizer;         ///< outer sizer
+  wxBoxSizer *InnerSizer;         ///< inner sizer
+  wxBoxSizer *CoreNameSizer;      ///< core name sizer
+  wxBoxSizer *ThreadUnitSizer;    ///< thread unit sizer
+  wxBoxSizer *ISANameSizer;       ///< isa name sizer
+  wxBoxSizer *CacheNameSizer;     ///< cache name sizer
+  wxBoxSizer *RegClassSizer;      ///< register class sizer
+  wxBoxSizer *ExtNameSizer;       ///< extension name sizer
 
   wxStaticText *CoreNameText;     ///< static text for SoC name
   wxStaticText *ThreadUnitText;   ///< static text for thread units name
@@ -79,6 +85,14 @@ protected:
   wxButton *m_userOK;                         ///< ok button
 
 private:
+  // Event handler functions
+  /// Declares the event table
+  wxDECLARE_EVENT_TABLE();
+
+  /// handles the 'ok' button press
+  void OnPressOk( wxCommandEvent& event );
+
+  void OnPressEnter( wxCommandEvent& event );
 };
 
 #endif

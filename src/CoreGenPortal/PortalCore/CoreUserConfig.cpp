@@ -19,6 +19,15 @@ CoreUserConfig::CoreUserConfig()
     wxString LH = getenv("HOME");
     ConfFile = LH + wxT("/") + PORTAL_USER_CONFIG;
   }
+
+  wxString OverridePlugin = getenv(PORTAL_ENV_PLUGIN_CONFIG.c_str());
+  if( OverridePlugin.length() > 0 ){
+    PluginDir = OverridePlugin;
+  }else{
+    // derive the plugin directory
+    wxFileName f(wxStandardPaths::Get().GetExecutablePath());
+    PluginDir = f.GetPathWithSep() + "../plugins/";
+  }
   ReadConfigFile();
 }
 

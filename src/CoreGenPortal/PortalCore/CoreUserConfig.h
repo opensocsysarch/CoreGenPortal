@@ -40,6 +40,7 @@ private:
   wxString ConfFile;            ///< Configuration file path
   wxString ProjectDir;          ///< Top-level project directory
   wxString ArchiveDir;          ///< Archive directory
+  wxString PluginDir;           ///< Plugin directory
 
   // private functions
 
@@ -67,6 +68,12 @@ public:
 
   /// Retrieve the user's home directory as a std::string
   std::string GetHomeDir() { return std::string(HomeDir.mb_str()); }
+
+  /// Retrieve the plugin directory as a wxString
+  wxString wxGetPluginDir() { return PluginDir; }
+
+  /// Retrieve the plugin directory as a std::string
+  std::string GetPluginDir() { return std::string(PluginDir.mb_str()); }
 
   /// Retrieve the user's configuration file as a wxString
   wxString wxGetConfFile() { return ConfFile; }
