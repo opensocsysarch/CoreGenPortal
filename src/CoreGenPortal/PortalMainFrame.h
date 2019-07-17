@@ -176,6 +176,7 @@ enum
   ID_BUILD_ALL          = 27,
   ID_COMPILE_SIM        = 30,
   ID_COMPILE_COMPILER   = 31,
+  ID_COMPILE_ALL        = 32,
   ID_PREF_USER          = 40,
   ID_PREF_VERIF         = 41,
   ID_PREF_STONECUTTER   = 42,

@@ -133,6 +133,7 @@ void PortalMainFrame::CreateMenuBar(){
   BuildMenu->AppendSeparator();
   BuildMenu->Append( ID_COMPILE_SIM,        wxT("&Compile Simulator"));
   BuildMenu->Append( ID_COMPILE_COMPILER,   wxT("&Compiler Compiler"));
+  BuildMenu->Append( ID_COMPILE_ALL,        wxT("&Compile All"));
 
   //-- Help Menu
   HelpMenu->Append(wxID_ABOUT);
