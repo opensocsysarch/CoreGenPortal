@@ -1515,7 +1515,14 @@ void PortalMainFrame::OnBuildVerify(wxCommandEvent &event){
 
   // restore the old cout buffer
   std::cout.rdbuf( oldBuf );
-  LogPane->AppendText(wxString(newBuf.str())+wxT("\n"));
+  //LogPane->AppendText(wxString(newBuf.str())+wxT("\n"));
+  CoreVerifWin *VW = new CoreVerifWin(this,
+                                      wxID_ANY,
+                                      wxT("Verification Results"),
+                                      &newBuf );
+  if( VW->ShowModal() == wxID_OK ){
+    VW->Destroy();
+  }
 }
 
 // PortalMainFrame::OnProjNew

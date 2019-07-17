@@ -30,6 +30,7 @@ CoreSpadInfoWin.cpp
 CoreMCtrlInfoWin.cpp
 CoreVTPInfoWin.cpp
 CorePluginInfoWin.cpp
+CoreVerifWin.cpp
 )
 
 #-- target deps

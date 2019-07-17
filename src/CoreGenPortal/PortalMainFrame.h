@@ -52,6 +52,7 @@
 #include "CoreGenPortal/PortalCore/CoreVerifConfig.h"
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
 #include "CoreGenPortal/PortalCore/CoreInfoWin.h"
+#include "CoreGenPortal/PortalCore/CoreVerifWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
