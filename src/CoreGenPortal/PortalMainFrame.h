@@ -173,6 +173,7 @@ enum
   ID_BUILD_VERILOG      = 24,
   ID_BUILD_COMPILER     = 25,
   ID_BUILD_SIM          = 26,
+  ID_BUILD_ALL          = 27,
   ID_COMPILE_SIM        = 30,
   ID_COMPILE_COMPILER   = 31,
   ID_PREF_USER          = 40,

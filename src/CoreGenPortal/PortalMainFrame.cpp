@@ -129,6 +129,7 @@ void PortalMainFrame::CreateMenuBar(){
   BuildMenu->Append( ID_BUILD_VERILOG,      wxT("&Build Verilog"));
   BuildMenu->Append( ID_BUILD_COMPILER,     wxT("&Build Compiler"));
   BuildMenu->Append( ID_BUILD_SIM,          wxT("&Build Simulator"));
+  BuildMenu->Append( ID_BUILD_ALL,          wxT("&Build All"));
   BuildMenu->AppendSeparator();
   BuildMenu->Append( ID_COMPILE_SIM,        wxT("&Compile Simulator"));
   BuildMenu->Append( ID_COMPILE_COMPILER,   wxT("&Compiler Compiler"));
