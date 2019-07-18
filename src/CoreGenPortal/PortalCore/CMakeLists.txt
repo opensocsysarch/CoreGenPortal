@@ -31,6 +31,7 @@ CoreMCtrlInfoWin.cpp
 CoreVTPInfoWin.cpp
 CorePluginInfoWin.cpp
 CoreVerifWin.cpp
+CorePluginBrowser.cpp
 )
 
 #-- target deps

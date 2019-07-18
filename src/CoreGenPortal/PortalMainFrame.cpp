@@ -1401,6 +1401,7 @@ void PortalMainFrame::OnSelectPlugin(wxCommandEvent& event){
     LogPane->AppendText("Opening plugin: " + PName + wxT("\n"));
 
     // open a new plugin information window
+    // use the 1st item of the pluginpane as the full path to the plugin
   }
 }
 
@@ -1409,9 +1410,7 @@ void PortalMainFrame::OnSelectNode(wxTreeEvent &event){
   switch( ModulesNotebook->GetSelection() ){
   case 0:
     LogPane->AppendText("Module node selected\n");
-    break;
-  case 1:
-    LogPane->AppendText("Plugin node selected\n");
+    // TODO: open the node window
     break;
   case 2:
     OpenFileFromWin(ProjDir->GetFilePath());
