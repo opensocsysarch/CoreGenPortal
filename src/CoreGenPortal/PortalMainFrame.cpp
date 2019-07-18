@@ -42,16 +42,6 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   // update the aui manager
   UpdateAuiMgr();
 
-#if 0
-  // read the user configuration data
-  UserConfig = new CoreUserConfig();
-  if( UserConfig->isValid() )
-    LogPane->AppendText("Read user configuration data; ConfigFile="
-                        + UserConfig->wxGetConfFile() + "\n");
-  else
-    LogPane->AppendText("Error reading user configuration data; ConfigFile="
-                        + UserConfig->wxGetConfFile() + "\n");
-#endif
   // initialize the verification configuration data
   VerifConfig = new CoreVerifConfig();
   if( VerifConfig->isValid() )
