@@ -44,7 +44,9 @@ public:
                       const wxString& title = wxT("Plugin Browser"),
                       wxString PluginName = wxT("NONAME"),
                       wxString PluginPath = wxT("NOPATH"),
-                      CoreGenBackend* CGProject = nullptr );
+                      CoreGenPlugin *PluginPtr = nullptr,
+                      CoreGenBackend* CGProject = nullptr,
+                      wxTextCtrl *LogPane = nullptr );
   ~CorePluginBrowser();
 
 protected:
@@ -55,8 +57,19 @@ protected:
   wxStaticLine* FinalStaticLine;  ///< final static line
 
   // box sizers
-  wxBoxSizer *OuterSizer;         ///< outer sizer
-  wxBoxSizer *InnerSizer;         ///< inner sizer
+  wxBoxSizer *OuterSizer;         ///< Outer sizer
+  wxBoxSizer *InnerSizer;         ///< Inner sizer
+  wxBoxSizer *PluginNameSizer;    ///< Plugin name sizer
+  wxBoxSizer *HDLSizer;           ///< HDL sizer
+  wxBoxSizer *LLVMSizer;          ///< LLVM sizer
+  wxBoxSizer *FeatureSizer;       ///< Feature sizer
+
+  // window elements
+  wxStaticText* PluginNameText;   ///< Plugin name text
+  wxStaticText* HDLCodegen;       ///< HDL codegen text
+  wxStaticText* LLVMCodegen;      ///< LLVM codegen text
+  wxStaticText* FeaturesText;     ///< Features text
+  std::vector<wxStaticText *> Features; ///< Features vector
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
@@ -66,6 +79,13 @@ private:
   // Event handler functions
   /// Declares the event table
   wxDECLARE_EVENT_TABLE();
+
+  // Private variables
+  wxString PluginName;
+  wxString PluginPath;
+  CoreGenPlugin *PLUGIN;
+  CoreGenBackend *CGProject;
+  wxTextCtrl *LogPane;
 
   /// handles the 'ok' button press
   void OnPressOk( wxCommandEvent& event );

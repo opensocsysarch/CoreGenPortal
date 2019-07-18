@@ -311,12 +311,29 @@ void PortalMainFrame::SetupPluginBox(){
     unsigned pos = 0;
     bool cont = PluginDir.GetFirst(&filename,wxEmptyString,wxDIR_DIRS);
     while( cont ){
-      PluginPanes.push_back(std::make_pair(filename,
-                                           UserConfig->wxGetPluginDir() +
-                                           wxT("/") +
-                                           filename ));
-      PluginBox->InsertItems(1,&filename,pos);
-      pos = pos+1;
+      wxDir LPluginDir(UserConfig->wxGetPluginDir() + wxT("/") + filename );
+      wxString FullPluginPath;
+      if( LPluginDir.HasFiles(wxT("*.so")) ){
+        FullPluginPath = UserConfig->wxGetPluginDir() +
+                         wxT("/") + filename +
+                         wxT("/") + wxT("lib") + filename + wxT(".so");
+        PluginPanes.push_back(std::make_pair(filename,
+                                             FullPluginPath));
+        LogPane->AppendText( "Loaded Plugin Path: " + FullPluginPath + wxT("\n"));
+        PluginBox->InsertItems(1,&filename,pos);
+        pos = pos+1;
+      }else if( LPluginDir.HasFiles(wxT("*.dylib")) ){
+        FullPluginPath = UserConfig->wxGetPluginDir() +
+                         wxT("/") + filename +
+                         wxT("/") + wxT("lib") + filename + wxT(".dylib");
+        PluginPanes.push_back(std::make_pair(filename,
+                                             FullPluginPath));
+        LogPane->AppendText( "Loaded Plugin Path: " + FullPluginPath + wxT("\n"));
+        PluginBox->InsertItems(1,&filename,pos);
+        pos = pos+1;
+      }else{
+        LogPane->AppendText("No plugin library found for " + filename );
+      }
       cont = PluginDir.GetNext(&filename);
     }
   }
@@ -1398,10 +1415,30 @@ void PortalMainFrame::OnSelectPlugin(wxCommandEvent& event){
     LogPane->AppendText("Invalid plugin item\n");
   }else{
     wxString PName = std::get<0>(PluginPanes[(unsigned)(Plugin)]);
-    LogPane->AppendText("Opening plugin: " + PName + wxT("\n"));
-
-    // open a new plugin information window
-    // use the 1st item of the pluginpane as the full path to the plugin
+    wxString PPath = std::get<1>(PluginPanes[(unsigned)(Plugin)]);
+    if( !CGProject->LoadPlugin( std::string(PPath.mb_str()) ) ){
+      LogPane->AppendText(  wxT("Failed to load plugin at ") + PPath + wxT("\n") );
+      LogPane->AppendText( wxString(CGProject->GetErrStr()) );
+    }else{
+      // open a new plugin information window
+      unsigned PID = CGProject->GetNumPlugins() - 1;
+      CoreGenPlugin *PLUGIN = CGProject->GetPlugin(PID);
+      CorePluginBrowser *PB = new CorePluginBrowser(this,
+                                                  wxID_ANY,
+                                                  wxT("Plugin Browser"),
+                                                  PName,
+                                                  PPath,
+                                                  PLUGIN,
+                                                  CGProject,
+                                                  LogPane);
+      if( PB->ShowModal() == wxID_OK ){
+        PB->Destroy();
+        if( !CGProject->ReleasePlugin(PID) ){
+          LogPane->AppendText( wxT("Failed to release plugin at ") + PPath + wxT("\n") );
+          LogPane->AppendText( wxString(CGProject->GetErrStr()) );
+        }
+      }
+    }
   }
 }
 
