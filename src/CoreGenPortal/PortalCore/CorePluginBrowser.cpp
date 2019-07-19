@@ -25,7 +25,7 @@ CorePluginBrowser::CorePluginBrowser( wxWindow *parent,
                                       CoreGenBackend *CGProject,
                                       wxTextCtrl *LogPane )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(600,600), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ),
+              wxSize(400,400), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ),
     PluginName(PluginName), PluginPath(PluginPath), PLUGIN(PluginPtr),
     CGProject(CGProject), LogPane(LogPane) {
 
@@ -113,6 +113,30 @@ CorePluginBrowser::CorePluginBrowser( wxWindow *parent,
   InnerSizer->Add( LLVMSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   //-- features
+  FeatureSizer = new wxBoxSizer( wxVERTICAL );
+  FeaturesText = new wxStaticText( Wnd,
+                                   wxID_ANY,
+                                   wxT("FeatureName : FeatureType"),
+                                   wxDefaultPosition,
+                                   wxSize(300,-1),
+                                   0 );
+  FeatureSizer->Add( FeaturesText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+
+  for( unsigned i=0; i<PLUGIN->GetNumFeatures(); i++ ){
+    wxString FeatureType = FeatureTypeToString(PLUGIN->GetFeatureType(i));
+    wxString FeatureName = wxString(PLUGIN->GetFeatureName(i));
+    wxStaticText *F = new wxStaticText( Wnd,
+                                        wxID_ANY,
+                                        FeatureName + wxT(" : ") + FeatureType,
+                                        wxDefaultPosition,
+                                        wxSize(300,-1),
+                                        0 );
+    F->Wrap(-1);
+    FeatureSizer->Add( F, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+    Features.push_back(F);
+  }
+  InnerSizer->Add( FeatureSizer, 0, wxALIGN_CENTER|wxALL, 5);
+
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
                                       wxID_ANY,
@@ -138,6 +162,42 @@ CorePluginBrowser::CorePluginBrowser( wxWindow *parent,
   this->SetSizer( OuterSizer );
   this->SetAutoLayout( true );
   this->Layout();
+}
+
+wxString CorePluginBrowser::FeatureTypeToString(CGFeatureType Type ){
+  switch( Type ){
+  case CGFUnsigned:
+    return wxString("Unsigned");
+    break;
+  case CGFUin32t:
+    return wxString("Uint32t");
+    break;
+  case CGFInt32t:
+    return wxString("Int32t");
+    break;
+  case CGFUint64t:
+    return wxString("Uint64t");
+    break;
+  case CGFInt64t:
+    return wxString("Int64t");
+    break;
+  case CGFFloat:
+    return wxString("Float");
+    break;
+  case CGFDouble:
+    return wxString("Double");
+    break;
+  case CGFString:
+    return wxString("String");
+    break;
+  case CGFBool:
+    return wxString("Bool");
+    break;
+  case CGFUnknown:
+  default:
+    return wxString("UNKNOWN");
+    break;
+  }
 }
 
 void CorePluginBrowser::OnPressOk(wxCommandEvent& ok){

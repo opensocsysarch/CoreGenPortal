@@ -1410,6 +1410,10 @@ void PortalMainFrame::OpenSCFile(wxString NP, wxFileName NPF){
 
 // PortalMainFrame::OnSelectPlugin
 void PortalMainFrame::OnSelectPlugin(wxCommandEvent& event){
+  if( !CGProject ){
+    LogPane->AppendText("Cannot load plugin; no project open\n" );
+    return ;
+  }
   int Plugin = PluginBox->GetSelection();
   if( (unsigned)(Plugin) > (PluginPanes.size()-1) ){
     LogPane->AppendText("Invalid plugin item\n");

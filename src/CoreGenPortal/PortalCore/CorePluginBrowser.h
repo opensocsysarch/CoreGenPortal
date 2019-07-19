@@ -89,6 +89,9 @@ private:
 
   /// handles the 'ok' button press
   void OnPressOk( wxCommandEvent& event );
+
+  /// converts a feature type to a wxString
+  wxString FeatureTypeToString(CGFeatureType Type );
 };
 
 #endif
