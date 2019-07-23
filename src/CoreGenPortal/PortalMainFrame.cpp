@@ -55,9 +55,17 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
 
 // PortalMainFrame::~PortalMainFrame
 PortalMainFrame::~PortalMainFrame(){
+
+  if( CGProject )
+    CloseProject();
+
+  if( UserConfig )
+    delete UserConfig;
+
+  if( VerifConfig )
+    delete VerifConfig;
+
   Mgr.UnInit();
-  delete UserConfig;
-  delete VerifConfig;
 }
 
 // PortalMainFrame::InitAuiMgr
@@ -1124,16 +1132,20 @@ void PortalMainFrame::CloseProject(){
   IRPane->ClearAll();
 
   // close out all the StoneCutter windows
+  LogPane->AppendText("Removing Pages\n" );
   for( size_t i=1; i<EditorNotebook->GetPageCount(); i++ ){
-    LogPane->AppendText("Removing Pages\n" );
     if( !EditorNotebook->RemovePage(i) )
       LogPane->AppendText("Error removing page\n" );
+    if( !EditorNotebook->DeletePage(i) )
+      LogPane->AppendText("Error deleting page\n" );
   }
 
+#if 0
   for( unsigned i=0; i<SCPanes.size(); i++ ){
     wxStyledTextCtrl *TmpCtrl = std::get<0>(SCPanes[i]);
     delete TmpCtrl;
   }
+#endif
   SCPanes.clear();
 
   // close out all the modules
@@ -1150,6 +1162,9 @@ void PortalMainFrame::CloseProject(){
   // delete the final bits
   delete CGProject;
   CGProject = nullptr;
+
+  // log the close project
+  LogPane->AppendText("Closed project\n");
 }
 
 // PortalMainFrame::OnQuit
@@ -1342,7 +1357,8 @@ void PortalMainFrame::OpenFileFromWin(wxString Path){
   }else if( Ext.IsSameAs(wxT("yaml"),false) ){
     LogPane->AppendText("Opening Yaml file at " + Path + wxT("\n") );
   }else{
-    LogPane->AppendText("Could not open file at " + Path + wxT("\n") );
+    LogPane->AppendText("Could not open unknonw file type at " +
+                        Path + wxT("\n") );
   }
 }
 
