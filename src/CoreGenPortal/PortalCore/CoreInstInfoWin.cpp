@@ -49,20 +49,21 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                                    wxID_ANY,
                                    wxT("Instruction Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160, -1),
                                    0 );
   InstNameText->Wrap(-1);
-  InnerSizer->Add( InstNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  InstNameSizer->Add( InstNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
   InstNameCtrl = new wxTextCtrl( Wnd,
                                  wxID_ANY,
                                  wxString(Inst->GetName()),
                                  wxDefaultPosition,
-                                 wxSize(400,25),
+                                 wxSize(320,25),
                                  wxTE_READONLY,
                                  wxDefaultValidator,
                                  wxT("Inst Name") );
-  InnerSizer->Add( InstNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  InstNameSizer->Add( InstNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add(InstNameSizer, 0, wxALIGN_CENTER|wxALL, 5 )
 
   //-- inst format
   InstFNameText = new wxStaticText( Wnd,
@@ -200,6 +201,11 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
 void CoreInstInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreInstInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->InstNode, CGInst);
 }
 
 CoreInstInfoWin::~CoreInstInfoWin(){
