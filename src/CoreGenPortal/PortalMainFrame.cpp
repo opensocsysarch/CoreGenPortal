@@ -1140,12 +1140,6 @@ void PortalMainFrame::CloseProject(){
       LogPane->AppendText("Error deleting page\n" );
   }
 
-#if 0
-  for( unsigned i=0; i<SCPanes.size(); i++ ){
-    wxStyledTextCtrl *TmpCtrl = std::get<0>(SCPanes[i]);
-    delete TmpCtrl;
-  }
-#endif
   SCPanes.clear();
 
   // close out all the modules
@@ -1353,12 +1347,79 @@ void PortalMainFrame::OpenFileFromWin(wxString Path){
   wxString Ext = NPF.GetExt();
 
   if( Ext.IsSameAs(wxT("sc"),false) ){
+    // open a new stonecutter window
     OpenSCFile(Path,NPF);
   }else if( Ext.IsSameAs(wxT("yaml"),false) ){
-    LogPane->AppendText("Opening Yaml file at " + Path + wxT("\n") );
+    // open a new yaml window (not a new project)
+    OpenYamlFile(Path,NPF);
   }else{
-    LogPane->AppendText("Could not open unknonw file type at " +
+    LogPane->AppendText("Could not open unknown file type at " +
                         Path + wxT("\n") );
+  }
+}
+
+// PortalMainFrame::OpenYamlFile
+void PortalMainFrame::OpenYamlFile(wxString NP, wxFileName NPF){
+  LogPane->AppendText( "Opening Yaml file at " +
+                       NPF.GetFullName() + wxT("\n") );
+
+  // check to see if the window is already open
+  wxString TmpName = NPF.GetFullName();
+  size_t TmpPage = -1;
+  for( unsigned i = 0; i<SCPanes.size(); i++ ){
+    if( std::get<1>(SCPanes[i]) == TmpName )
+      TmpPage = i+1;
+  }
+
+  if( TmpPage != -1 ){
+    // page already exists, refocus to the target tab
+    LogPane->AppendText("File is already open... refocusing to the appropriate tab\n" );
+    EditorNotebook->SetSelection(TmpPage);
+  }else{
+    // create a new window
+    wxStyledTextCtrl *SCPane = new wxStyledTextCtrl(this, wxID_ANY);
+
+    SCPane->StyleClearAll();
+    SCPane->SetMarginWidth(MARGIN_LINE_NUMBERS, 50);
+    SCPane->SetTabWidth(3);
+    SCPane->SetIndent(3);
+    SCPane->SetUseTabs(false);
+    SCPane->StyleSetForeground(wxSTC_STYLE_LINENUMBER, wxColour (75, 75, 75) );
+    SCPane->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour (220, 220, 220));
+    SCPane->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
+    SCPane->SetWrapMode(wxSTC_WRAP_WORD);
+    SCPane->SetLexer(wxSTC_LEX_YAML);
+
+    // -- set all the colors
+    SCPane->StyleSetForeground(wxSTC_YAML_DEFAULT,    *wxBLACK);
+    SCPane->StyleSetForeground(wxSTC_YAML_COMMENT,    *wxLIGHT_GREY);
+    SCPane->StyleSetForeground(wxSTC_YAML_IDENTIFIER, *wxBLUE);
+    SCPane->StyleSetForeground(wxSTC_YAML_KEYWORD,    *wxGREEN);
+    SCPane->StyleSetForeground(wxSTC_YAML_NUMBER,     *wxGREEN);
+    SCPane->StyleSetForeground(wxSTC_YAML_REFERENCE,  *wxCYAN);
+    SCPane->StyleSetForeground(wxSTC_YAML_DOCUMENT,   *wxBLACK);
+    SCPane->StyleSetForeground(wxSTC_YAML_TEXT,       *wxBLACK);
+    SCPane->StyleSetForeground(wxSTC_YAML_ERROR,      *wxRED);
+    SCPane->StyleSetForeground(wxSTC_YAML_OPERATOR,   *wxBLUE);
+    SCPane->StyleSetBold(wxSTC_YAML_IDENTIFIER, true);
+
+    // -- set all the keywords
+    SCPane->SetKeyWords(0, wxString(L0KeyWords.c_str()) );
+    SCPane->SetKeyWords(1, wxString(L1KeyWords.c_str()) );
+    SCPane->SetKeyWords(2, wxString(L2KeyWords.c_str()) );
+
+    // the load file
+    SCPane->LoadFile(NP);
+
+    // add it to our vector
+    SCPanes.push_back(std::make_pair(SCPane,NPF.GetFullName()));
+
+    // add the file to the editor network
+    EditorNotebook->AddPage( SCPane, NP, true, wxBookCtrlBase::NO_IMAGE );
+
+    // reset the tab title
+    EditorNotebook->SetPageText( EditorNotebook->GetPageCount()-1,
+                                 NPF.GetName() );
   }
 }
 
@@ -1627,6 +1688,45 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
   OpenDialog->Destroy();
 }
 
+// PortalMainFrame::OpenProject
+void PortalMainFrame::OpenProject(wxString NP){
+  LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
+  wxFileName NPF(NP);
+
+  // create a new coregen object
+  CGProject = new CoreGenBackend( std::string(NPF.GetName().mb_str()),
+                                    std::string(NPF.GetPath().mb_str()),
+                                    UserConfig->GetArchiveDir() );
+  if( CGProject == nullptr ){
+    LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
+    return ;
+  }
+
+  // read the ir
+  if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
+    LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
+    return ;
+  }
+
+  // Force the DAG to build
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // load the ir into the ir pane
+  IRPane->LoadFile(NP);
+  IRFileName = NP;
+
+  // switch the directory tree to the project directory
+  ProjDir->SetPath(NPF.GetPath());
+
+  // load all the modules into the modulebox
+  LoadModuleBox();
+
+  LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
+}
+
 // PortalMainFrame::OnProjOpen
 void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
   // stage 1, decide whether we need to close the current project
@@ -1641,44 +1741,9 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
                                                _("IR Files (*.yaml)|*.yaml"),
                                                wxFD_OPEN, wxDefaultPosition );
 
-  wxString NP;
   if( OpenDialog->ShowModal() == wxID_OK ){
-    NP = OpenDialog->GetPath();
-    LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
-    wxFileName NPF(NP);
-
-    // create a new coregen object
-    CGProject = new CoreGenBackend( std::string(NPF.GetName().mb_str()),
-                                    std::string(NPF.GetPath().mb_str()),
-                                    UserConfig->GetArchiveDir() );
-    if( CGProject == nullptr ){
-      LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
-      OpenDialog->Destroy();
-    }
-
-    // read the ir
-    if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
-      LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
-      OpenDialog->Destroy();
-    }
-
-    // Force the DAG to build
-    if( !CGProject->BuildDAG() ){
-      LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
-      OpenDialog->Destroy();
-    }
-
-    // load the ir into the ir pane
-    IRPane->LoadFile(NP);
-    IRFileName = NP;
-
-    // switch the directory tree to the project directory
-    ProjDir->SetPath(NPF.GetPath());
-
-    // load all the modules into the modulebox
-    LoadModuleBox();
-
-    LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
+    //NP = OpenDialog->GetPath();
+    OpenProject(OpenDialog->GetPath());
   }
 
   // clean up the dialog box
