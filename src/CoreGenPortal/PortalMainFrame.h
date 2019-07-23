@@ -39,6 +39,7 @@
 #include <wx/filedlg.h>
 #include <wx/treelist.h>
 #include <wx/treectrl.h>
+#include <wx/textctrl.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -51,6 +52,8 @@
 #include "CoreGenPortal/PortalCore/CoreVerifConfig.h"
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
 #include "CoreGenPortal/PortalCore/CoreInfoWin.h"
+#include "CoreGenPortal/PortalCore/CoreVerifWin.h"
+#include "CoreGenPortal/PortalCore/CorePluginBrowser.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
@@ -60,6 +63,7 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <sstream>
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -137,7 +141,9 @@ private:
   void DeleteNode(CoreGenNode *N);
   void AddNodeWin();
   void OpenFileFromWin(wxString Path);
+  void OpenYamlFile(wxString NP, wxFileName NPF);
   void OpenSCFile(wxString NP, wxFileName NPF);
+  void OpenProject(wxString NP);
 
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
@@ -151,6 +157,7 @@ private:
   void OnProjOpen(wxCommandEvent& event);
   void OnProjSCOpen(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
+  void OnBuildVerify(wxCommandEvent& event);
   void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
@@ -170,8 +177,10 @@ enum
   ID_BUILD_VERILOG      = 24,
   ID_BUILD_COMPILER     = 25,
   ID_BUILD_SIM          = 26,
+  ID_BUILD_ALL          = 27,
   ID_COMPILE_SIM        = 30,
   ID_COMPILE_COMPILER   = 31,
+  ID_COMPILE_ALL        = 32,
   ID_PREF_USER          = 40,
   ID_PREF_VERIF         = 41,
   ID_PREF_STONECUTTER   = 42,

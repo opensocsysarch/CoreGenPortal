@@ -42,16 +42,6 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   // update the aui manager
   UpdateAuiMgr();
 
-#if 0
-  // read the user configuration data
-  UserConfig = new CoreUserConfig();
-  if( UserConfig->isValid() )
-    LogPane->AppendText("Read user configuration data; ConfigFile="
-                        + UserConfig->wxGetConfFile() + "\n");
-  else
-    LogPane->AppendText("Error reading user configuration data; ConfigFile="
-                        + UserConfig->wxGetConfFile() + "\n");
-#endif
   // initialize the verification configuration data
   VerifConfig = new CoreVerifConfig();
   if( VerifConfig->isValid() )
@@ -65,9 +55,17 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
 
 // PortalMainFrame::~PortalMainFrame
 PortalMainFrame::~PortalMainFrame(){
+
+  if( CGProject )
+    CloseProject();
+
+  if( UserConfig )
+    delete UserConfig;
+
+  if( VerifConfig )
+    delete VerifConfig;
+
   Mgr.UnInit();
-  delete UserConfig;
-  delete VerifConfig;
 }
 
 // PortalMainFrame::InitAuiMgr
@@ -129,9 +127,11 @@ void PortalMainFrame::CreateMenuBar(){
   BuildMenu->Append( ID_BUILD_VERILOG,      wxT("&Build Verilog"));
   BuildMenu->Append( ID_BUILD_COMPILER,     wxT("&Build Compiler"));
   BuildMenu->Append( ID_BUILD_SIM,          wxT("&Build Simulator"));
+  BuildMenu->Append( ID_BUILD_ALL,          wxT("&Build All"));
   BuildMenu->AppendSeparator();
   BuildMenu->Append( ID_COMPILE_SIM,        wxT("&Compile Simulator"));
   BuildMenu->Append( ID_COMPILE_COMPILER,   wxT("&Compiler Compiler"));
+  BuildMenu->Append( ID_COMPILE_ALL,        wxT("&Compile All"));
 
   //-- Help Menu
   HelpMenu->Append(wxID_ABOUT);
@@ -171,6 +171,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjSCOpen));
 
   //-- build menu
+  Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildVerify));
 
   //-- help menu
   Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED,
@@ -317,12 +319,29 @@ void PortalMainFrame::SetupPluginBox(){
     unsigned pos = 0;
     bool cont = PluginDir.GetFirst(&filename,wxEmptyString,wxDIR_DIRS);
     while( cont ){
-      PluginPanes.push_back(std::make_pair(filename,
-                                           UserConfig->wxGetPluginDir() +
-                                           wxT("/") +
-                                           filename ));
-      PluginBox->InsertItems(1,&filename,pos);
-      pos = pos+1;
+      wxDir LPluginDir(UserConfig->wxGetPluginDir() + wxT("/") + filename );
+      wxString FullPluginPath;
+      if( LPluginDir.HasFiles(wxT("*.so")) ){
+        FullPluginPath = UserConfig->wxGetPluginDir() +
+                         wxT("/") + filename +
+                         wxT("/") + wxT("lib") + filename + wxT(".so");
+        PluginPanes.push_back(std::make_pair(filename,
+                                             FullPluginPath));
+        LogPane->AppendText( "Loaded Plugin Path: " + FullPluginPath + wxT("\n"));
+        PluginBox->InsertItems(1,&filename,pos);
+        pos = pos+1;
+      }else if( LPluginDir.HasFiles(wxT("*.dylib")) ){
+        FullPluginPath = UserConfig->wxGetPluginDir() +
+                         wxT("/") + filename +
+                         wxT("/") + wxT("lib") + filename + wxT(".dylib");
+        PluginPanes.push_back(std::make_pair(filename,
+                                             FullPluginPath));
+        LogPane->AppendText( "Loaded Plugin Path: " + FullPluginPath + wxT("\n"));
+        PluginBox->InsertItems(1,&filename,pos);
+        pos = pos+1;
+      }else{
+        LogPane->AppendText("No plugin library found for " + filename );
+      }
       cont = PluginDir.GetNext(&filename);
     }
   }
@@ -1113,16 +1132,14 @@ void PortalMainFrame::CloseProject(){
   IRPane->ClearAll();
 
   // close out all the StoneCutter windows
+  LogPane->AppendText("Removing Pages\n" );
   for( size_t i=1; i<EditorNotebook->GetPageCount(); i++ ){
-    LogPane->AppendText("Removing Pages\n" );
     if( !EditorNotebook->RemovePage(i) )
       LogPane->AppendText("Error removing page\n" );
+    if( !EditorNotebook->DeletePage(i) )
+      LogPane->AppendText("Error deleting page\n" );
   }
 
-  for( unsigned i=0; i<SCPanes.size(); i++ ){
-    wxStyledTextCtrl *TmpCtrl = std::get<0>(SCPanes[i]);
-    delete TmpCtrl;
-  }
   SCPanes.clear();
 
   // close out all the modules
@@ -1139,6 +1156,9 @@ void PortalMainFrame::CloseProject(){
   // delete the final bits
   delete CGProject;
   CGProject = nullptr;
+
+  // log the close project
+  LogPane->AppendText("Closed project\n");
 }
 
 // PortalMainFrame::OnQuit
@@ -1327,11 +1347,79 @@ void PortalMainFrame::OpenFileFromWin(wxString Path){
   wxString Ext = NPF.GetExt();
 
   if( Ext.IsSameAs(wxT("sc"),false) ){
+    // open a new stonecutter window
     OpenSCFile(Path,NPF);
   }else if( Ext.IsSameAs(wxT("yaml"),false) ){
-    LogPane->AppendText("Opening Yaml file at " + Path + wxT("\n") );
+    // open a new yaml window (not a new project)
+    OpenYamlFile(Path,NPF);
   }else{
-    LogPane->AppendText("Could not open file at " + Path + wxT("\n") );
+    LogPane->AppendText("Could not open unknown file type at " +
+                        Path + wxT("\n") );
+  }
+}
+
+// PortalMainFrame::OpenYamlFile
+void PortalMainFrame::OpenYamlFile(wxString NP, wxFileName NPF){
+  LogPane->AppendText( "Opening Yaml file at " +
+                       NPF.GetFullName() + wxT("\n") );
+
+  // check to see if the window is already open
+  wxString TmpName = NPF.GetFullName();
+  size_t TmpPage = -1;
+  for( unsigned i = 0; i<SCPanes.size(); i++ ){
+    if( std::get<1>(SCPanes[i]) == TmpName )
+      TmpPage = i+1;
+  }
+
+  if( TmpPage != -1 ){
+    // page already exists, refocus to the target tab
+    LogPane->AppendText("File is already open... refocusing to the appropriate tab\n" );
+    EditorNotebook->SetSelection(TmpPage);
+  }else{
+    // create a new window
+    wxStyledTextCtrl *SCPane = new wxStyledTextCtrl(this, wxID_ANY);
+
+    SCPane->StyleClearAll();
+    SCPane->SetMarginWidth(MARGIN_LINE_NUMBERS, 50);
+    SCPane->SetTabWidth(3);
+    SCPane->SetIndent(3);
+    SCPane->SetUseTabs(false);
+    SCPane->StyleSetForeground(wxSTC_STYLE_LINENUMBER, wxColour (75, 75, 75) );
+    SCPane->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour (220, 220, 220));
+    SCPane->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
+    SCPane->SetWrapMode(wxSTC_WRAP_WORD);
+    SCPane->SetLexer(wxSTC_LEX_YAML);
+
+    // -- set all the colors
+    SCPane->StyleSetForeground(wxSTC_YAML_DEFAULT,    *wxBLACK);
+    SCPane->StyleSetForeground(wxSTC_YAML_COMMENT,    *wxLIGHT_GREY);
+    SCPane->StyleSetForeground(wxSTC_YAML_IDENTIFIER, *wxBLUE);
+    SCPane->StyleSetForeground(wxSTC_YAML_KEYWORD,    *wxGREEN);
+    SCPane->StyleSetForeground(wxSTC_YAML_NUMBER,     *wxGREEN);
+    SCPane->StyleSetForeground(wxSTC_YAML_REFERENCE,  *wxCYAN);
+    SCPane->StyleSetForeground(wxSTC_YAML_DOCUMENT,   *wxBLACK);
+    SCPane->StyleSetForeground(wxSTC_YAML_TEXT,       *wxBLACK);
+    SCPane->StyleSetForeground(wxSTC_YAML_ERROR,      *wxRED);
+    SCPane->StyleSetForeground(wxSTC_YAML_OPERATOR,   *wxBLUE);
+    SCPane->StyleSetBold(wxSTC_YAML_IDENTIFIER, true);
+
+    // -- set all the keywords
+    SCPane->SetKeyWords(0, wxString(L0KeyWords.c_str()) );
+    SCPane->SetKeyWords(1, wxString(L1KeyWords.c_str()) );
+    SCPane->SetKeyWords(2, wxString(L2KeyWords.c_str()) );
+
+    // the load file
+    SCPane->LoadFile(NP);
+
+    // add it to our vector
+    SCPanes.push_back(std::make_pair(SCPane,NPF.GetFullName()));
+
+    // add the file to the editor network
+    EditorNotebook->AddPage( SCPane, NP, true, wxBookCtrlBase::NO_IMAGE );
+
+    // reset the tab title
+    EditorNotebook->SetPageText( EditorNotebook->GetPageCount()-1,
+                                 NPF.GetName() );
   }
 }
 
@@ -1399,14 +1487,39 @@ void PortalMainFrame::OpenSCFile(wxString NP, wxFileName NPF){
 
 // PortalMainFrame::OnSelectPlugin
 void PortalMainFrame::OnSelectPlugin(wxCommandEvent& event){
+  if( !CGProject ){
+    LogPane->AppendText("Cannot load plugin; no project open\n" );
+    return ;
+  }
   int Plugin = PluginBox->GetSelection();
   if( (unsigned)(Plugin) > (PluginPanes.size()-1) ){
     LogPane->AppendText("Invalid plugin item\n");
   }else{
     wxString PName = std::get<0>(PluginPanes[(unsigned)(Plugin)]);
-    LogPane->AppendText("Opening plugin: " + PName + wxT("\n"));
-
-    // open a new plugin information window
+    wxString PPath = std::get<1>(PluginPanes[(unsigned)(Plugin)]);
+    if( !CGProject->LoadPlugin( std::string(PPath.mb_str()) ) ){
+      LogPane->AppendText(  wxT("Failed to load plugin at ") + PPath + wxT("\n") );
+      LogPane->AppendText( wxString(CGProject->GetErrStr()) );
+    }else{
+      // open a new plugin information window
+      unsigned PID = CGProject->GetNumPlugins() - 1;
+      CoreGenPlugin *PLUGIN = CGProject->GetPlugin(PID);
+      CorePluginBrowser *PB = new CorePluginBrowser(this,
+                                                  wxID_ANY,
+                                                  wxT("Plugin Browser"),
+                                                  PName,
+                                                  PPath,
+                                                  PLUGIN,
+                                                  CGProject,
+                                                  LogPane);
+      if( PB->ShowModal() == wxID_OK ){
+        PB->Destroy();
+        if( !CGProject->ReleasePlugin(PID) ){
+          LogPane->AppendText( wxT("Failed to release plugin at ") + PPath + wxT("\n") );
+          LogPane->AppendText( wxString(CGProject->GetErrStr()) );
+        }
+      }
+    }
   }
 }
 
@@ -1415,9 +1528,7 @@ void PortalMainFrame::OnSelectNode(wxTreeEvent &event){
   switch( ModulesNotebook->GetSelection() ){
   case 0:
     LogPane->AppendText("Module node selected\n");
-    break;
-  case 1:
-    LogPane->AppendText("Plugin node selected\n");
+    // TODO: open the node window
     break;
   case 2:
     OpenFileFromWin(ProjDir->GetFilePath());
@@ -1458,6 +1569,67 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
     LogPane->AppendText("Committed user preferences\n");
   }
   UP->Destroy();
+}
+
+// PortalMainFrame:: OnBuildVerify
+void PortalMainFrame::OnBuildVerify(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // check the verification config options
+  if( !VerifConfig ){
+    LogPane->AppendText( "Error: verification preferences are not initialized\n");
+    return ;
+  }
+
+  if( !VerifConfig->isValid() ){
+    LogPane->AppendText( "Error: verification preferences are not valid\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // init the pass manager
+  if( !CGProject->InitPassMgr() ){
+    LogPane->AppendText( "Error initializing the CoreGen pass manager\n" );
+    return ;
+  }
+
+  LogPane->AppendText( "Executing verification passes...\n" );
+
+  // setup the text redirector
+  std::streambuf *oldBuf = std::cout.rdbuf();
+  std::ostringstream newBuf;
+  std::cout.rdbuf( newBuf.rdbuf() );
+
+  // execute all the enabled passes
+  for( unsigned i=0; i<VerifConfig->GetNumPasses(); i++ ){
+    if( VerifConfig->IsPassEnabled(i) ){
+      if( !CGProject->ExecutePass(
+          std::string(VerifConfig->GetPassName(i).mb_str()) ) ){
+        LogPane->AppendText( "Error executing pass: " +
+                             VerifConfig->GetPassName(i) +
+                             wxT("\n") );
+      }
+    }
+  }
+
+  // restore the old cout buffer
+  std::cout.rdbuf( oldBuf );
+  //LogPane->AppendText(wxString(newBuf.str())+wxT("\n"));
+  CoreVerifWin *VW = new CoreVerifWin(this,
+                                      wxID_ANY,
+                                      wxT("Verification Results"),
+                                      &newBuf );
+  if( VW->ShowModal() == wxID_OK ){
+    VW->Destroy();
+  }
 }
 
 // PortalMainFrame::OnProjNew
@@ -1516,6 +1688,45 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
   OpenDialog->Destroy();
 }
 
+// PortalMainFrame::OpenProject
+void PortalMainFrame::OpenProject(wxString NP){
+  LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
+  wxFileName NPF(NP);
+
+  // create a new coregen object
+  CGProject = new CoreGenBackend( std::string(NPF.GetName().mb_str()),
+                                    std::string(NPF.GetPath().mb_str()),
+                                    UserConfig->GetArchiveDir() );
+  if( CGProject == nullptr ){
+    LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
+    return ;
+  }
+
+  // read the ir
+  if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
+    LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
+    return ;
+  }
+
+  // Force the DAG to build
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // load the ir into the ir pane
+  IRPane->LoadFile(NP);
+  IRFileName = NP;
+
+  // switch the directory tree to the project directory
+  ProjDir->SetPath(NPF.GetPath());
+
+  // load all the modules into the modulebox
+  LoadModuleBox();
+
+  LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
+}
+
 // PortalMainFrame::OnProjOpen
 void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
   // stage 1, decide whether we need to close the current project
@@ -1530,44 +1741,9 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
                                                _("IR Files (*.yaml)|*.yaml"),
                                                wxFD_OPEN, wxDefaultPosition );
 
-  wxString NP;
   if( OpenDialog->ShowModal() == wxID_OK ){
-    NP = OpenDialog->GetPath();
-    LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
-    wxFileName NPF(NP);
-
-    // create a new coregen object
-    CGProject = new CoreGenBackend( std::string(NPF.GetName().mb_str()),
-                                    std::string(NPF.GetPath().mb_str()),
-                                    UserConfig->GetArchiveDir() );
-    if( CGProject == nullptr ){
-      LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
-      OpenDialog->Destroy();
-    }
-
-    // read the ir
-    if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
-      LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
-      OpenDialog->Destroy();
-    }
-
-    // Force the DAG to build
-    if( !CGProject->BuildDAG() ){
-      LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
-      OpenDialog->Destroy();
-    }
-
-    // load the ir into the ir pane
-    IRPane->LoadFile(NP);
-    IRFileName = NP;
-
-    // switch the directory tree to the project directory
-    ProjDir->SetPath(NPF.GetPath());
-
-    // load all the modules into the modulebox
-    LoadModuleBox();
-
-    LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
+    //NP = OpenDialog->GetPath();
+    OpenProject(OpenDialog->GetPath());
   }
 
   // clean up the dialog box
