@@ -1760,10 +1760,20 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
       }
     }
     break;
+    case CGISA:
+      CoreGenISA *ISANode = (CoreGenISA*)node;
+      ISANode->SetName(BoxContents);
+    break;
   }
 
   // write out the new IR file
+  LogPane->AppendText(std::string(this->IRFileName.mb_str()) + "\n");
   CGProject->WriteIR(std::string(IRFileName.mb_str()));
+  ModuleBox->DeleteAllItems();
+  TreeItems.clear();
+  NodeItems.clear();
+  SetupModuleBox();
+  LoadModuleBox();
   //LoadModuleBox();
   LogPane->AppendText("Updated " + wxString(node->GetName()) +
                       " Box " + wxString(std::to_string(InfoBoxIndex)) +
