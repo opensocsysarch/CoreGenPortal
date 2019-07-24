@@ -1694,6 +1694,12 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 2:
           CacheNode->SetWays(std::stoi(BoxContents));
           break;
+        case 3:
+          LogPane->AppendText("Set Parent Cache.\n");
+          break;
+        case 4:
+          LogPane->AppendText("Set Child Cache.\n");
+          break;
       }
     }
     break;
@@ -1721,6 +1727,8 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 2:
           CommNode->SetWidth(std::stoi(BoxContents));
           break;
+        case 3:
+          LogPane->AppendText("Set Endpoint.\n");
       }
     }
     break;
@@ -1734,6 +1742,17 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 1:
           CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
           break;
+        case 2:
+          LogPane->AppendText("Set ISA.\n");
+          break;
+        case 3:
+          LogPane->AppendText("Set Cache.\n");
+          break;
+        case 4:
+          LogPane->AppendText("Set Register Class.\n");
+          break;
+        case 5:
+          LogPane->AppendText("Set Extension.\n");
       }
     }
     break;
@@ -1760,9 +1779,35 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
       }
     }
     break;
-    case CGISA:
+    case CGISA:{
       CoreGenISA *ISANode = (CoreGenISA*)node;
       ISANode->SetName(BoxContents);
+    }
+    break;
+    case CGInst:{
+      CoreGenInst *InstNode = (CoreGenInst*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          InstNode->SetName(BoxContents);
+          break;
+        case 1:
+          LogPane->AppendText("Set Instruction format.\n");
+          break;
+        case 2:
+          LogPane->AppendText("Set ISA.\n");
+          break;
+        case 3:
+          InstNode->SetSyntax(BoxContents);
+          LogPane->AppendText(BoxContents + ".\n");
+          break;
+        case 4:
+          InstNode->SetImpl(BoxContents);
+          break;
+        case 5:
+          LogPane->AppendText("Set Encoding.\n");
+          break;
+      }
+    }
     break;
   }
 

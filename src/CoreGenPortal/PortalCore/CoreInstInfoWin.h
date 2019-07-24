@@ -39,6 +39,8 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+#include "CoreGenPortal/PortalMainFrame.h"
+
 class CoreInstInfoWin : public wxDialog {
 public:
   CoreInstInfoWin( wxWindow* parent,
@@ -49,7 +51,7 @@ public:
 
 
 protected:
-  CoreGenInst *InstNode           ///< Inst node for this window
+  CoreGenInst *InstNode;          ///< Inst node for this window
   // window handlers
   wxScrolledWindow *Wnd;         ///< scrolling window handler
 
@@ -57,6 +59,11 @@ protected:
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
   wxBoxSizer *InstNameSizer;      ///< inst name sizer
+  wxBoxSizer *InstFNameSizer;     ///< inst format name sizer
+  wxBoxSizer *ISANameSizer;       ///< ISA name sizer
+  wxBoxSizer *SyntaxSizer;        ///< syntax sizer
+  wxBoxSizer *StoneCutterSizer;   ///< StoneCuttter Syntax Sizer
+  wxBoxSizer *EncodingSizer;      ///< encoding sizer
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
