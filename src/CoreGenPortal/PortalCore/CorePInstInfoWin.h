@@ -39,6 +39,8 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+#include "CoreGenPortal/PortalMainFrame.h"
+
 class CorePInstInfoWin : public wxDialog {
 public:
   CorePInstInfoWin( wxWindow* parent,
@@ -46,13 +48,6 @@ public:
                     const wxString& title = wxT("Pseudo Inst Node"),
                     CoreGenPseudoInst *Node = nullptr);
   ~CorePInstInfoWin();
-
-  // Event handler functions
-  /// Declares the event table
-  wxDECLARE_EVENT_TABLE();
-
-  /// handles the 'ok' button press
-  void OnPressOk( wxCommandEvent& event );
 
 protected:
   // window handlers
@@ -80,6 +75,15 @@ protected:
   wxButton *m_userOK;                         ///< ok button
 
 private:
+  // Event handler functions
+  /// Declares the event table
+  wxDECLARE_EVENT_TABLE();
+
+  /// handles the 'ok' button press
+  void OnPressOk( wxCommandEvent& event );
+
+  /// handles 'enter' press in textctrl box
+  void OnPressEnter( wxCommandEvent& event);
 };
 
 #endif

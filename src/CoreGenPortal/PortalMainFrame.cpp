@@ -1820,6 +1820,7 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           break;
       }
     }
+    case CG
   }
 
   // write out the new IR file

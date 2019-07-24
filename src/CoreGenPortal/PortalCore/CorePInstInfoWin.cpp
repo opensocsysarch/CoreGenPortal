@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CorePInstInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CorePInstInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CorePInstInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
@@ -160,6 +161,11 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
 
 void CorePInstInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CorePInstInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->CacheNode, CGCache);
 }
 
 CorePInstInfoWin::~CorePInstInfoWin(){
