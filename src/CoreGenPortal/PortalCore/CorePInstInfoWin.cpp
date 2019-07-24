@@ -21,10 +21,12 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenPseudoInst *PInst )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,350), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
   if( PInst == nullptr ){
     this->EndModal(wxID_OK);
   }
+
+  this->PInstNode = PInst;
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -46,81 +48,88 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
 
   // add all the interior data
   //-- pseudo inst name
+  PInstNameSizer = new wxBoxSizer( wxHORIZONTAL );
   PInstNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Pseudo Instruction Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   PInstNameText->Wrap(-1);
-  InnerSizer->Add( PInstNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  PInstNameSizer->Add( PInstNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   PInstNameCtrl = new wxTextCtrl( Wnd,
-                                 wxID_ANY,
+                                 0,
                                  wxString(PInst->GetName()),
                                  wxDefaultPosition,
-                                 wxSize(400,25),
-                                 wxTE_READONLY,
+                                 wxSize(320,25),
+                                 wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("Inst Name") );
-  InnerSizer->Add( PInstNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  PInstNameSizer->Add( PInstNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( PInstNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- inst name
+  InstNameSizer = new wxBoxSizer( wxHORIZONTAL );
   InstNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Target Instruction Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   InstNameText->Wrap(-1);
-  InnerSizer->Add( InstNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  InstNameSizer->Add( InstNameText, 0, wxALIGN_CENTER|wxALL, 0 );
 
   InstNameCtrl = new wxTextCtrl( Wnd,
-                                 wxID_ANY,
+                                 1,
                                  wxString(PInst->GetInst()->GetName()),
                                  wxDefaultPosition,
-                                 wxSize(400,25),
-                                 wxTE_READONLY,
+                                 wxSize(320,25),
+                                 wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("Inst Name") );
-  InnerSizer->Add( InstNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  InstNameSizer->Add( InstNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( InstNameSizer, 0, wxALIGN_CENTER|wxALL, 0 );
 
   //-- isa name
+  ISANameSizer = new wxBoxSizer( wxHORIZONTAL );
   ISANameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Instruction Set"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   ISANameText->Wrap(-1);
-  InnerSizer->Add( ISANameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  ISANameSizer->Add( ISANameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   ISANameCtrl = new wxTextCtrl( Wnd,
-                                 wxID_ANY,
+                                 2,
                                  wxString(PInst->GetISA()->GetName()),
                                  wxDefaultPosition,
-                                 wxSize(400,25),
-                                 wxTE_READONLY,
+                                 wxSize(320,25),
+                                 wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("Inst Format Name") );
-  InnerSizer->Add( ISANameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  ISANameSizer->Add( ISANameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add(ISANameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- encodings
+  EncodingSizer = new wxBoxSizer( wxHORIZONTAL );
   EncText = new wxStaticText( Wnd,
                               wxID_ANY,
                               wxT("Instruction Field Encodings"),
                               wxDefaultPosition,
-                              wxDefaultSize,
+                              wxSize(160,-1),
                               0 );
   EncText->Wrap(-1);
-  InnerSizer->Add( EncText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  EncodingSizer->Add( EncText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   EncCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            3,
                             wxEmptyString,
                             wxDefaultPosition,
-                            wxSize(400,100),
-                            wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL,
+                            wxSize(320,100),
+                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("StoneCutter") );
 
@@ -130,7 +139,8 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
     EncCtrl->AppendText(wxString(PInst->GetEncoding(i)->GetField()) +
                         wxT(" = ") + tmp + wxT("\n"));
   }
-  InnerSizer->Add( EncCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  EncodingSizer->Add( EncCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( EncodingSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -165,7 +175,7 @@ void CorePInstInfoWin::OnPressOk(wxCommandEvent& ok){
 
 void CorePInstInfoWin::OnPressEnter(wxCommandEvent& enter){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->CacheNode, CGCache);
+  PMF->OnPressEnter(enter, this->PInstNode, CGPInst);
 }
 
 CorePInstInfoWin::~CorePInstInfoWin(){

@@ -56,6 +56,11 @@ protected:
   // box sizers
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
+  wxBoxSizer *PInstNameSizer;     ///< pinst name sizer
+  wxBoxSizer *InstNameSizer;      ///< inst name sizer
+  wxBoxSizer *ISANameSizer;       ///< ISA name sizer
+  wxBoxSizer *EncodingSizer;      ///< encoding sizer
+
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
@@ -75,6 +80,7 @@ protected:
   wxButton *m_userOK;                         ///< ok button
 
 private:
+  CoreGenPseudoInst *PInstNode;
   // Event handler functions
   /// Declares the event table
   wxDECLARE_EVENT_TABLE();

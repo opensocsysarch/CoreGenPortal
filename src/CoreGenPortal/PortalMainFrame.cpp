@@ -1820,7 +1820,23 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           break;
       }
     }
-    case CG
+    case CGPInst:{
+      CoreGenPseudoInst *PInstNode = (CoreGenPseudoInst*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          PInstNode->SetName(BoxContents);
+          break;
+        case 1:
+          LogPane->AppendText("Set Target Instruction.\n");
+          break;
+        case 2:
+          LogPane->AppendText("Set ISA.\n");
+          break;
+        case 3:
+          LogPane->AppendText("Set Encoding.\n");
+          break;
+      }
+    }
   }
 
   // write out the new IR file
