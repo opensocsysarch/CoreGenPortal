@@ -1809,6 +1809,17 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
       }
     }
     break;
+    case CGMCtrl:{
+      CoreGenMCtrl *MCtrlNode = (CoreGenMCtrl*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          MCtrlNode->SetName(BoxContents);
+          break;
+        case 2:
+          MCtrlNode->SetNumInputPorts(std::stoi(BoxContents));
+          break;
+      }
+    }
   }
 
   // write out the new IR file
