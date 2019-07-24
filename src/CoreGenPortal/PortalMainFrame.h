@@ -141,7 +141,9 @@ private:
   void DeleteNode(CoreGenNode *N);
   void AddNodeWin();
   void OpenFileFromWin(wxString Path);
+  void OpenYamlFile(wxString NP, wxFileName NPF);
   void OpenSCFile(wxString NP, wxFileName NPF);
+  void OpenProject(wxString NP);
 
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
