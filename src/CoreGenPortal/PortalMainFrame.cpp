@@ -1901,6 +1901,7 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           break;
       }
     }
+    break;
     case CGPInst:{
       CoreGenPseudoInst *PInstNode = (CoreGenPseudoInst*)node;
       switch(InfoBoxIndex){
@@ -1918,11 +1919,31 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           break;
       }
     }
+    break;
+    case CGReg:{
+      CoreGenReg *RegNode = (CoreGenReg*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          RegNode->SetName(BoxContents);
+          break;
+        case 1:
+          RegNode->SetIndex(std::stoi(BoxContents));
+          break;
+        case 2:
+          LogPane->AppendText("Set register width.\n");
+          break;
+        case 3:
+          LogPane->AppendText("Set Subregisters.\n");
+          break;
+      }
+    }
+    break;
   }
 
   // write out the new IR file
   LogPane->AppendText(std::string(this->IRFileName.mb_str()) + "\n");
-  CGProject->WriteIR(std::string(IRFileName.mb_str()));
+  //CGProject->WriteIR(std::string(IRFileName.mb_str()));
+  CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
   ModuleBox->DeleteAllItems();
   TreeItems.clear();
   NodeItems.clear();

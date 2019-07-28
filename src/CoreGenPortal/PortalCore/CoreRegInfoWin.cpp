@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreRegInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreRegInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreRegInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
@@ -24,6 +25,8 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   if( Reg == nullptr ){
     this->EndModal(wxID_OK);
   }
+
+  RegNode = (CoreGenReg*)Reg;
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -45,81 +48,88 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   // add all the interior data
   // -- reg name
+  RegNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RegNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Register Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   RegNameText->Wrap(-1);
-  InnerSizer->Add( RegNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RegNameSizer->Add( RegNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   RegNameCtrl = new wxTextCtrl( Wnd,
-                                 wxID_ANY,
+                                 0,
                                  wxString(Reg->GetName()),
                                  wxDefaultPosition,
-                                 wxSize(400,25),
-                                 wxTE_READONLY,
+                                 wxSize(320,25),
+                                 wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("Reg Name") );
-  InnerSizer->Add( RegNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RegNameSizer->Add( RegNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add(RegNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- reg idx
+  RegIdxSizer = new wxBoxSizer( wxHORIZONTAL );
   RegIdxText = new wxStaticText( Wnd,
                               wxID_ANY,
                               wxT("Register Index"),
                               wxDefaultPosition,
-                              wxDefaultSize,
+                              wxSize(160, -1),
                               0 );
   RegIdxText->Wrap(-1);
-  InnerSizer->Add( RegIdxText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RegIdxSizer->Add( RegIdxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   RegIdxCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            1,
                             wxString::Format(wxT("%i"),Reg->GetIndex()),
                             wxDefaultPosition,
-                            wxSize(400,25),
-                            wxTE_READONLY,
+                            wxSize(320,25),
+                            wxTE_PROCESS_ENTER,
                             wxDefaultValidator,
                             wxT("Register Index") );
-  InnerSizer->Add( RegIdxCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RegIdxSizer->Add( RegIdxCtrl, 0, wxALL, 0 );
+  InnerSizer->Add(RegIdxSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   //-- width
+  WidthSizer = new wxBoxSizer( wxHORIZONTAL );
   WidthText = new wxStaticText( Wnd,
                               wxID_ANY,
                               wxT("Register Width (in bits)"),
                               wxDefaultPosition,
-                              wxDefaultSize,
+                              wxSize(160, -1),
                               0 );
   WidthText->Wrap(-1);
-  InnerSizer->Add( WidthText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  WidthSizer->Add( WidthText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   WidthCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            2,
                             wxString::Format(wxT("%i"),Reg->GetWidth()),
                             wxDefaultPosition,
-                            wxSize(400,25),
-                            wxTE_READONLY,
+                            wxSize(320,25),
+                            wxTE_PROCESS_ENTER,
                             wxDefaultValidator,
                             wxT("Register Width") );
-  InnerSizer->Add( WidthCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  WidthSizer->Add( WidthCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( WidthSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- subregs
+  SubRegSizer = new wxBoxSizer( wxHORIZONTAL );
   SubRegText = new wxStaticText( Wnd,
                               wxID_ANY,
                               wxT("Subregister Fields"),
                               wxDefaultPosition,
-                              wxDefaultSize,
+                              wxSize(160, -1),
                               0 );
   WidthText->Wrap(-1);
-  InnerSizer->Add( SubRegText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  SubRegSizer->Add( SubRegText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   SubRegCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            3,
                             wxEmptyString,
                             wxDefaultPosition,
-                            wxSize(400,100),
-                            wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL,
+                            wxSize(320,100),
+                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("Subregisters ") );
   SubRegCtrl->AppendText(wxT("NAME:START_BIT:END_BIT\n"));
@@ -132,8 +142,10 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                            wxString::Format(wxT("%i"),SRStart) + wxT(":") +
                            wxString::Format(wxT("%i"),SREnd) + wxT("\n") );
   }
-  InnerSizer->Add( SubRegCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  SubRegSizer->Add( SubRegCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( SubRegSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
+  HCheckSizer1 = new wxBoxSizer( wxHORIZONTAL );
   //-- simd check box
   SIMDCheck = new wxCheckBox( Wnd,
                               wxID_ANY,
@@ -148,7 +160,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   else
     SIMDCheck->SetValue(false);
 
-  InnerSizer->Add(SIMDCheck, 1, wxEXPAND|wxALIGN_LEFT|wxALL, 5);
+  HCheckSizer1->Add(SIMDCheck, 0, wxALL, 0);
 
   //-- rw check box
   RWCheck = new wxCheckBox( Wnd,
@@ -164,7 +176,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   else
     RWCheck->SetValue(false);
 
-  InnerSizer->Add(RWCheck, 1, wxEXPAND|wxALIGN_LEFT|wxALL, 5);
+  HCheckSizer1->Add(RWCheck, 0, wxALL, 0);
 
   //-- ro check box
   ROCheck = new wxCheckBox( Wnd,
@@ -180,12 +192,14 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   else
     ROCheck->SetValue(false);
 
-  InnerSizer->Add(ROCheck, 1, wxEXPAND|wxALIGN_LEFT|wxALL, 5);
-
+  HCheckSizer1->Add(ROCheck, 0, wxALL, 0 );
+  InnerSizer->Add(HCheckSizer1, 0, wxALIGN_CENTER|wxALL, 5 );
+  
+  HCheckSizer2 = new wxBoxSizer( wxHORIZONTAL );
   //-- csr check box
   CSRCheck = new wxCheckBox( Wnd,
                               wxID_ANY,
-                              wxT("Configuration Status Register"),
+                              wxT("Config Status Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
                               wxALIGN_RIGHT,
@@ -196,7 +210,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   else
     CSRCheck->SetValue(false);
 
-  InnerSizer->Add(CSRCheck, 1, wxEXPAND|wxALIGN_LEFT|wxALL, 5);
+  HCheckSizer2->Add(CSRCheck, 0, wxALL, 0);
 
   //-- ams check box
   AMSCheck = new wxCheckBox( Wnd,
@@ -212,8 +226,10 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   else
     AMSCheck->SetValue(false);
 
-  InnerSizer->Add(AMSCheck, 1, wxEXPAND|wxALIGN_LEFT|wxALL, 5);
-
+  HCheckSizer2->Add(AMSCheck, 0, wxALL, 0);
+  InnerSizer->Add( HCheckSizer2, 0, wxALIGN_CENTER|wxALL, 5 );
+ 
+  HCheckSizer3 = new wxBoxSizer( wxHORIZONTAL );
   //-- tus check box
   TUSCheck = new wxCheckBox( Wnd,
                               wxID_ANY,
@@ -228,7 +244,8 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   else
     TUSCheck->SetValue(false);
 
-  InnerSizer->Add(TUSCheck, 1, wxEXPAND|wxALIGN_LEFT|wxALL, 5);
+  HCheckSizer3->Add(TUSCheck, 0, wxALL, 0);
+  
 
   //-- pc check box
   PCCheck = new wxCheckBox( Wnd,
@@ -244,7 +261,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   else
     PCCheck->SetValue(false);
 
-  InnerSizer->Add(PCCheck, 1, wxEXPAND|wxALIGN_LEFT|wxALL, 5);
+  HCheckSizer3->Add(PCCheck, 0, wxALL, 0);
 
   //-- shared check box
   SharedCheck = new wxCheckBox( Wnd,
@@ -260,8 +277,8 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   else
     SharedCheck->SetValue(false);
 
-  InnerSizer->Add(SharedCheck, 1, wxEXPAND|wxALIGN_LEFT|wxALL, 5);
-
+  HCheckSizer3->Add(SharedCheck, 0, wxALL, 0);
+  InnerSizer->Add( HCheckSizer3, 0, wxALIGN_CENTER|wxALL, 5 );
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -292,6 +309,11 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
 void CoreRegInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreRegInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->RegNode, CGReg);
 }
 
 CoreRegInfoWin::~CoreRegInfoWin(){
