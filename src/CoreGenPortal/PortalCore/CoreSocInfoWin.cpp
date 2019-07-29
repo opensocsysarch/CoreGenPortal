@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreSocInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreSocInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreSocInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
@@ -25,6 +26,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
     this->EndModal(wxID_OK);
   }
 
+  SoCNode = Soc;
   // init the internals
   this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
@@ -40,49 +42,53 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
 
   // init all the options
   //-- soc name
+  SoCNameSizer = new wxBoxSizer( wxHORIZONTAL );
   SocNameText = new wxStaticText(this,
                                  wxID_ANY,
                                  wxT("SoC Name"),
                                  wxDefaultPosition,
-                                 wxDefaultSize,
+                                 wxSize(160,-1),
                                  0 );
   SocNameText->Wrap(-1);
-  bSizer2->Add( SocNameText, 0, wxALIGN_CENTER|wxALL, 5 );
+  SoCNameSizer->Add( SocNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   //-- soc name box
   SocNameCtrl = new wxTextCtrl(this,
-                               wxID_ANY,
+                               0,
                                wxString(Soc->GetName()),
                                wxDefaultPosition,
-                               wxSize(400,25),
-                               wxTE_READONLY,
+                               wxSize(320,25),
+                               wxTE_PROCESS_ENTER,
                                wxDefaultValidator,
                                wxT("SoC Name") );
-  bSizer2->Add( SocNameCtrl, 0, wxALIGN_CENTER|wxALL, 5 );
+  SoCNameSizer->Add( SocNameCtrl, 0, wxALL, 0 );
+  bSizer2->Add( SoCNameSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   //-- core name
+  CoreNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CoreNameText = new wxStaticText(this,
                                  wxID_ANY,
                                  wxT("Cores"),
                                  wxDefaultPosition,
-                                 wxDefaultSize,
+                                 wxSize(160,-1),
                                  0 );
   CoreNameText->Wrap(-1);
-  bSizer2->Add( CoreNameText, 0, wxALIGN_CENTER|wxALL, 5 );
+  CoreNameSizer->Add( CoreNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   //-- cores
   CoreNameCtrl = new wxTextCtrl(this,
                                wxID_ANY,
                                wxEmptyString,
                                wxDefaultPosition,
-                               wxSize(400,100),
-                               wxTE_MULTILINE|wxTE_READONLY,
+                               wxSize(320,100),
+                               wxTE_MULTILINE|wxTE_PROCESS_ENTER,
                                wxDefaultValidator,
                                wxT("Cores") );
   for( unsigned i=0; i<Soc->GetNumCores(); i++ ){
     CoreNameCtrl->AppendText( wxString(Soc->GetCore(i)->GetName()) + wxT("\n"));
   }
-  bSizer2->Add( CoreNameCtrl, 0, wxALIGN_CENTER|wxALL, 5 );
+  CoreNameSizer->Add( CoreNameCtrl, 0, wxALL, 0 );
+  bSizer2->Add( CoreNameSizer, 0, wxALIGN_CENTER|wxALL, 0 );
 
   // add the static line
   FinalStaticLine = new wxStaticLine( this,
@@ -90,7 +96,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
                                       wxDefaultPosition,
                                       wxDefaultSize,
                                       wxLI_HORIZONTAL );
-  bSizer2->Add( FinalStaticLine, 1, wxSHAPED|wxALL, 5 );
+  bSizer2->Add( FinalStaticLine, 1, wxEXPAND|wxALL, 5 );
 
   // setup all the buttons
   wxBoxSizer *bSizer3 = new wxBoxSizer( wxVERTICAL );
@@ -100,18 +106,23 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   m_socbuttonsizer->AddButton( m_userOK );
   m_socbuttonsizer->Realize();
 
-  bSizer3->Add( m_socbuttonsizer, 1, wxSHAPED, 5 );
-  bSizer2->Add( bSizer3, 1, wxSHAPED, 5 );
+  bSizer2->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  bSizer3->Add( bSizer2, 1, wxEXPAND|wxALL, 5 );
 
   // draw the dialog box until we get more info
-  this->SetSizer( bSizer2 );
+  this->SetSizer( bSizer3 );
   this->Layout();
-  bSizer2->Fit(this);
-  this->Centre(wxBOTH);
+  bSizer3->Fit(this);
+  //this->Centre(wxBOTH);
 }
 
 void CoreSocInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreSocInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->SoCNode, CGSoc);
 }
 
 CoreSocInfoWin::~CoreSocInfoWin(){
