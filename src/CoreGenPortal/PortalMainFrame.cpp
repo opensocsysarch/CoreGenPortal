@@ -1938,6 +1938,18 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
       }
     }
     break;
+    case CGRegC:{
+      CoreGenRegClass *RegClassNode = (CoreGenRegClass*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          RegClassNode->SetName(BoxContents);
+          break;
+        case 1:
+          LogPane->AppendText("Set registers.\n");
+          break;
+      }
+    }
+    break;
   }
 
   // write out the new IR file

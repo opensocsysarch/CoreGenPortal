@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreRegClassInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreRegClassInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreRegClassInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
@@ -20,10 +21,12 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenRegClass *RegClass )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,250), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
   if( RegClass == nullptr ){
     this->EndModal(wxID_OK);
   }
+
+  RegClassNode = RegClass;
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -45,48 +48,52 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
 
   // add all the interior data
   // -- reg class
+  RegClassNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RegClassNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Register Class Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160, -1),
                                    0 );
   RegClassNameText->Wrap(-1);
-  InnerSizer->Add( RegClassNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RegClassNameSizer->Add( RegClassNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   RegClassNameCtrl = new wxTextCtrl( Wnd,
-                                 wxID_ANY,
+                                 0,
                                  wxString(RegClass->GetName()),
                                  wxDefaultPosition,
-                                 wxSize(400,25),
-                                 wxTE_READONLY,
+                                 wxSize(320,25),
+                                 wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("Reg Class Name") );
-  InnerSizer->Add( RegClassNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RegClassNameSizer->Add( RegClassNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( RegClassNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- registers
+  RegNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RegNameText = new wxStaticText( Wnd,
                               wxID_ANY,
                               wxT("Registers"),
                               wxDefaultPosition,
-                              wxDefaultSize,
+                              wxSize(160,-1),
                               0 );
   RegNameText->Wrap(-1);
-  InnerSizer->Add( RegNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RegNameSizer->Add( RegNameText, 0, wxALIGN_CENTER|wxALL, 0 );
 
   RegNameCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            1,
                             wxEmptyString,
                             wxDefaultPosition,
-                            wxSize(400,100),
-                            wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL,
+                            wxSize(320,100),
+                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("registers") );
 
   for( unsigned i=0; i<RegClass->GetNumReg(); i++ ){
     RegNameCtrl->AppendText(wxString(RegClass->GetReg(i)->GetName())+wxT("\n") );
   }
-  InnerSizer->Add( RegNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RegNameSizer->Add( RegNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( RegNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -117,6 +124,11 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
 
 void CoreRegClassInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreRegClassInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->RegClassNode, CGRegC);
 }
 
 CoreRegClassInfoWin::~CoreRegClassInfoWin(){
