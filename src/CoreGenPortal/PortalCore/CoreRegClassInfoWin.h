@@ -39,6 +39,8 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+#include "CoreGenPortal/PortalMainFrame.h"
+
 class CoreRegClassInfoWin : public wxDialog {
 public:
   CoreRegClassInfoWin( wxWindow* parent,
@@ -47,20 +49,16 @@ public:
                  CoreGenRegClass *Node = nullptr);
   ~CoreRegClassInfoWin();
 
-  // Event handler functions
-  /// Declares the event table
-  wxDECLARE_EVENT_TABLE();
-
-  /// handles the 'ok' button press
-  void OnPressOk( wxCommandEvent& event );
-
 protected:
+  CoreGenRegClass *RegClassNode;  ///< RegClassNode
   // window handlers
   wxScrolledWindow *Wnd;         ///< scrolling window handler
 
   // box sizers
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
+  wxBoxSizer *RegClassNameSizer;  ///< regclass name sizer
+  wxBoxSizer *RegNameSizer;       ///< reg name sizer
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
@@ -76,6 +74,15 @@ protected:
   wxButton *m_userOK;                         ///< ok button
 
 private:
+  // Event handler functions
+  /// Declares the event table
+  wxDECLARE_EVENT_TABLE();
+
+  /// handles the 'ok' button press
+  void OnPressOk( wxCommandEvent& event );
+
+  /// handles 'enter' press in textctrl box
+  void OnPressEnter( wxCommandEvent& event);
 };
 
 #endif

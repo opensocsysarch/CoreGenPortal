@@ -38,6 +38,8 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+#include "CoreGenPortal/PortalMainFrame.h"
+
 class CoreSocInfoWin : public wxDialog {
 public:
   CoreSocInfoWin( wxWindow* parent,
@@ -46,20 +48,20 @@ public:
                  CoreGenSoC *Node = nullptr);
   ~CoreSocInfoWin();
 
+  
+
+protected:
+  CoreGenSoC *SoCNode;            ///< SoC node for this window
+
+  wxBoxSizer *SoCNameSizer;        ///< SoC name sizer
+  wxBoxSizer *CoreNameSizer;       ///< Core name sizer
+
   wxStaticText *SocNameText;      ///< static text for SoC name
   wxStaticText *CoreNameText;     ///< static text for core name
+  
   wxTextCtrl *SocNameCtrl;        ///< name of the SoC
   wxTextCtrl *CoreNameCtrl;       ///< name of the Cores
 
-
-  // Event handler functions
-  /// Declares the event table
-  wxDECLARE_EVENT_TABLE();
-
-  /// handles the 'ok' button press
-  void OnPressOk( wxCommandEvent& event );
-
-protected:
   // window handlers
   wxPanel *m_panel1;              ///< main panel
 
@@ -71,6 +73,15 @@ protected:
   wxButton *m_userOK;                         ///< ok button
 
 private:
+  // Event handler functions
+  /// Declares the event table
+  wxDECLARE_EVENT_TABLE();
+
+  /// handles the 'ok' button press
+  void OnPressOk( wxCommandEvent& event );
+
+  /// handles 'enter' press in textctrl box
+  void OnPressEnter( wxCommandEvent& event);
 };
 
 #endif

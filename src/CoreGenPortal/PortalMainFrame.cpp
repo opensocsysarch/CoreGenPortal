@@ -1775,6 +1775,12 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 2:
           CacheNode->SetWays(std::stoi(BoxContents));
           break;
+        case 3:
+          LogPane->AppendText("Set Parent Cache.\n");
+          break;
+        case 4:
+          LogPane->AppendText("Set Child Cache.\n");
+          break;
       }
     }
     break;
@@ -1802,6 +1808,8 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 2:
           CommNode->SetWidth(std::stoi(BoxContents));
           break;
+        case 3:
+          LogPane->AppendText("Set Endpoint.\n");
       }
     }
     break;
@@ -1815,6 +1823,17 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 1:
           CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
           break;
+        case 2:
+          LogPane->AppendText("Set ISA.\n");
+          break;
+        case 3:
+          LogPane->AppendText("Set Cache.\n");
+          break;
+        case 4:
+          LogPane->AppendText("Set Register Class.\n");
+          break;
+        case 5:
+          LogPane->AppendText("Set Extension.\n");
       }
     }
     break;
@@ -1841,10 +1860,107 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
       }
     }
     break;
+    case CGISA:{
+      CoreGenISA *ISANode = (CoreGenISA*)node;
+      ISANode->SetName(BoxContents);
+    }
+    break;
+    case CGInst:{
+      CoreGenInst *InstNode = (CoreGenInst*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          InstNode->SetName(BoxContents);
+          break;
+        case 1:
+          LogPane->AppendText("Set Instruction format.\n");
+          break;
+        case 2:
+          LogPane->AppendText("Set ISA.\n");
+          break;
+        case 3:
+          InstNode->SetSyntax(BoxContents);
+          LogPane->AppendText(BoxContents + ".\n");
+          break;
+        case 4:
+          InstNode->SetImpl(BoxContents);
+          break;
+        case 5:
+          LogPane->AppendText("Set Encoding.\n");
+          break;
+      }
+    }
+    break;
+    case CGMCtrl:{
+      CoreGenMCtrl *MCtrlNode = (CoreGenMCtrl*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          MCtrlNode->SetName(BoxContents);
+          break;
+        case 2:
+          MCtrlNode->SetNumInputPorts(std::stoi(BoxContents));
+          break;
+      }
+    }
+    break;
+    case CGPInst:{
+      CoreGenPseudoInst *PInstNode = (CoreGenPseudoInst*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          PInstNode->SetName(BoxContents);
+          break;
+        case 1:
+          LogPane->AppendText("Set Target Instruction.\n");
+          break;
+        case 2:
+          LogPane->AppendText("Set ISA.\n");
+          break;
+        case 3:
+          LogPane->AppendText("Set Encoding.\n");
+          break;
+      }
+    }
+    break;
+    case CGReg:{
+      CoreGenReg *RegNode = (CoreGenReg*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          RegNode->SetName(BoxContents);
+          break;
+        case 1:
+          RegNode->SetIndex(std::stoi(BoxContents));
+          break;
+        case 2:
+          LogPane->AppendText("Set register width.\n");
+          break;
+        case 3:
+          LogPane->AppendText("Set Subregisters.\n");
+          break;
+      }
+    }
+    break;
+    case CGRegC:{
+      CoreGenRegClass *RegClassNode = (CoreGenRegClass*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          RegClassNode->SetName(BoxContents);
+          break;
+        case 1:
+          LogPane->AppendText("Set registers.\n");
+          break;
+      }
+    }
+    break;
   }
 
   // write out the new IR file
-  CGProject->WriteIR(std::string(IRFileName.mb_str()));
+  LogPane->AppendText(std::string(this->IRFileName.mb_str()) + "\n");
+  //CGProject->WriteIR(std::string(IRFileName.mb_str()));
+  CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
+  ModuleBox->DeleteAllItems();
+  TreeItems.clear();
+  NodeItems.clear();
+  SetupModuleBox();
+  LoadModuleBox();
   //LoadModuleBox();
   LogPane->AppendText("Updated " + wxString(node->GetName()) +
                       " Box " + wxString(std::to_string(InfoBoxIndex)) +

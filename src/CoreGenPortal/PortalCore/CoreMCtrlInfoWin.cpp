@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreMCtrlInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreMCtrlInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreMCtrlInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
@@ -20,10 +21,12 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenMCtrl *MCtrl )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,250), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
   if( MCtrl == nullptr ){
     this->EndModal(wxID_OK);
   }
+
+  this->MCtrlNode = MCtrl;
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -45,44 +48,48 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
 
   // add all the interior data
   //-- memory controller name
+  MCtrlNameSizer = new wxBoxSizer( wxHORIZONTAL );
   MCtrlNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Memory Controller Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160, -1),
                                    0 );
   MCtrlNameText->Wrap(-1);
-  InnerSizer->Add( MCtrlNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  MCtrlNameSizer->Add( MCtrlNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   MCtrlCtrl = new wxTextCtrl( Wnd,
-                              wxID_ANY,
+                              0,
                               wxString(MCtrl->GetName()),
                               wxDefaultPosition,
-                              wxSize(400,25),
-                              wxTE_READONLY,
+                              wxSize(320,25),
+                              wxTE_PROCESS_ENTER,
                               wxDefaultValidator,
                               wxT("MCtrlName") );
-  InnerSizer->Add( MCtrlCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  MCtrlNameSizer->Add( MCtrlCtrl, 0, wxALL, 0 );
+  InnerSizer->Add(MCtrlNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- input ports
+  InputPortSizer = new wxBoxSizer( wxHORIZONTAL );
   InputPortText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Input Ports"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   InputPortText->Wrap(-1);
-  InnerSizer->Add( InputPortText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  InputPortSizer->Add( InputPortText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   InputPortCtrl = new wxTextCtrl( Wnd,
-                                  wxID_ANY,
+                                  1,
                                   wxString::Format(wxT("%i"),MCtrl->GetNumInputPorts()),
                                   wxDefaultPosition,
-                                  wxSize(400,25),
-                                  wxTE_READONLY,
+                                  wxSize(320,25),
+                                  wxTE_PROCESS_ENTER,
                                   wxDefaultValidator,
                                   wxT("InputPorts") );
-  InnerSizer->Add( InputPortCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  InputPortSizer->Add( InputPortCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( InputPortSizer, 0, wxALIGN_CENTER|wxALL, 0);
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -113,6 +120,11 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
 
 void CoreMCtrlInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreMCtrlInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->MCtrlNode, CGMCtrl);
 }
 
 CoreMCtrlInfoWin::~CoreMCtrlInfoWin(){

@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreISAInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreISAInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreISAInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
@@ -20,10 +21,12 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenISA *ISA )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,150), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
   if( ISA == nullptr ){
     this->EndModal(wxID_OK);
   }
+
+  this->ISANode = ISA;
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -45,24 +48,26 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
 
   // add all the interior data
   // -- ISA
+  ISANameSizer = new wxBoxSizer(wxHORIZONTAL);
   ISANameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("ISA Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   ISANameText->Wrap(-1);
-  InnerSizer->Add( ISANameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  ISANameSizer->Add( ISANameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   ISANameCtrl = new wxTextCtrl( Wnd,
                                 wxID_ANY,
                                 wxString(ISA->GetName()),
                                 wxDefaultPosition,
-                                wxSize(400,25),
-                                wxTE_READONLY,
+                                wxSize(320,25),
+                                wxTE_PROCESS_ENTER,
                                 wxDefaultValidator,
                                 wxT("ISA Name") );
-  InnerSizer->Add( ISANameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  ISANameSizer->Add( ISANameCtrl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+  InnerSizer->Add(ISANameSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -93,6 +98,11 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
 
 void CoreISAInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreISAInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->ISANode, CGISA);
 }
 
 CoreISAInfoWin::~CoreISAInfoWin(){

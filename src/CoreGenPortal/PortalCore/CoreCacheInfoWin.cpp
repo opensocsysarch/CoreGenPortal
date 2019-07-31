@@ -165,7 +165,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
       ChildCacheCtrl->AppendText(wxString(Child->GetName()));
   }
   ChildCacheSizer->Add( ChildCacheCtrl, 0, wxALL, 0 );
-  InnerSizer->Add( ChildCacheSizer, 0, wxALIGN_CENTER|wxALL, 5);
+  InnerSizer->Add( ChildCacheSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   // add space between info items and static line
   SpacerPanelSizer = new wxBoxSizer( wxVERTICAL );
