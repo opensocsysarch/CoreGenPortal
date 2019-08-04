@@ -34,6 +34,7 @@
 #include <wx/checkbox.h>
 #include <wx/msgdlg.h>
 #include <wx/textctrl.h>
+#include <wx/richtext/richtextctrl.h>
 
 #include <string>
 #include <sstream>
@@ -58,7 +59,8 @@ protected:
   wxBoxSizer *InnerSizer;         ///< inner sizer
   wxBoxSizer *VerifWinSizer;      ///< Verification window sizer
 
-  wxTextCtrl *VerifResults;       ///< verification results
+  //wxTextCtrl *VerifResults;       ///< verification results
+  wxRichTextCtrl *VerifResults;       ///< verification results
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer

@@ -43,7 +43,7 @@ CoreVerifWin::CoreVerifWin( wxWindow* parent,
   VerifWinSizer = new wxBoxSizer( wxHORIZONTAL );
 
 
-  VerifResults = new wxTextCtrl(Wnd,
+  VerifResults = new wxRichTextCtrl(Wnd,
                            4,
                            wxEmptyString,
                            wxDefaultPosition,
@@ -51,7 +51,48 @@ CoreVerifWin::CoreVerifWin( wxWindow* parent,
                            wxTE_MULTILINE|wxTE_READONLY,
                            wxDefaultValidator,
                            wxT("Verification Results") );
-  VerifResults->AppendText( wxString((*VerifBuf).str())+wxT("\n") );
+  //VerifResults->AppendText( wxString((*VerifBuf).str())+wxT("\n") );
+  std::stringstream ss((*VerifBuf).str());
+  std::string out;
+  unsigned FailedTests = 0;
+  unsigned PassedTests = 0;
+  while(std::getline(ss,out,'\n')){
+    std::size_t foundp = out.find("PASSED");
+    std::size_t foundf = out.find("FAILED");
+
+    if( foundp != std::string::npos ){
+      VerifResults->BeginBold();
+      VerifResults->WriteText(wxString(out)+wxT("\n"));
+      VerifResults->EndBold();
+      PassedTests = PassedTests+1;
+    }else if( foundf != std::string::npos ){
+      VerifResults->BeginTextColour(wxColour("RED"));
+      VerifResults->BeginBold();
+      VerifResults->WriteText(wxString(out)+wxT("\n"));
+      VerifResults->EndBold();
+      VerifResults->EndTextColour();
+      FailedTests = FailedTests+1;
+    }else{
+      VerifResults->AppendText(wxString(out)+wxT("\n"));
+    }
+  }
+
+  // write the pass/fail status
+  VerifResults->WriteText(wxT("\n\n\nSUMMARY OF VERIFICATION PASSES\n"));
+  VerifResults->WriteText(wxT("==============================\n"));
+  VerifResults->BeginBold();
+  VerifResults->WriteText(wxT("Number of passing tests: ") +
+                          wxString::Format(wxT("%i"),PassedTests)+
+                          wxT("\n"));
+  VerifResults->EndBold();
+  VerifResults->BeginTextColour(wxColour("RED"));
+  VerifResults->BeginBold();
+  VerifResults->WriteText(wxT("Number of failed tests: ") +
+                          wxString::Format(wxT("%i"),FailedTests)+
+                          wxT("\n"));
+  VerifResults->EndBold();
+  VerifResults->EndTextColour();
+
   VerifWinSizer->Add( VerifResults, 0, wxALL, 0 );
   InnerSizer->Add( VerifWinSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
