@@ -53,6 +53,7 @@
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
 #include "CoreGenPortal/PortalCore/CoreInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreVerifWin.h"
+#include "CoreGenPortal/PortalCore/CoreStatsWin.h"
 #include "CoreGenPortal/PortalCore/CorePluginBrowser.h"
 
 //-- COREGEN HEADERS
@@ -156,6 +157,7 @@ private:
   void OnProjNew(wxCommandEvent& event);
   void OnProjOpen(wxCommandEvent& event);
   void OnProjSCOpen(wxCommandEvent& event);
+  void OnProjSummary(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
   void OnBuildVerify(wxCommandEvent& event);
   void OnSelectPlugin(wxCommandEvent& event);
@@ -170,6 +172,7 @@ enum
   MARGIN_LINE_NUMBERS,
   ID_PROJNEW            = 10,
   ID_PROJSCOPEN         = 11,
+  ID_PROJSUMMARY        = 12,
   ID_BUILD_VERIFY       = 20,
   ID_BUILD_CODEGEN      = 21,
   ID_BUILD_SIGMAP       = 22,

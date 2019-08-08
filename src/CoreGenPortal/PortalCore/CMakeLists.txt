@@ -31,6 +31,7 @@ CoreMCtrlInfoWin.cpp
 CoreVTPInfoWin.cpp
 CorePluginInfoWin.cpp
 CoreVerifWin.cpp
+CoreStatsWin.cpp
 CorePluginBrowser.cpp
 )
 

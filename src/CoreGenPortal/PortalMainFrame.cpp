@@ -118,6 +118,7 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->Append(wxID_SAVEAS);
   ProjectMenu->AppendSeparator();
   ProjectMenu->Append( ID_PROJSCOPEN, wxT("&Open StoneCutter"));
+  ProjectMenu->Append( ID_PROJSUMMARY, wxT("&Project Summary"));
 
   //-- Build Menu
   BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
@@ -169,6 +170,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjClose));
   Connect(ID_PROJSCOPEN, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjSCOpen));
+  Connect( ID_PROJSUMMARY, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjSummary));
 
   //-- build menu
   Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
@@ -1571,7 +1574,60 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
   UP->Destroy();
 }
 
-// PortalMainFrame:: OnBuildVerify
+// PortalMainFrame::OnProjSummary
+void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // check the verification config options
+  if( !VerifConfig ){
+    LogPane->AppendText( "Error: verification preferences are not initialized\n");
+    return ;
+  }
+
+  if( !VerifConfig->isValid() ){
+    LogPane->AppendText( "Error: verification preferences are not valid\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // init the pass manager
+  if( !CGProject->InitPassMgr() ){
+    LogPane->AppendText( "Error initializing the CoreGen pass manager\n" );
+    return ;
+  }
+
+  LogPane->AppendText( "Building project summary...\n" );
+
+  // setup the text redirector
+  std::streambuf *oldBuf = std::cout.rdbuf();
+  std::ostringstream newBuf;
+  std::cout.rdbuf( newBuf.rdbuf() );
+
+  // Execute the pass
+  if( !CGProject->ExecutePass("StatsPass") ){
+    LogPane->AppendText( "Error executing StatsPass\n" );
+  }
+
+  // restore the old cout buffer
+  std::cout.rdbuf( oldBuf );
+  CoreStatsWin *SW = new CoreStatsWin(this,
+                                      wxID_ANY,
+                                      wxT("Project Summary"),
+                                      &newBuf );
+  if( SW->ShowModal() == wxID_OK ){
+    SW->Destroy();
+  }
+}
+
+// PortalMainFrame::OnBuildVerify
 void PortalMainFrame::OnBuildVerify(wxCommandEvent &event){
   if( !CGProject ){
     LogPane->AppendText( "No project is open!\n" );
@@ -1622,7 +1678,6 @@ void PortalMainFrame::OnBuildVerify(wxCommandEvent &event){
 
   // restore the old cout buffer
   std::cout.rdbuf( oldBuf );
-  //LogPane->AppendText(wxString(newBuf.str())+wxT("\n"));
   CoreVerifWin *VW = new CoreVerifWin(this,
                                       wxID_ANY,
                                       wxT("Verification Results"),

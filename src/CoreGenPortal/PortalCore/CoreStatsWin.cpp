@@ -1,5 +1,5 @@
 //
-// _COREVERIFWIN_CPP_
+// _CORESTATSWIN_CPP_
 //
 // Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,17 +8,17 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#include "CoreGenPortal/PortalCore/CoreVerifWin.h"
+#include "CoreGenPortal/PortalCore/CoreStatsWin.h"
 
 // Event Table
-wxBEGIN_EVENT_TABLE(CoreVerifWin, wxDialog)
-  EVT_BUTTON(wxID_OK, CoreVerifWin::OnPressOk)
+wxBEGIN_EVENT_TABLE(CoreStatsWin, wxDialog)
+  EVT_BUTTON(wxID_OK, CoreStatsWin::OnPressOk)
 wxEND_EVENT_TABLE()
 
-CoreVerifWin::CoreVerifWin( wxWindow* parent,
+CoreStatsWin::CoreStatsWin( wxWindow* parent,
                               wxWindowID id,
                               const wxString& title,
-                              std::ostringstream *VerifBuf )
+                              std::ostringstream *StatsBuf )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(600,600), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
 
@@ -40,61 +40,42 @@ CoreVerifWin::CoreVerifWin( wxWindow* parent,
   // create the inner sizer
   InnerSizer = new wxBoxSizer( wxVERTICAL );
 
-  VerifWinSizer = new wxBoxSizer( wxHORIZONTAL );
+  StatsWinSizer = new wxBoxSizer( wxHORIZONTAL );
 
 
-  VerifResults = new wxRichTextCtrl(Wnd,
+  StatsResults = new wxRichTextCtrl(Wnd,
                            4,
                            wxEmptyString,
                            wxDefaultPosition,
                            wxSize(500,500),
                            wxTE_MULTILINE|wxTE_READONLY,
                            wxDefaultValidator,
-                           wxT("Verification Results") );
-  //VerifResults->AppendText( wxString((*VerifBuf).str())+wxT("\n") );
-  std::stringstream ss((*VerifBuf).str());
+                           wxT("Project Summary") );
+  std::stringstream ss((*StatsBuf).str());
   std::string out;
-  unsigned FailedTests = 0;
-  unsigned PassedTests = 0;
   while(std::getline(ss,out,'\n')){
-    std::size_t foundp = out.find("PASSED");
-    std::size_t foundf = out.find("FAILED");
+    std::size_t foundarrow = out.find("==>");
+    std::size_t foundtotal = out.find("TOTAL NODES:");
 
-    if( foundp != std::string::npos ){
-      VerifResults->BeginBold();
-      VerifResults->WriteText(wxString(out)+wxT("\n"));
-      VerifResults->EndBold();
-      PassedTests = PassedTests+1;
-    }else if( foundf != std::string::npos ){
-      VerifResults->BeginTextColour(wxColour("RED"));
-      VerifResults->BeginBold();
-      VerifResults->WriteText(wxString(out)+wxT("\n"));
-      VerifResults->EndBold();
-      VerifResults->EndTextColour();
-      FailedTests = FailedTests+1;
+    if( (foundarrow != std::string::npos) &&
+        (foundtotal != std::string::npos ) ){
+      StatsResults->BeginTextColour(wxColour("RED"));
+      StatsResults->BeginBold();
+      StatsResults->WriteText(wxString(out)+wxT("\n"));
+      StatsResults->EndBold();
+      StatsResults->EndTextColour();
+    }else if( foundarrow != std::string::npos ){
+      StatsResults->BeginBold();
+      StatsResults->WriteText(wxString(out)+wxT("\n"));
+      StatsResults->EndBold();
     }else{
-      VerifResults->AppendText(wxString(out)+wxT("\n"));
+      StatsResults->AppendText(wxString(out)+wxT("\n"));
     }
   }
 
   // write the pass/fail status
-  VerifResults->WriteText(wxT("\n\n\nSUMMARY OF VERIFICATION PASSES\n"));
-  VerifResults->WriteText(wxT("==============================\n"));
-  VerifResults->BeginBold();
-  VerifResults->WriteText(wxT("Number of passing tests: ") +
-                          wxString::Format(wxT("%i"),PassedTests)+
-                          wxT("\n"));
-  VerifResults->EndBold();
-  VerifResults->BeginTextColour(wxColour("RED"));
-  VerifResults->BeginBold();
-  VerifResults->WriteText(wxT("Number of failed tests: ") +
-                          wxString::Format(wxT("%i"),FailedTests)+
-                          wxT("\n"));
-  VerifResults->EndBold();
-  VerifResults->EndTextColour();
-
-  VerifWinSizer->Add( VerifResults, 0, wxALL, 0 );
-  InnerSizer->Add( VerifWinSizer, 0, wxALIGN_CENTER|wxALL, 5);
+  StatsWinSizer->Add( StatsResults, 0, wxALL, 0 );
+  InnerSizer->Add( StatsWinSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -123,11 +104,11 @@ CoreVerifWin::CoreVerifWin( wxWindow* parent,
   this->Layout();
 }
 
-void CoreVerifWin::OnPressOk(wxCommandEvent& ok){
+void CoreStatsWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-CoreVerifWin::~CoreVerifWin(){
+CoreStatsWin::~CoreStatsWin(){
 }
 
 // EOF
