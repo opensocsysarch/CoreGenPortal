@@ -119,6 +119,7 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->AppendSeparator();
   ProjectMenu->Append( ID_PROJSCOPEN, wxT("&Open StoneCutter"));
   ProjectMenu->Append( ID_PROJSUMMARY, wxT("&Project Summary"));
+  ProjectMenu->Append( ID_PROJSPECDOC, wxT("&Build Specification Doc"));
 
   //-- Build Menu
   BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
@@ -172,6 +173,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjSCOpen));
   Connect( ID_PROJSUMMARY, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjSummary));
+  Connect( ID_PROJSPECDOC, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjSpecDoc));
 
   //-- build menu
   Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
@@ -1574,21 +1577,83 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
   UP->Destroy();
 }
 
-// PortalMainFrame::OnProjSummary
-void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
+// PortalMainFrame::OnProjSpecDoc
+void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event){
   if( !CGProject ){
     LogPane->AppendText( "No project is open!\n" );
     return ;
   }
 
-  // check the verification config options
-  if( !VerifConfig ){
-    LogPane->AppendText( "Error: verification preferences are not initialized\n");
+  // create the directory
+  wxString FullPath = ProjDir->GetPath() + wxT("/spec/");
+  if( !wxDirExists( FullPath ) ){
+    LogPane->AppendText( "Creating spec directory at " + FullPath + wxT("\n"));
+    if( !wxFileName::Mkdir( FullPath, wxS_DIR_DEFAULT, 0 ) ){
+      LogPane->AppendText( "Error creating spec directory at " + FullPath + wxT("\n") );
+      return ;
+    }
+  }
+
+  // refresh the project window
+  ProjDir->ReCreateTree();
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
     return ;
   }
 
-  if( !VerifConfig->isValid() ){
-    LogPane->AppendText( "Error: verification preferences are not valid\n" );
+  // init the pass manager
+  if( !CGProject->InitPassMgr() ){
+    LogPane->AppendText( "Error initializing the CoreGen pass manager\n" );
+    return ;
+  }
+
+  LogPane->AppendText( "Building specification document...\n" );
+
+  // Set the pass output path
+  if( !CGProject->SetPassOutputPath( "SpecDoc",
+                                     std::string(FullPath.mb_str()) )){
+    LogPane->AppendText( "Error initializing SpecDoc pass output\n" );
+    LogPane->AppendText( wxString(CGProject->GetErrStr()) + wxT("\n"));
+    return ;
+  }
+
+  // setup the text redirector
+  std::streambuf *oldBuf = std::cout.rdbuf();
+  std::ostringstream newBuf;
+  std::cout.rdbuf( newBuf.rdbuf() );
+
+  bool failed = false;
+
+  // Execute the pass
+  if( !CGProject->ExecuteSysPass("SpecDoc") ){
+    LogPane->AppendText( "Error executing SpecDoc\n" );
+    LogPane->AppendText( wxString(CGProject->GetErrStr()) + wxT("\n"));
+    failed = true;
+  }
+
+  // restore the old cout buffer
+  std::cout.rdbuf( oldBuf );
+  if( failed ){
+    return ;
+  }
+
+  // else, display the results
+  CoreSpecDocWin *SW = new CoreSpecDocWin(this,
+                                      wxID_ANY,
+                                      wxT("Specification Document"),
+                                      &newBuf );
+  if( SW->ShowModal() == wxID_OK ){
+    SW->Destroy();
+  }
+}
+
+
+// PortalMainFrame::OnProjSummary
+void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
     return ;
   }
 
@@ -1797,7 +1862,6 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
                                                wxFD_OPEN, wxDefaultPosition );
 
   if( OpenDialog->ShowModal() == wxID_OK ){
-    //NP = OpenDialog->GetPath();
     OpenProject(OpenDialog->GetPath());
   }
 
