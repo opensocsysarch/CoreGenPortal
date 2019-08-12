@@ -35,6 +35,7 @@
 #include <wx/msgdlg.h>
 #include <wx/textctrl.h>
 #include <wx/richtext/richtextctrl.h>
+#include <wx/clipbrd.h>
 
 #include <string>
 #include <sstream>
@@ -59,7 +60,6 @@ protected:
   wxBoxSizer *InnerSizer;         ///< inner sizer
   wxBoxSizer *VerifWinSizer;      ///< Verification window sizer
 
-  //wxTextCtrl *VerifResults;       ///< verification results
   wxRichTextCtrl *VerifResults;       ///< verification results
 
   // buttons
@@ -73,6 +73,9 @@ private:
 
   /// handles the 'ok' button press
   void OnPressOk( wxCommandEvent& event );
+
+  /// handles the 'copy' command
+  void OnCopyText( wxClipboardTextEvent& event );
 };
 
 #endif

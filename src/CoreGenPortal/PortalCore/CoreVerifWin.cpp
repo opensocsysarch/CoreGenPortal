@@ -12,7 +12,7 @@
 
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreVerifWin, wxDialog)
-  EVT_BUTTON(wxID_OK, CoreVerifWin::OnPressOk)
+  EVT_BUTTON(wxID_OK,         CoreVerifWin::OnPressOk)
 wxEND_EVENT_TABLE()
 
 CoreVerifWin::CoreVerifWin( wxWindow* parent,
@@ -21,6 +21,9 @@ CoreVerifWin::CoreVerifWin( wxWindow* parent,
                               std::ostringstream *VerifBuf )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(600,600), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+
+  // connect the command handlers
+  Bind(wxEVT_TEXT_COPY, &CoreVerifWin::OnCopyText, this);
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -125,6 +128,17 @@ CoreVerifWin::CoreVerifWin( wxWindow* parent,
 
 void CoreVerifWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreVerifWin::OnCopyText( wxClipboardTextEvent& event ){
+  if(wxTheClipboard->Open()){
+    if (wxTheClipboard->IsSupported( wxDF_TEXT )){
+      wxTheClipboard->AddData(
+        new wxTextDataObject(VerifResults->GetStringSelection()));
+      wxTheClipboard->Flush();
+    }
+    wxTheClipboard->Close();
+  }
 }
 
 CoreVerifWin::~CoreVerifWin(){
