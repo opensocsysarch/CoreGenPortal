@@ -169,6 +169,7 @@ private:
   void OnMiddleClickNode(wxTreeEvent& event);
   void OnPopupNode(wxCommandEvent &event);
   void OnCopyText(wxCommandEvent &event );
+  void OnPasteText(wxCommandEvent &event );
 };
 
 enum
