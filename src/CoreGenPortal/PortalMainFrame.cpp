@@ -155,6 +155,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnQuit));
 
   //-- edit menu
+  Connect(wxID_COPY, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnCopyText));
 
   //-- preferences menu
   Connect(ID_PREF_VERIF, wxEVT_COMMAND_MENU_SELECTED,
@@ -440,6 +442,24 @@ void PortalMainFrame::SetupModuleBox(){
   Bind(wxEVT_TREE_ITEM_ACTIVATED, &PortalMainFrame::OnSelectNode, this);
   Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, &PortalMainFrame::OnRightClickNode, this);
   Bind(wxEVT_TREE_ITEM_MIDDLE_CLICK, &PortalMainFrame::OnMiddleClickNode, this);
+}
+
+// PortalMainFrame::OnCopyText
+// copies the text from the current window ti the clipboard
+void PortalMainFrame::OnCopyText( wxCommandEvent& WXUNUSED(event) ){
+  if( !CGProject )
+    return ;
+
+  if(wxTheClipboard->Open()){
+    if (wxTheClipboard->IsSupported( wxDF_TEXT )){
+      wxStyledTextCtrl *SW = (wxStyledTextCtrl *)(EditorNotebook->GetPage(
+                                                  EditorNotebook->GetSelection()));
+      wxTheClipboard->AddData(
+        new wxTextDataObject(SW->GetStringSelection()));
+      wxTheClipboard->Flush();
+    }
+    wxTheClipboard->Close();
+  }
 }
 
 // PortalMainFrame::FindNodeStr

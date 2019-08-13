@@ -40,6 +40,7 @@
 #include <wx/treelist.h>
 #include <wx/treectrl.h>
 #include <wx/textctrl.h>
+#include <wx/clipbrd.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -167,6 +168,7 @@ private:
   void OnRightClickNode(wxTreeEvent& event);
   void OnMiddleClickNode(wxTreeEvent& event);
   void OnPopupNode(wxCommandEvent &event);
+  void OnCopyText(wxCommandEvent &event );
 };
 
 enum
