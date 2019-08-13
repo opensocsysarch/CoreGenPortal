@@ -1,5 +1,5 @@
 //
-// _COREVERIFWIN_H_
+// _CORESTATSWIN_H_
 //
 // Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,8 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#ifndef _COREVERIFWIN_H_
-#define _COREVERIFWIN_H_
+#ifndef _CORESTATSWIN_H_
+#define _CORESTATSWIN_H_
 
 //-- WX HEADERS
 #include <wx/artprov.h>
@@ -39,13 +39,13 @@
 #include <string>
 #include <sstream>
 
-class CoreVerifWin : public wxDialog {
+class CoreStatsWin : public wxDialog {
 public:
-  CoreVerifWin( wxWindow* parent,
+  CoreStatsWin( wxWindow* parent,
                 wxWindowID id = wxID_ANY,
-                const wxString& title = wxT("Verification Results"),
+                const wxString& title = wxT("Project Summary"),
                 std::ostringstream *VerifBuf = nullptr );
-  ~CoreVerifWin();
+  ~CoreStatsWin();
 
 protected:
   // window handlers
@@ -57,10 +57,9 @@ protected:
   // box sizers
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
-  wxBoxSizer *VerifWinSizer;      ///< Verification window sizer
+  wxBoxSizer *StatsWinSizer;      ///< Statistics window sizer
 
-  //wxTextCtrl *VerifResults;       ///< verification results
-  wxRichTextCtrl *VerifResults;       ///< verification results
+  wxRichTextCtrl *StatsResults;   ///< statistics results
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
