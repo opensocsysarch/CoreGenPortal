@@ -1927,6 +1927,24 @@ void PortalMainFrame::OnBuildStoneCutter(wxCommandEvent &event){
   // now that we've build the entire list of SCExec objects,
   // execute each one individually
   for( unsigned i=0; i<SCObjects.size(); i++ ){
+    // setup the text redirector
+    std::streambuf *oldBuf = std::cout.rdbuf();
+    std::ostringstream newBuf;
+    std::cout.rdbuf( newBuf.rdbuf() );
+
+    SCExec *SCE = std::get<2>(SCObjects[i]);
+    bool Success = SCE->Exec();
+    LogPane->AppendText( wxString(newBuf.str())+wxT("\n") );
+    if( !Success ){
+      LogPane->AppendText( "Failed to compile StoneCutter from " +
+                           std::get<0>(SCObjects[i]) + wxT("\n") );
+    }else{
+      LogPane->AppendText( "Successfully compiled StoneCutter from " +
+                           std::get<0>(SCObjects[i]) + wxT("\n") );
+    }
+
+    // restore the old cout buffer
+    std::cout.rdbuf( oldBuf );
   }
   ProjDir->ReCreateTree();
 }
