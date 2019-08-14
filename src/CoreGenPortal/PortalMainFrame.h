@@ -172,6 +172,7 @@ private:
   void OnBuildCodegen(wxCommandEvent& event);
   void OnBuildLLVMCodegen(wxCommandEvent& event);
   void OnBuildStoneCutter(wxCommandEvent& event);
+  void OnBuildSigmap(wxCommandEvent& event);
   void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
