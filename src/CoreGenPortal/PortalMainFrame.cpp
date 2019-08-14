@@ -186,6 +186,8 @@ void PortalMainFrame::CreateMenuBar(){
          wxCommandEventHandler(PortalMainFrame::OnBuildVerify));
   Connect(ID_BUILD_CODEGEN, wxEVT_COMMAND_MENU_SELECTED,
          wxCommandEventHandler(PortalMainFrame::OnBuildCodegen));
+  Connect(ID_BUILD_LLVM_CODEGEN, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildLLVMCodegen));
 
   //-- help menu
   Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED,
@@ -1733,6 +1735,29 @@ void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
   if( SW->ShowModal() == wxID_OK ){
     SW->Destroy();
   }
+}
+
+// PortalMainFrame::OnBuildLLVMCodegen
+void PortalMainFrame::OnBuildLLVMCodegen(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // execute the codegen
+  if( !CGProject->ExecuteLLVMCodegen() ){
+    LogPane->AppendText( wxString( CGProject->GetErrStr() ) + wxT("\n") );
+    LogPane->AppendText( "Failed to execute LLVM codegen!\n" );
+  }else{
+    LogPane->AppendText( "Successfully executed LLVM codegen\n" );
+  }
+  ProjDir->ReCreateTree();
 }
 
 // PortalMainFrame::OnBuildCodegen

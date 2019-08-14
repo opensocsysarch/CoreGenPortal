@@ -164,6 +164,7 @@ private:
   void OnProjClose(wxCommandEvent& event);
   void OnBuildVerify(wxCommandEvent& event);
   void OnBuildCodegen(wxCommandEvent& event);
+  void OnBuildLLVMCodegen(wxCommandEvent& event);
   void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
