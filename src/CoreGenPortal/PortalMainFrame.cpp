@@ -123,7 +123,8 @@ void PortalMainFrame::CreateMenuBar(){
 
   //-- Build Menu
   BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
-  BuildMenu->Append( ID_BUILD_CODEGEN,      wxT("&Execute CoreGen Codegen"));
+  BuildMenu->Append( ID_BUILD_CODEGEN,      wxT("&Execute Chisel Codegen"));
+  BuildMenu->Append( ID_BUILD_LLVM_CODEGEN, wxT("&Execute LLVM Codegen"));
   BuildMenu->Append( ID_BUILD_SIGMAP,       wxT("&Generate Signal Map"));
   BuildMenu->Append( ID_BUILD_STONECUTTER,  wxT("&Build StoneCutter"));
   BuildMenu->Append( ID_BUILD_VERILOG,      wxT("&Build Verilog"));
@@ -183,6 +184,8 @@ void PortalMainFrame::CreateMenuBar(){
   //-- build menu
   Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
          wxCommandEventHandler(PortalMainFrame::OnBuildVerify));
+  Connect(ID_BUILD_CODEGEN, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildCodegen));
 
   //-- help menu
   Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED,
@@ -1730,6 +1733,28 @@ void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
   if( SW->ShowModal() == wxID_OK ){
     SW->Destroy();
   }
+}
+
+// PortalMainFrame::OnBuildCodegen
+void PortalMainFrame::OnBuildCodegen(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  if( !CGProject->ExecuteChiselCodegen() ){
+    LogPane->AppendText( wxString( CGProject->GetErrStr() ) + wxT("\n") );
+    LogPane->AppendText( "Failed to execute Chisel codegen!\n" );
+  }else{
+    LogPane->AppendText( "Successfully executed Chisel codegen\n" );
+  }
+  ProjDir->ReCreateTree();
 }
 
 // PortalMainFrame::OnBuildVerify

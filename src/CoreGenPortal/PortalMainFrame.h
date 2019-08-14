@@ -163,6 +163,7 @@ private:
   void OnProjSpecDoc(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
   void OnBuildVerify(wxCommandEvent& event);
+  void OnBuildCodegen(wxCommandEvent& event);
   void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
@@ -187,6 +188,7 @@ enum
   ID_BUILD_COMPILER     = 25,
   ID_BUILD_SIM          = 26,
   ID_BUILD_ALL          = 27,
+  ID_BUILD_LLVM_CODEGEN = 28,
   ID_COMPILE_SIM        = 30,
   ID_COMPILE_COMPILER   = 31,
   ID_COMPILE_ALL        = 32,
