@@ -2376,6 +2376,40 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
       }
     }
     break;
+    case CGSoc:{
+      CoreGenSoC *SoCNode = (CoreGenSoC*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          SoCNode->SetName(BoxContents);
+          break;
+        case 1:
+          LogPane->AppendText("Set SoC Cores");
+          break;
+      }
+    }
+    break;
+    case CGSpad:{
+      CoreGenSpad *SpadNode = (CoreGenSpad*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          SpadNode->SetName(BoxContents);
+          break;
+        case 1:
+          SpadNode->SetMemSize(std::stoi(BoxContents));
+          break;
+        case 2:
+          SpadNode->SetRqstPorts(std::stoi(BoxContents));
+          break;
+        case 3:
+          SpadNode->SetRspPorts(std::stoi(BoxContents));
+          break;
+        case 4:
+          LogPane->AppendText("Change start addr.\n");
+          //SpadNode->SetStartAddr();
+          break;
+      }
+    }
+    break;
   }
 
   // write out the new IR file
@@ -2387,7 +2421,6 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
   NodeItems.clear();
   SetupModuleBox();
   LoadModuleBox();
-  //LoadModuleBox();
   LogPane->AppendText("Updated " + wxString(node->GetName()) +
                       " Box " + wxString(std::to_string(InfoBoxIndex)) +
                       ".\n");

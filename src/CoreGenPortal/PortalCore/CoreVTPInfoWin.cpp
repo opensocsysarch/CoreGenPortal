@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreVTPInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreVTPInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreVTPInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
@@ -20,10 +21,12 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenVTP *VTP )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,175), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
   if( VTP == nullptr ){
     this->EndModal(wxID_OK);
   }
+
+  this->VTPNode = (CoreGenVTP*)VTP;
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -45,6 +48,7 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
 
   // add all the interior data
   //-- memory controller name
+  NameSizer = new wxBoxSizer( wxHORIZONTAL );
   VTPNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("VTP Controller Name"),
@@ -52,17 +56,18 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
                                    wxDefaultSize,
                                    0 );
   VTPNameText->Wrap(-1);
-  InnerSizer->Add( VTPNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  NameSizer->Add( VTPNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   VTPCtrl = new wxTextCtrl( Wnd,
                             wxID_ANY,
                             wxString(VTP->GetName()),
                             wxDefaultPosition,
-                            wxSize(400,25),
-                            wxTE_READONLY,
+                            wxSize(320,25),
+                            wxTE_PROCESS_ENTER,
                             wxDefaultValidator,
                             wxT("VTPName") );
-  InnerSizer->Add( VTPCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  NameSizer->Add( VTPCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( NameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -93,6 +98,11 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
 
 void CoreVTPInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreVTPInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->VTPNode, CGVTP);
 }
 
 CoreVTPInfoWin::~CoreVTPInfoWin(){
