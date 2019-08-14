@@ -61,6 +61,9 @@
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
+//-- STONECUTTER HEADERS
+#include "CoreGen/StoneCutter/StoneCutter.h"
+
 //-- STANDARD HEADERS
 #include <stdlib.h>
 #include <vector>
@@ -127,6 +130,9 @@ private:
   std::vector<std::tuple<wxTreeItemId,CoreGenExt *,CoreGenNode *>> ExtItems;
   std::vector<std::tuple<wxTreeItemId,CoreGenPlugin *,CoreGenNode *>> PluginItems;
 
+  SCMsg *Msgs;
+  std::vector<std::tuple<wxString,SCOpts *,SCExec *>> SCObjects;
+
   // private functions
   void InitAuiMgr();
   void UpdateAuiMgr();
@@ -165,6 +171,7 @@ private:
   void OnBuildVerify(wxCommandEvent& event);
   void OnBuildCodegen(wxCommandEvent& event);
   void OnBuildLLVMCodegen(wxCommandEvent& event);
+  void OnBuildStoneCutter(wxCommandEvent& event);
   void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);

@@ -188,6 +188,8 @@ void PortalMainFrame::CreateMenuBar(){
          wxCommandEventHandler(PortalMainFrame::OnBuildCodegen));
   Connect(ID_BUILD_LLVM_CODEGEN, wxEVT_COMMAND_MENU_SELECTED,
          wxCommandEventHandler(PortalMainFrame::OnBuildLLVMCodegen));
+  Connect(ID_BUILD_STONECUTTER, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildStoneCutter));
 
   //-- help menu
   Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED,
@@ -1204,6 +1206,16 @@ void PortalMainFrame::CloseProject(){
   // reset the file browser window
   ProjDir->SetPath(UserConfig->wxGetProjectDir());
 
+  // delete all the stonecutter contexts
+  for( unsigned i=0; i<SCObjects.size(); i++ ){
+    if( std::get<1>(SCObjects[i]) )
+      delete std::get<1>(SCObjects[i]);
+    if( std::get<2>(SCObjects[i]) )
+      delete std::get<2>(SCObjects[i]);
+  }
+  if( Msgs )
+    delete Msgs;
+
   // delete the final bits
   delete CGProject;
   CGProject = nullptr;
@@ -1737,6 +1749,83 @@ void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
   }
 }
 
+// PortalMainFrame::OnBuildStoneCutter
+void PortalMainFrame::OnBuildStoneCutter(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // determine if the target stonecutter directory exists
+  wxString FullPath = ProjDir->GetPath() + wxT("/RTL/stonecutter/");
+  if( !wxDirExists(FullPath) ){
+    LogPane->AppendText( "StoneCutter path does not exist: " + FullPath + "\n" );
+    return ;
+  }
+
+  // walk the ~/Project/RTL/stonecutter directory and discover all the
+  // stonecutter source files
+  wxString SCFile = wxFindFirstFile(FullPath + "*.sc" );
+  while( !SCFile.empty() ){
+    bool isFound = false;
+    unsigned Idx = 0;
+    for( unsigned i=0; i<SCObjects.size(); i++ ){
+      if( std::get<0>(SCObjects[i]) == SCFile ){
+        isFound = true;
+        Idx = i;
+      }
+    }
+
+    // split the file name into its constituent parts
+    wxString RawPath;
+    wxString RawName;
+    wxString RawExt;
+
+    wxFileName::SplitPath( SCFile, &RawPath, &RawName, &RawExt );
+
+    if( !isFound ){
+
+      // create a new SCOpts context
+      SCOpts *SCO = new SCOpts( Msgs );
+
+      // set all the options
+      std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
+                                  "/RTL/chisel/src/main/scala/" +
+                                  std::string(RawName.mb_str()) + ".chisel";
+      SCO->SetOutputFile( OutFile );
+      SCO->SetChisel();
+
+      // create a new SCExec context
+      SCExec *SCE = new SCExec(SCO,Msgs);
+
+      // add it to the vector
+      SCObjects.push_back(std::make_tuple(SCFile,SCO,SCE));
+    }else{
+      SCOpts *SCO = std::get<1>(SCObjects[Idx]);
+      std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
+                                  "/RTL/chisel/src/main/scala/" +
+                                  std::string(RawName.mb_str()) + ".chisel";
+      SCO->SetOutputFile( OutFile );
+      SCO->SetChisel();
+      SCO->UnsetSignalMap();
+    }
+
+    // find the next file
+    SCFile = wxFindNextFile();
+  }
+
+  // now that we've build the entire list of SCExec objects,
+  // execute each one individually
+  for( unsigned i=0; i<SCObjects.size(); i++ ){
+  }
+}
+
 // PortalMainFrame::OnBuildLLVMCodegen
 void PortalMainFrame::OnBuildLLVMCodegen(wxCommandEvent &event){
   if( !CGProject ){
@@ -1934,6 +2023,10 @@ void PortalMainFrame::OpenProject(wxString NP){
 
   // load all the modules into the modulebox
   LoadModuleBox();
+
+  // initialize the stonecutter message context
+  Msgs = new SCMsg();
+  //wxStreamToTextRedirector(LogPane, &SCBuf);
 
   LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
 }

@@ -46,6 +46,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCOREGEN_PORTAL_PLATFORM=${CMAKE_SYSTEM
 message(STATUS "Building for ${CMAKE_SYSTEM_NAME}")
 
 #------------------------------------------------------------------------
+#-- FIND PACKAGES
+#------------------------------------------------------------------------
+# Find LLVM packages
+find_package(LLVM REQUIRED CONFIG)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+include_directories(${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS})
+
+#------------------------------------------------------------------------
 #-- COREGEN PATHS
 #------------------------------------------------------------------------
 # Add package paths
