@@ -1748,6 +1748,7 @@ void PortalMainFrame::OnBuildCodegen(wxCommandEvent &event){
     return ;
   }
 
+  // execute the codegen
   if( !CGProject->ExecuteChiselCodegen() ){
     LogPane->AppendText( wxString( CGProject->GetErrStr() ) + wxT("\n") );
     LogPane->AppendText( "Failed to execute Chisel codegen!\n" );
@@ -1880,8 +1881,8 @@ void PortalMainFrame::OpenProject(wxString NP){
 
   // create a new coregen object
   CGProject = new CoreGenBackend( std::string(NPF.GetName().mb_str()),
-                                    std::string(NPF.GetPath().mb_str()),
-                                    UserConfig->GetArchiveDir() );
+                                  std::string(NPF.GetPath().mb_str()),
+                                  UserConfig->GetArchiveDir() );
   if( CGProject == nullptr ){
     LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
     return ;
