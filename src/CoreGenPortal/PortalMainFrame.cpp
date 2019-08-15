@@ -1934,12 +1934,22 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 2:
           CacheNode->SetWays(std::stoi(BoxContents));
           break;
-        case 3:
-          LogPane->AppendText("Set Parent Cache.\n");
+        case 3:{
+          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
+          if(newNode) 
+            CacheNode->SetChildCache(newNode);
+          else 
+            LogPane->AppendText("Could not find specified cache.\n");
           break;
-        case 4:
-          LogPane->AppendText("Set Child Cache.\n");
+        }
+        case 4:{
+          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
+          if(newNode) 
+            CacheNode->SetParentCache(newNode);
+          else 
+            LogPane->AppendText("Could not find specified cache.\n");
           break;
+        }
       }
     }
     break;
@@ -1982,12 +1992,22 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 1:
           CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
           break;
-        case 2:
-          LogPane->AppendText("Set ISA.\n");
+        case 2:{
+          CoreGenISA *newNode = CGProject->GetISANodeByName(BoxContents);
+          if(newNode) 
+            CoreNode->SetISA(newNode);
+          else 
+            LogPane->AppendText("Could not find specified ISA.\n");
           break;
-        case 3:
-          LogPane->AppendText("Set Cache.\n");
+        }
+        case 3:{
+          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
+          if(newNode) 
+            CoreNode->InsertCache(newNode);
+          else 
+            LogPane->AppendText("Could not find specified ISA.\n");
           break;
+        }
         case 4:
           LogPane->AppendText("Set Register Class.\n");
           break;
@@ -2030,12 +2050,22 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 0:
           InstNode->SetName(BoxContents);
           break;
-        case 1:
-          LogPane->AppendText("Set Instruction format.\n");
+        case 1:{
+          CoreGenInstFormat *newNode = CGProject->GetInstFormatNodeByName(BoxContents);
+          if(newNode) 
+            InstNode->SetFormat(newNode);
+          else 
+            LogPane->AppendText("Could not find specified Instruction Format.\n");
           break;
-        case 2:
-          LogPane->AppendText("Set ISA.\n");
+        }
+        case 2:{
+          CoreGenISA *newNode = CGProject->GetISANodeByName(BoxContents);
+          if(newNode) 
+            InstNode->SetISA(newNode);
+          else 
+            LogPane->AppendText("Could not find specified Instruction Format.\n");
           break;
+        }
         case 3:
           InstNode->SetSyntax(BoxContents);
           LogPane->AppendText(BoxContents + ".\n");
@@ -2067,10 +2097,16 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 0:
           PInstNode->SetName(BoxContents);
           break;
-        case 1:
-          LogPane->AppendText("Set Target Instruction.\n");
+        case 1:{
+          CoreGenInst *newNode = CGProject->GetInstNodeByName(BoxContents);
+          if(newNode) 
+            PInstNode->SetTargetInst(newNode);
+          else 
+            LogPane->AppendText("Could not find specified Instruction.\n");
           break;
+        }
         case 2:
+          //perhaps make uneditable
           LogPane->AppendText("Set ISA.\n");
           break;
         case 3:
@@ -2089,6 +2125,7 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           RegNode->SetIndex(std::stoi(BoxContents));
           break;
         case 2:
+          //Is it by design that there's no function to change the width?
           LogPane->AppendText("Set register width.\n");
           break;
         case 3:
@@ -2139,6 +2176,15 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 4:
           LogPane->AppendText("Change start addr.\n");
           //SpadNode->SetStartAddr();
+          break;
+      }
+    }
+    break;
+    case CGVTP:{
+      CoreGenVTP *VTPNode = (CoreGenVTP*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          VTPNode->SetName(BoxContents);
           break;
       }
     }

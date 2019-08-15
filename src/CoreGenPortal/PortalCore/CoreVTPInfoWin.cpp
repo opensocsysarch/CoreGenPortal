@@ -59,7 +59,7 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
   NameSizer->Add( VTPNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   VTPCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            0,
                             wxString(VTP->GetName()),
                             wxDefaultPosition,
                             wxSize(320,25),
