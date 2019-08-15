@@ -5,7 +5,7 @@
 ## Prerequisites
 * C++11 Compiler (LLVM/Clang and GCC are tested)
 * CMake 3.4.3+
-* CoreGen
+* CoreGen (and it's constituent dependencies)
 
 ## Building
 
@@ -45,7 +45,7 @@ cd build
 ```
 1. Execute CMake to generate the makefiles
 ```
-cmake ../
+cmake -DLLVM_DIR=/usr/lib/llvm-6.0/cmake ../
 ```
 1. Execute the build
 ```
@@ -69,7 +69,7 @@ cd build
 ```
 1. Execute CMake to generate the makefiles
 ```
-cmake ../
+cmake -DLLVM_DIR=/usr/lib/llvm-6.0/cmake ../
 ```
 1. Execute the build
 ```
@@ -111,7 +111,7 @@ cd build
 ```
 1. Execute CMake to generate the makefiles
 ```
-cmake ../
+cmake -DLLVM_DIR=/opt/rh/llvm-toolset-7/root/usr/lib64/cmake/llvm ../
 ```
 1. Execute the build
 ```
@@ -137,7 +137,7 @@ cd build
 ```
 1. Execute CMake to generate the makefiles
 ```
-cmake ../
+cmake -DLLVM_DIR=/usr/local/opt/llvm\@5/lib/cmake/llvm ../
 ```
 1. Execute the build
 ```
@@ -150,7 +150,8 @@ make
 * -DCMAKE\_BUILD\_TYPE=Release : Builds a release build with optimization (Default)
 * -DCMAKE\_BUILD\_TYPE=Debug : Builds with debugging options (-O0 -g, etc)
 * -DCMAKE\_INSTALL\_PREFIX=/path/to/install : Forces alternate install locations
-- -DCOREGEN\_INSTALL\_PATH=/path/to/coregen/install : The default is /opt/coregen
+* -DCOREGEN\_INSTALL\_PATH=/path/to/coregen/install : The default is /opt/coregen
+* -DLLVM\_DIR=/path/to/llvm/cmake/scripts : Sets the path for the LLVM cmake scripts.  This must be set for the build to be successful.  This is generally difficult to derive automatically.
 
 ### Documentation Options
 * -DBUILD\_DOCUMENTATION=ON  : Enables Doxygenized documentaition.  ``make doc`` will build the documentation (requires Doxygen to be installed)
