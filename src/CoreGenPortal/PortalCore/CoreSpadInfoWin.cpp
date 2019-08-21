@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreSpadInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreSpadInfoWin::OnPressOk)
+  EVT_TEXT_ENTER(wxID_ANY, CoreSpadInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
@@ -20,11 +21,12 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenSpad *Spad )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,325), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
   if( Spad == nullptr ){
     this->EndModal(wxID_OK);
   }
 
+  SpadNode = Spad;
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
   this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -45,107 +47,117 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
 
   // add all the interior data
   //-- spad name
+  SpadNameSizer = new wxBoxSizer( wxHORIZONTAL );
   SpadNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Scratchpad Name"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   SpadNameText->Wrap(-1);
-  InnerSizer->Add( SpadNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  SpadNameSizer->Add( SpadNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   SpadNameCtrl = new wxTextCtrl( Wnd,
-                                 wxID_ANY,
+                                 0,
                                  wxString(Spad->GetName()),
                                  wxDefaultPosition,
-                                 wxSize(400,25),
-                                 wxTE_READONLY,
+                                 wxSize(320,25),
+                                 wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("SpadName") );
-  InnerSizer->Add( SpadNameCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  SpadNameSizer->Add( SpadNameCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( SpadNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- scratchpad size
+  SizeNameSizer = new wxBoxSizer( wxHORIZONTAL );
   SizeNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
-                                   wxT("Scratchpad Size (in bytes)"),
+                                   wxT("Scratchpad Size (bytes)"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   SizeNameText->Wrap(-1);
-  InnerSizer->Add( SizeNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  SizeNameSizer->Add( SizeNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   SizeCtrl = new wxTextCtrl( Wnd,
-                             wxID_ANY,
+                             1,
                              wxString::Format(wxT("%i"),Spad->GetMemSize()),
                              wxDefaultPosition,
-                             wxSize(400,25),
-                             wxTE_READONLY,
+                             wxSize(320,25),
+                             wxTE_PROCESS_ENTER,
                              wxDefaultValidator,
                              wxT("SpadSize") );
-  InnerSizer->Add( SizeCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  SizeNameSizer->Add( SizeCtrl, 0, wxALL, 0 );
+  InnerSizer->Add(SizeNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- request ports
+  RqstNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RqstNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Request Ports"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   RqstNameText->Wrap(-1);
-  InnerSizer->Add( RqstNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RqstNameSizer->Add( RqstNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   RqstCtrl = new wxTextCtrl( Wnd,
-                             wxID_ANY,
+                             2,
                              wxString::Format(wxT("%i"),Spad->GetRqstPorts()),
                              wxDefaultPosition,
-                             wxSize(400,25),
-                             wxTE_READONLY,
+                             wxSize(320,25),
+                             wxTE_PROCESS_ENTER,
                              wxDefaultValidator,
                              wxT("RqstPorts") );
-  InnerSizer->Add( RqstCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RqstNameSizer->Add( RqstCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( RqstNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- response ports
+  RspNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RspNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Response Ports"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   RspNameText->Wrap(-1);
-  InnerSizer->Add( RspNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RspNameSizer->Add( RspNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   RspCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            3,
                             wxString::Format(wxT("%i"),Spad->GetRspPorts()),
                             wxDefaultPosition,
-                            wxSize(400,25),
-                            wxTE_READONLY,
+                            wxSize(320,25),
+                            wxTE_PROCESS_ENTER,
                             wxDefaultValidator,
                             wxT("RspPorts") );
-  InnerSizer->Add( RspCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  RspNameSizer->Add( RspCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( RspNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- starting address
+  StartNameSizer = new wxBoxSizer( wxHORIZONTAL );
   StartNameText = new wxStaticText( Wnd,
                                    wxID_ANY,
-                                   wxT("Starting Memory Address"),
+                                   wxT("Starting Mem Address"),
                                    wxDefaultPosition,
-                                   wxDefaultSize,
+                                   wxSize(160,-1),
                                    0 );
   StartNameText->Wrap(-1);
-  InnerSizer->Add( StartNameText, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  StartNameSizer->Add( StartNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   // TODO: print this in hex
   wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
                                   Spad->GetStartAddr() );
   StartCtrl = new wxTextCtrl( Wnd,
-                            wxID_ANY,
+                            4,
                             tmp,
                             wxDefaultPosition,
-                            wxSize(400,25),
-                            wxTE_READONLY,
+                            wxSize(320,25),
+                            wxTE_PROCESS_ENTER,
                             wxDefaultValidator,
                             wxT("StartAddr") );
-  InnerSizer->Add( StartCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
+  StartNameSizer->Add( StartCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( StartNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -176,6 +188,11 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
 
 void CoreSpadInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreSpadInfoWin::OnPressEnter(wxCommandEvent& enter){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  PMF->OnPressEnter(enter, this->SpadNode, CGSpad);
 }
 
 CoreSpadInfoWin::~CoreSpadInfoWin(){

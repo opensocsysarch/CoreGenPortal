@@ -1,5 +1,5 @@
 //
-// _COREVERIFWIN_CPP_
+// _CORESPECDOCWIN_CPP_
 //
 // Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,22 +8,19 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#include "CoreGenPortal/PortalCore/CoreVerifWin.h"
+#include "CoreGenPortal/PortalCore/CoreSpecDocWin.h"
 
 // Event Table
-wxBEGIN_EVENT_TABLE(CoreVerifWin, wxDialog)
-  EVT_BUTTON(wxID_OK,         CoreVerifWin::OnPressOk)
+wxBEGIN_EVENT_TABLE(CoreSpecDocWin, wxDialog)
+  EVT_BUTTON(wxID_OK, CoreSpecDocWin::OnPressOk)
 wxEND_EVENT_TABLE()
 
-CoreVerifWin::CoreVerifWin( wxWindow* parent,
+CoreSpecDocWin::CoreSpecDocWin( wxWindow* parent,
                               wxWindowID id,
                               const wxString& title,
-                              std::ostringstream *VerifBuf )
+                              std::ostringstream *SpecDocBuf )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(600,600), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-
-  // connect the command handlers
-  Bind(wxEVT_TEXT_COPY, &CoreVerifWin::OnCopyText, this);
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -43,61 +40,54 @@ CoreVerifWin::CoreVerifWin( wxWindow* parent,
   // create the inner sizer
   InnerSizer = new wxBoxSizer( wxVERTICAL );
 
-  VerifWinSizer = new wxBoxSizer( wxHORIZONTAL );
+  SpecDocWinSizer = new wxBoxSizer( wxHORIZONTAL );
 
 
-  VerifResults = new wxRichTextCtrl(Wnd,
+  SpecDocResults = new wxRichTextCtrl(Wnd,
                            4,
                            wxEmptyString,
                            wxDefaultPosition,
                            wxSize(500,500),
                            wxTE_MULTILINE|wxTE_READONLY,
                            wxDefaultValidator,
-                           wxT("Verification Results") );
-  //VerifResults->AppendText( wxString((*VerifBuf).str())+wxT("\n") );
-  std::stringstream ss((*VerifBuf).str());
+                           wxT("Specification Document Build") );
+  std::stringstream ss((*SpecDocBuf).str());
   std::string out;
-  unsigned FailedTests = 0;
-  unsigned PassedTests = 0;
+  bool failed = false;
   while(std::getline(ss,out,'\n')){
     std::size_t foundp = out.find("PASSED");
     std::size_t foundf = out.find("FAILED");
 
-    if( foundp != std::string::npos ){
-      VerifResults->BeginBold();
-      VerifResults->WriteText(wxString(out)+wxT("\n"));
-      VerifResults->EndBold();
-      PassedTests = PassedTests+1;
-    }else if( foundf != std::string::npos ){
-      VerifResults->BeginTextColour(wxColour("RED"));
-      VerifResults->BeginBold();
-      VerifResults->WriteText(wxString(out)+wxT("\n"));
-      VerifResults->EndBold();
-      VerifResults->EndTextColour();
-      FailedTests = FailedTests+1;
+    if( foundf != std::string::npos ){
+      SpecDocResults->BeginTextColour(wxColour("RED"));
+      SpecDocResults->BeginBold();
+      SpecDocResults->WriteText(wxString(out)+wxT("\n"));
+      SpecDocResults->EndBold();
+      SpecDocResults->EndTextColour();
+      failed = true;
+    }else if( foundp != std::string::npos ){
+      SpecDocResults->BeginBold();
+      SpecDocResults->WriteText(wxString(out)+wxT("\n"));
+      SpecDocResults->EndBold();
     }else{
-      VerifResults->AppendText(wxString(out)+wxT("\n"));
+      SpecDocResults->AppendText(wxString(out)+wxT("\n"));
     }
   }
 
   // write the pass/fail status
-  VerifResults->WriteText(wxT("\n\n\nSUMMARY OF VERIFICATION PASSES\n"));
-  VerifResults->WriteText(wxT("==============================\n"));
-  VerifResults->BeginBold();
-  VerifResults->WriteText(wxT("Number of passing tests: ") +
-                          wxString::Format(wxT("%i"),PassedTests)+
-                          wxT("\n"));
-  VerifResults->EndBold();
-  VerifResults->BeginTextColour(wxColour("RED"));
-  VerifResults->BeginBold();
-  VerifResults->WriteText(wxT("Number of failed tests: ") +
-                          wxString::Format(wxT("%i"),FailedTests)+
-                          wxT("\n"));
-  VerifResults->EndBold();
-  VerifResults->EndTextColour();
-
-  VerifWinSizer->Add( VerifResults, 0, wxALL, 0 );
-  InnerSizer->Add( VerifWinSizer, 0, wxALIGN_CENTER|wxALL, 5);
+  if( failed ){
+      SpecDocResults->BeginTextColour(wxColour("RED"));
+      SpecDocResults->BeginBold();
+      SpecDocResults->AppendText(wxT("Failed to create architecture specification document\n"));
+      SpecDocResults->EndBold();
+      SpecDocResults->EndTextColour();
+  }else{
+      SpecDocResults->BeginBold();
+      SpecDocResults->AppendText(wxT("Successfully created architecture specification document\n"));
+      SpecDocResults->EndBold();
+  }
+  SpecDocWinSizer->Add( SpecDocResults, 0, wxALL, 0 );
+  InnerSizer->Add( SpecDocWinSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
@@ -126,22 +116,11 @@ CoreVerifWin::CoreVerifWin( wxWindow* parent,
   this->Layout();
 }
 
-void CoreVerifWin::OnPressOk(wxCommandEvent& ok){
+void CoreSpecDocWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-void CoreVerifWin::OnCopyText( wxClipboardTextEvent& event ){
-  if(wxTheClipboard->Open()){
-    if (wxTheClipboard->IsSupported( wxDF_TEXT )){
-      wxTheClipboard->AddData(
-        new wxTextDataObject(VerifResults->GetStringSelection()));
-      wxTheClipboard->Flush();
-    }
-    wxTheClipboard->Close();
-  }
-}
-
-CoreVerifWin::~CoreVerifWin(){
+CoreSpecDocWin::~CoreSpecDocWin(){
 }
 
 // EOF

@@ -1,5 +1,5 @@
 //
-// _COREVTPINFOWIN_H_
+// _CORESPECDOCWIN_H_
 //
 // Copyright (C) 2017-2019 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,8 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#ifndef _COREVTPINFOWIN_H_
-#define _COREVTPINFOWIN_H_
+#ifndef _CORESPECDOCWIN_H_
+#define _CORESPECDOCWIN_H_
 
 //-- WX HEADERS
 #include <wx/artprov.h>
@@ -34,37 +34,32 @@
 #include <wx/checkbox.h>
 #include <wx/msgdlg.h>
 #include <wx/textctrl.h>
-#include <wx/scrolwin.h>
+#include <wx/richtext/richtextctrl.h>
 
-//-- COREGEN HEADERS
-#include "CoreGen/CoreGenBackend/CoreGenBackend.h"
+#include <string>
+#include <sstream>
 
-#include "CoreGenPortal/PortalMainFrame.h"
-
-class CoreVTPInfoWin : public wxDialog {
+class CoreSpecDocWin : public wxDialog {
 public:
-  CoreVTPInfoWin( wxWindow* parent,
-                 wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("Virtual-to-Physical Node"),
-                 CoreGenVTP *Node = nullptr);
-  ~CoreVTPInfoWin();
+  CoreSpecDocWin( wxWindow* parent,
+                wxWindowID id = wxID_ANY,
+                const wxString& title = wxT("Specification Document Build"),
+                std::ostringstream *SpecDocBuf = nullptr );
+  ~CoreSpecDocWin();
 
 protected:
-  CoreGenVTP *VTPNode;
   // window handlers
-  wxScrolledWindow *Wnd;         ///< scrolling window handler
-
-  // box sizers
-  wxBoxSizer *OuterSizer;         ///< outer sizer
-  wxBoxSizer *InnerSizer;         ///< inner sizer
-  wxBoxSizer *NameSizer;        ///< name sizer
+  wxScrolledWindow *Wnd;          ///< scrolling window handler
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
 
-  wxStaticText *VTPNameText;      ///< static text for vtp name
+  // box sizers
+  wxBoxSizer *OuterSizer;         ///< outer sizer
+  wxBoxSizer *InnerSizer;         ///< inner sizer
+  wxBoxSizer *SpecDocWinSizer;    ///< Statistics window sizer
 
-  wxTextCtrl *VTPCtrl;            ///< vtp name
+  wxRichTextCtrl *SpecDocResults; ///< statistics results
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
@@ -77,9 +72,6 @@ private:
 
   /// handles the 'ok' button press
   void OnPressOk( wxCommandEvent& event );
-
-  /// handles 'enter' press in textctrl box
-  void OnPressEnter( wxCommandEvent& event);
 };
 
 #endif

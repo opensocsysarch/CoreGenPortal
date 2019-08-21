@@ -119,10 +119,12 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->AppendSeparator();
   ProjectMenu->Append( ID_PROJSCOPEN, wxT("&Open StoneCutter"));
   ProjectMenu->Append( ID_PROJSUMMARY, wxT("&Project Summary"));
+  ProjectMenu->Append( ID_PROJSPECDOC, wxT("&Build Specification Doc"));
 
   //-- Build Menu
   BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
-  BuildMenu->Append( ID_BUILD_CODEGEN,      wxT("&Execute CoreGen Codegen"));
+  BuildMenu->Append( ID_BUILD_CODEGEN,      wxT("&Execute Chisel Codegen"));
+  BuildMenu->Append( ID_BUILD_LLVM_CODEGEN, wxT("&Execute LLVM Codegen"));
   BuildMenu->Append( ID_BUILD_SIGMAP,       wxT("&Generate Signal Map"));
   BuildMenu->Append( ID_BUILD_STONECUTTER,  wxT("&Build StoneCutter"));
   BuildMenu->Append( ID_BUILD_VERILOG,      wxT("&Build Verilog"));
@@ -154,6 +156,10 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnQuit));
 
   //-- edit menu
+  Connect(wxID_COPY, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnCopyText));
+  Connect(wxID_PASTE, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnPasteText));
 
   //-- preferences menu
   Connect(ID_PREF_VERIF, wxEVT_COMMAND_MENU_SELECTED,
@@ -172,10 +178,20 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjSCOpen));
   Connect( ID_PROJSUMMARY, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjSummary));
+  Connect( ID_PROJSPECDOC, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjSpecDoc));
 
   //-- build menu
   Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
          wxCommandEventHandler(PortalMainFrame::OnBuildVerify));
+  Connect(ID_BUILD_CODEGEN, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildCodegen));
+  Connect(ID_BUILD_LLVM_CODEGEN, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildLLVMCodegen));
+  Connect(ID_BUILD_STONECUTTER, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildStoneCutter));
+  Connect(ID_BUILD_SIGMAP, wxEVT_COMMAND_MENU_SELECTED,
+         wxCommandEventHandler(PortalMainFrame::OnBuildSigmap));
 
   //-- help menu
   Connect(wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED,
@@ -437,6 +453,42 @@ void PortalMainFrame::SetupModuleBox(){
   Bind(wxEVT_TREE_ITEM_ACTIVATED, &PortalMainFrame::OnSelectNode, this);
   Bind(wxEVT_TREE_ITEM_RIGHT_CLICK, &PortalMainFrame::OnRightClickNode, this);
   Bind(wxEVT_TREE_ITEM_MIDDLE_CLICK, &PortalMainFrame::OnMiddleClickNode, this);
+}
+
+// PortalMainFrame::OnPasteText
+// pastes the clipboard text to the current window
+void PortalMainFrame::OnPasteText( wxCommandEvent& WXUNUSED(event) ){
+  if( !CGProject )
+    return ;
+
+  if(wxTheClipboard->Open()){
+    if (wxTheClipboard->IsSupported( wxDF_TEXT )){
+      wxTextDataObject data;
+      wxTheClipboard->GetData( data );
+      wxStyledTextCtrl *SW = (wxStyledTextCtrl *)(EditorNotebook->GetPage(
+                                                  EditorNotebook->GetSelection()));
+      SW->InsertText(SW->GetCurrentPos(),data.GetText());
+    }
+    wxTheClipboard->Close();
+  }
+}
+
+// PortalMainFrame::OnCopyText
+// copies the text from the current window to the clipboard
+void PortalMainFrame::OnCopyText( wxCommandEvent& WXUNUSED(event) ){
+  if( !CGProject )
+    return ;
+
+  if(wxTheClipboard->Open()){
+    if (wxTheClipboard->IsSupported( wxDF_TEXT )){
+      wxStyledTextCtrl *SW = (wxStyledTextCtrl *)(EditorNotebook->GetPage(
+                                                  EditorNotebook->GetSelection()));
+      wxTheClipboard->AddData(
+        new wxTextDataObject(SW->GetStringSelection()));
+      wxTheClipboard->Flush();
+    }
+    wxTheClipboard->Close();
+  }
 }
 
 // PortalMainFrame::FindNodeStr
@@ -1156,6 +1208,16 @@ void PortalMainFrame::CloseProject(){
   // reset the file browser window
   ProjDir->SetPath(UserConfig->wxGetProjectDir());
 
+  // delete all the stonecutter contexts
+  for( unsigned i=0; i<SCObjects.size(); i++ ){
+    if( std::get<1>(SCObjects[i]) )
+      delete std::get<1>(SCObjects[i]);
+    if( std::get<2>(SCObjects[i]) )
+      delete std::get<2>(SCObjects[i]);
+  }
+  if( Msgs )
+    delete Msgs;
+
   // delete the final bits
   delete CGProject;
   CGProject = nullptr;
@@ -1574,21 +1636,83 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
   UP->Destroy();
 }
 
-// PortalMainFrame::OnProjSummary
-void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
+// PortalMainFrame::OnProjSpecDoc
+void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event){
   if( !CGProject ){
     LogPane->AppendText( "No project is open!\n" );
     return ;
   }
 
-  // check the verification config options
-  if( !VerifConfig ){
-    LogPane->AppendText( "Error: verification preferences are not initialized\n");
+  // create the directory
+  wxString FullPath = ProjDir->GetPath() + wxT("/spec/");
+  if( !wxDirExists( FullPath ) ){
+    LogPane->AppendText( "Creating spec directory at " + FullPath + wxT("\n"));
+    if( !wxFileName::Mkdir( FullPath, wxS_DIR_DEFAULT, 0 ) ){
+      LogPane->AppendText( "Error creating spec directory at " + FullPath + wxT("\n") );
+      return ;
+    }
+  }
+
+  // refresh the project window
+  ProjDir->ReCreateTree();
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
     return ;
   }
 
-  if( !VerifConfig->isValid() ){
-    LogPane->AppendText( "Error: verification preferences are not valid\n" );
+  // init the pass manager
+  if( !CGProject->InitPassMgr() ){
+    LogPane->AppendText( "Error initializing the CoreGen pass manager\n" );
+    return ;
+  }
+
+  LogPane->AppendText( "Building specification document...\n" );
+
+  // Set the pass output path
+  if( !CGProject->SetPassOutputPath( "SpecDoc",
+                                     std::string(FullPath.mb_str()) )){
+    LogPane->AppendText( "Error initializing SpecDoc pass output\n" );
+    LogPane->AppendText( wxString(CGProject->GetErrStr()) + wxT("\n"));
+    return ;
+  }
+
+  // setup the text redirector
+  std::streambuf *oldBuf = std::cout.rdbuf();
+  std::ostringstream newBuf;
+  std::cout.rdbuf( newBuf.rdbuf() );
+
+  bool failed = false;
+
+  // Execute the pass
+  if( !CGProject->ExecuteSysPass("SpecDoc") ){
+    LogPane->AppendText( "Error executing SpecDoc\n" );
+    LogPane->AppendText( wxString(CGProject->GetErrStr()) + wxT("\n"));
+    failed = true;
+  }
+
+  // restore the old cout buffer
+  std::cout.rdbuf( oldBuf );
+  if( failed ){
+    return ;
+  }
+
+  // else, display the results
+  CoreSpecDocWin *SW = new CoreSpecDocWin(this,
+                                      wxID_ANY,
+                                      wxT("Specification Document"),
+                                      &newBuf );
+  if( SW->ShowModal() == wxID_OK ){
+    SW->Destroy();
+  }
+}
+
+
+// PortalMainFrame::OnProjSummary
+void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
     return ;
   }
 
@@ -1625,6 +1749,250 @@ void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
   if( SW->ShowModal() == wxID_OK ){
     SW->Destroy();
   }
+}
+
+// PortalMainFrame::OnBuildSigmap
+void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // determine if the target stonecutter directory exists
+  wxString FullPath = ProjDir->GetPath() + wxT("/RTL/stonecutter/");
+  if( !wxDirExists(FullPath) ){
+    LogPane->AppendText( "StoneCutter path does not exist: " + FullPath + "\n" );
+    return ;
+  }
+
+  // walk the ~/Project/RTL/stonecutter directory and discover all the
+  // stonecutter source files
+  wxString SCFile = wxFindFirstFile(FullPath + "*.sc" );
+  while( !SCFile.empty() ){
+    bool isFound = false;
+    unsigned Idx = 0;
+    for( unsigned i=0; i<SCObjects.size(); i++ ){
+      if( std::get<0>(SCObjects[i]) == SCFile ){
+        isFound = true;
+        Idx = i;
+      }
+    }
+
+    // split the file name into its constituent parts
+    wxString RawPath;
+    wxString RawName;
+    wxString RawExt;
+
+    wxFileName::SplitPath( SCFile, &RawPath, &RawName, &RawExt );
+
+    if( !isFound ){
+
+      // create a new SCOpts context
+      SCOpts *SCO = new SCOpts( Msgs );
+
+      // set all the options
+      std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
+                                  "/RTL/stonecutter/" +
+                                  std::string(RawName.mb_str()) + ".yaml";
+      SCO->PurgeInputFiles();
+      SCO->SetInputFile(std::string(SCFile.mb_str()));
+      SCO->SetSignalMap( OutFile );
+      SCO->UnsetChisel();
+
+      // create a new SCExec context
+      SCExec *SCE = new SCExec(SCO,Msgs);
+
+      // add it to the vector
+      SCObjects.push_back(std::make_tuple(SCFile,SCO,SCE));
+    }else{
+      SCOpts *SCO = std::get<1>(SCObjects[Idx]);
+      std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
+                                  "/RTL/stonecutter/" +
+                                  std::string(RawName.mb_str()) + ".yaml";
+      SCO->PurgeInputFiles();
+      SCO->SetInputFile(std::string(SCFile.mb_str()));
+      SCO->SetSignalMap( OutFile );
+      SCO->UnsetChisel();
+    }
+
+    // find the next file
+    SCFile = wxFindNextFile();
+  }
+
+  // execute each of the signal map generators
+  for( unsigned i=0; i<SCObjects.size(); i++ ){
+    // setup the text redirector
+    std::streambuf *oldBuf = std::cout.rdbuf();
+    std::ostringstream newBuf;
+    std::cout.rdbuf( newBuf.rdbuf() );
+
+    SCExec *SCE = std::get<2>(SCObjects[i]);
+    bool Success = SCE->Exec();
+    LogPane->AppendText( wxString(newBuf.str())+wxT("\n") );
+    if( !Success ){
+      LogPane->AppendText( "Failed to build signal map from " +
+                           std::get<0>(SCObjects[i]) + wxT("\n") );
+    }else{
+      LogPane->AppendText( "Successfully built signal map from " +
+                           std::get<0>(SCObjects[i]) + wxT("\n") );
+    }
+
+    // restore the old cout buffer
+    std::cout.rdbuf( oldBuf );
+  }
+  ProjDir->ReCreateTree();
+}
+
+// PortalMainFrame::OnBuildStoneCutter
+void PortalMainFrame::OnBuildStoneCutter(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // determine if the target stonecutter directory exists
+  wxString FullPath = ProjDir->GetPath() + wxT("/RTL/stonecutter/");
+  if( !wxDirExists(FullPath) ){
+    LogPane->AppendText( "StoneCutter path does not exist: " + FullPath + "\n" );
+    return ;
+  }
+
+  // walk the ~/Project/RTL/stonecutter directory and discover all the
+  // stonecutter source files
+  wxString SCFile = wxFindFirstFile(FullPath + "*.sc" );
+  while( !SCFile.empty() ){
+    bool isFound = false;
+    unsigned Idx = 0;
+    for( unsigned i=0; i<SCObjects.size(); i++ ){
+      if( std::get<0>(SCObjects[i]) == SCFile ){
+        isFound = true;
+        Idx = i;
+      }
+    }
+
+    // split the file name into its constituent parts
+    wxString RawPath;
+    wxString RawName;
+    wxString RawExt;
+
+    wxFileName::SplitPath( SCFile, &RawPath, &RawName, &RawExt );
+
+    if( !isFound ){
+
+      // create a new SCOpts context
+      SCOpts *SCO = new SCOpts( Msgs );
+
+      // set all the options
+      std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
+                                  "/RTL/chisel/src/main/scala/" +
+                                  std::string(RawName.mb_str()) + ".chisel";
+      SCO->PurgeInputFiles();
+      SCO->SetInputFile(std::string(SCFile.mb_str()));
+      SCO->SetOutputFile( OutFile );
+      SCO->SetChisel();
+
+      // create a new SCExec context
+      SCExec *SCE = new SCExec(SCO,Msgs);
+
+      // add it to the vector
+      SCObjects.push_back(std::make_tuple(SCFile,SCO,SCE));
+    }else{
+      SCOpts *SCO = std::get<1>(SCObjects[Idx]);
+      std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
+                                  "/RTL/chisel/src/main/scala/" +
+                                  std::string(RawName.mb_str()) + ".chisel";
+      SCO->PurgeInputFiles();
+      SCO->SetInputFile(std::string(SCFile.mb_str()));
+      SCO->SetOutputFile( OutFile );
+      SCO->SetChisel();
+      SCO->UnsetSignalMap();
+    }
+
+    // find the next file
+    SCFile = wxFindNextFile();
+  }
+
+  // now that we've build the entire list of SCExec objects,
+  // execute each one individually
+  for( unsigned i=0; i<SCObjects.size(); i++ ){
+    // setup the text redirector
+    std::streambuf *oldBuf = std::cout.rdbuf();
+    std::ostringstream newBuf;
+    std::cout.rdbuf( newBuf.rdbuf() );
+
+    SCExec *SCE = std::get<2>(SCObjects[i]);
+    bool Success = SCE->Exec();
+    LogPane->AppendText( wxString(newBuf.str())+wxT("\n") );
+    if( !Success ){
+      LogPane->AppendText( "Failed to compile StoneCutter from " +
+                           std::get<0>(SCObjects[i]) + wxT("\n") );
+    }else{
+      LogPane->AppendText( "Successfully compiled StoneCutter from " +
+                           std::get<0>(SCObjects[i]) + wxT("\n") );
+    }
+
+    // restore the old cout buffer
+    std::cout.rdbuf( oldBuf );
+  }
+  ProjDir->ReCreateTree();
+}
+
+// PortalMainFrame::OnBuildLLVMCodegen
+void PortalMainFrame::OnBuildLLVMCodegen(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // execute the codegen
+  if( !CGProject->ExecuteLLVMCodegen() ){
+    LogPane->AppendText( wxString( CGProject->GetErrStr() ) + wxT("\n") );
+    LogPane->AppendText( "Failed to execute LLVM codegen!\n" );
+  }else{
+    LogPane->AppendText( "Successfully executed LLVM codegen\n" );
+  }
+  ProjDir->ReCreateTree();
+}
+
+// PortalMainFrame::OnBuildCodegen
+void PortalMainFrame::OnBuildCodegen(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  // build the dag
+  if( !CGProject->BuildDAG() ){
+    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    return ;
+  }
+
+  // execute the codegen
+  if( !CGProject->ExecuteChiselCodegen() ){
+    LogPane->AppendText( wxString( CGProject->GetErrStr() ) + wxT("\n") );
+    LogPane->AppendText( "Failed to execute Chisel codegen!\n" );
+  }else{
+    LogPane->AppendText( "Successfully executed Chisel codegen\n" );
+  }
+  ProjDir->ReCreateTree();
 }
 
 // PortalMainFrame::OnBuildVerify
@@ -1750,8 +2118,8 @@ void PortalMainFrame::OpenProject(wxString NP){
 
   // create a new coregen object
   CGProject = new CoreGenBackend( std::string(NPF.GetName().mb_str()),
-                                    std::string(NPF.GetPath().mb_str()),
-                                    UserConfig->GetArchiveDir() );
+                                  std::string(NPF.GetPath().mb_str()),
+                                  UserConfig->GetArchiveDir() );
   if( CGProject == nullptr ){
     LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
     return ;
@@ -1779,6 +2147,10 @@ void PortalMainFrame::OpenProject(wxString NP){
   // load all the modules into the modulebox
   LoadModuleBox();
 
+  // initialize the stonecutter message context
+  Msgs = new SCMsg();
+  //wxStreamToTextRedirector(LogPane, &SCBuf);
+
   LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
 }
 
@@ -1797,7 +2169,6 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
                                                wxFD_OPEN, wxDefaultPosition );
 
   if( OpenDialog->ShowModal() == wxID_OK ){
-    //NP = OpenDialog->GetPath();
     OpenProject(OpenDialog->GetPath());
   }
 
@@ -1830,12 +2201,22 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 2:
           CacheNode->SetWays(std::stoi(BoxContents));
           break;
-        case 3:
-          LogPane->AppendText("Set Parent Cache.\n");
+        case 3:{
+          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
+          if(newNode) 
+            CacheNode->SetChildCache(newNode);
+          else 
+            LogPane->AppendText("Could not find specified cache.\n");
           break;
-        case 4:
-          LogPane->AppendText("Set Child Cache.\n");
+        }
+        case 4:{
+          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
+          if(newNode) 
+            CacheNode->SetParentCache(newNode);
+          else 
+            LogPane->AppendText("Could not find specified cache.\n");
           break;
+        }
       }
     }
     break;
@@ -1878,12 +2259,22 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 1:
           CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
           break;
-        case 2:
-          LogPane->AppendText("Set ISA.\n");
+        case 2:{
+          CoreGenISA *newNode = CGProject->GetISANodeByName(BoxContents);
+          if(newNode) 
+            CoreNode->SetISA(newNode);
+          else 
+            LogPane->AppendText("Could not find specified ISA.\n");
           break;
-        case 3:
-          LogPane->AppendText("Set Cache.\n");
+        }
+        case 3:{
+          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
+          if(newNode) 
+            CoreNode->InsertCache(newNode);
+          else 
+            LogPane->AppendText("Could not find specified ISA.\n");
           break;
+        }
         case 4:
           LogPane->AppendText("Set Register Class.\n");
           break;
@@ -1926,12 +2317,22 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 0:
           InstNode->SetName(BoxContents);
           break;
-        case 1:
-          LogPane->AppendText("Set Instruction format.\n");
+        case 1:{
+          CoreGenInstFormat *newNode = CGProject->GetInstFormatNodeByName(BoxContents);
+          if(newNode) 
+            InstNode->SetFormat(newNode);
+          else 
+            LogPane->AppendText("Could not find specified Instruction Format.\n");
           break;
-        case 2:
-          LogPane->AppendText("Set ISA.\n");
+        }
+        case 2:{
+          CoreGenISA *newNode = CGProject->GetISANodeByName(BoxContents);
+          if(newNode) 
+            InstNode->SetISA(newNode);
+          else 
+            LogPane->AppendText("Could not find specified Instruction Format.\n");
           break;
+        }
         case 3:
           InstNode->SetSyntax(BoxContents);
           LogPane->AppendText(BoxContents + ".\n");
@@ -1963,10 +2364,16 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 0:
           PInstNode->SetName(BoxContents);
           break;
-        case 1:
-          LogPane->AppendText("Set Target Instruction.\n");
+        case 1:{
+          CoreGenInst *newNode = CGProject->GetInstNodeByName(BoxContents);
+          if(newNode) 
+            PInstNode->SetTargetInst(newNode);
+          else 
+            LogPane->AppendText("Could not find specified Instruction.\n");
           break;
+        }
         case 2:
+          //perhaps make uneditable
           LogPane->AppendText("Set ISA.\n");
           break;
         case 3:
@@ -1985,6 +2392,7 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           RegNode->SetIndex(std::stoi(BoxContents));
           break;
         case 2:
+          //Is it by design that there's no function to change the width?
           LogPane->AppendText("Set register width.\n");
           break;
         case 3:
@@ -2005,6 +2413,49 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
       }
     }
     break;
+    case CGSoc:{
+      CoreGenSoC *SoCNode = (CoreGenSoC*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          SoCNode->SetName(BoxContents);
+          break;
+        case 1:
+          LogPane->AppendText("Set SoC Cores");
+          break;
+      }
+    }
+    break;
+    case CGSpad:{
+      CoreGenSpad *SpadNode = (CoreGenSpad*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          SpadNode->SetName(BoxContents);
+          break;
+        case 1:
+          SpadNode->SetMemSize(std::stoi(BoxContents));
+          break;
+        case 2:
+          SpadNode->SetRqstPorts(std::stoi(BoxContents));
+          break;
+        case 3:
+          SpadNode->SetRspPorts(std::stoi(BoxContents));
+          break;
+        case 4:
+          LogPane->AppendText("Change start addr.\n");
+          //SpadNode->SetStartAddr();
+          break;
+      }
+    }
+    break;
+    case CGVTP:{
+      CoreGenVTP *VTPNode = (CoreGenVTP*)node;
+      switch(InfoBoxIndex){
+        case 0:
+          VTPNode->SetName(BoxContents);
+          break;
+      }
+    }
+    break;
   }
 
   // write out the new IR file
@@ -2016,7 +2467,6 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
   NodeItems.clear();
   SetupModuleBox();
   LoadModuleBox();
-  //LoadModuleBox();
   LogPane->AppendText("Updated " + wxString(node->GetName()) +
                       " Box " + wxString(std::to_string(InfoBoxIndex)) +
                       ".\n");

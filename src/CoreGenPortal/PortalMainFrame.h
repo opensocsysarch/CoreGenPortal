@@ -40,6 +40,7 @@
 #include <wx/treelist.h>
 #include <wx/treectrl.h>
 #include <wx/textctrl.h>
+#include <wx/clipbrd.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -54,10 +55,14 @@
 #include "CoreGenPortal/PortalCore/CoreInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreVerifWin.h"
 #include "CoreGenPortal/PortalCore/CoreStatsWin.h"
+#include "CoreGenPortal/PortalCore/CoreSpecDocWin.h"
 #include "CoreGenPortal/PortalCore/CorePluginBrowser.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
+
+//-- STONECUTTER HEADERS
+#include "CoreGen/StoneCutter/StoneCutter.h"
 
 //-- STANDARD HEADERS
 #include <stdlib.h>
@@ -125,6 +130,9 @@ private:
   std::vector<std::tuple<wxTreeItemId,CoreGenExt *,CoreGenNode *>> ExtItems;
   std::vector<std::tuple<wxTreeItemId,CoreGenPlugin *,CoreGenNode *>> PluginItems;
 
+  SCMsg *Msgs;
+  std::vector<std::tuple<wxString,SCOpts *,SCExec *>> SCObjects;
+
   // private functions
   void InitAuiMgr();
   void UpdateAuiMgr();
@@ -158,13 +166,20 @@ private:
   void OnProjOpen(wxCommandEvent& event);
   void OnProjSCOpen(wxCommandEvent& event);
   void OnProjSummary(wxCommandEvent& event);
+  void OnProjSpecDoc(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
   void OnBuildVerify(wxCommandEvent& event);
+  void OnBuildCodegen(wxCommandEvent& event);
+  void OnBuildLLVMCodegen(wxCommandEvent& event);
+  void OnBuildStoneCutter(wxCommandEvent& event);
+  void OnBuildSigmap(wxCommandEvent& event);
   void OnSelectPlugin(wxCommandEvent& event);
   void OnSelectNode(wxTreeEvent& event);
   void OnRightClickNode(wxTreeEvent& event);
   void OnMiddleClickNode(wxTreeEvent& event);
   void OnPopupNode(wxCommandEvent &event);
+  void OnCopyText(wxCommandEvent &event );
+  void OnPasteText(wxCommandEvent &event );
 };
 
 enum
@@ -173,6 +188,7 @@ enum
   ID_PROJNEW            = 10,
   ID_PROJSCOPEN         = 11,
   ID_PROJSUMMARY        = 12,
+  ID_PROJSPECDOC        = 13,
   ID_BUILD_VERIFY       = 20,
   ID_BUILD_CODEGEN      = 21,
   ID_BUILD_SIGMAP       = 22,
@@ -181,6 +197,7 @@ enum
   ID_BUILD_COMPILER     = 25,
   ID_BUILD_SIM          = 26,
   ID_BUILD_ALL          = 27,
+  ID_BUILD_LLVM_CODEGEN = 28,
   ID_COMPILE_SIM        = 30,
   ID_COMPILE_COMPILER   = 31,
   ID_COMPILE_ALL        = 32,

@@ -24,6 +24,39 @@ PortalNewProjWin.cpp
 PortalNewProjWin.h
 )
 
+set(llvm_codegens
+  x86codegen
+  AArch64codegen
+  ARMcodegen
+  Mipscodegen
+  PowerPCcodegen
+)
+set(llvm_parsers
+  x86asmparser
+  AArch64asmparser
+  ARMasmparser
+  Mipsasmparser
+  PowerPCasmparser
+)
+
+llvm_map_components_to_libnames(llvm_libs
+  support
+  core
+  irreader
+  mcjit
+  ipo
+  executionengine
+  instrumentation
+  transformutils
+  vectorize
+  scalaropts
+  instcombine
+  bitreader
+  bitwriter
+  ${llvm_codegens}
+  ${llvm_parsers}
+)
+
 #-- target deps
 find_package(wxWidgets COMPONENTS net adv aui core gl html propgrid qa ribbon richtext stc xrc base REQUIRED)
 IF(wxWidgets_FOUND)
@@ -39,7 +72,7 @@ IF(wxWidgets_FOUND)
   link_directories (${COREGEN_INSTALL_PATH}/lib64/potassco-1.0)
   add_executable( CoreGenPortal ${CGPortalSrcs}
                                 $<TARGET_OBJECTS:PortalCoreObjs> )
-  TARGET_LINK_LIBRARIES( CoreGenPortal ${COREGEN_LINK_LIBS} ${wxWidgets_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( CoreGenPortal SCComp ${llvm_libs} CoreGenSigMap ${COREGEN_LINK_LIBS} ${wxWidgets_LIBRARIES} )
   install(TARGETS CoreGenPortal DESTINATION bin)
 ELSE(wxWidgets_FOUND)
   MESSAGE("wxWidgets not found!")
