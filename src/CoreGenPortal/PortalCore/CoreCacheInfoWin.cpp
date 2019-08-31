@@ -160,7 +160,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                              wxDefaultValidator,
                              wxT("ChildCache") );
   if( Cache->IsSubLevel() ){
-    CoreGenCache *Child = Cache->GetParentCache();
+    CoreGenCache *Child = Cache->GetParentCache(0);
     if( Child != nullptr )
       ChildCacheCtrl->AppendText(wxString(Child->GetName()));
   }
