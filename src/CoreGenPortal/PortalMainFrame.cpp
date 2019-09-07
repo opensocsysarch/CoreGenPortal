@@ -8,6 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
+#include <sstream>
+#include <vector>
 #include "PortalMainFrame.h"
 
 // PortalMainFrame::PortalMainFrame
@@ -2182,6 +2184,8 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
   // get the box contents
   wxTextCtrl *ClickedBox = (wxTextCtrl*)enter.GetEventObject();
   std::string BoxContents = ClickedBox->GetValue().ToStdString();
+  std::istringstream iss(BoxContents);
+  std::string nextNodeName;
   // get the box id
   int InfoBoxIndex = ClickedBox->GetId();
 
@@ -2245,13 +2249,63 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           CommNode->SetWidth(std::stoi(BoxContents));
           break;
         case 3:
-          LogPane->AppendText("Set Endpoint.\n");
+          std::getline(iss, nextNodeName);
+          std::vector<std::string> nodeNames;
+
+          // add the nodes that need to be added
+          while(!iss.eof()){
+            // get an endpoint with the node name in the user list
+            CoreGenNode *N = CommNode->GetEndpoint(nextNodeName);
+
+            // check if the node was in the endpoints list
+            if(!N){
+              // it node wasn't in endpoints see if it exists
+              // if it exists add it to the endpoints o/w note an error
+              N = CGProject->GetNodeByName(nextNodeName);
+              if(N){
+                CommNode->InsertEndpoint(N);
+              }
+              else{
+                LogPane->AppendText(nextNodeName + " is not a valid node,\n");
+              }
+            }
+            //add the nodes to the list of user nodes
+            nodeNames.push_back(nextNodeName);
+            std::getline(iss, nextNodeName);
+          }
+
+          // find the nodes that need to be deleted
+          int delIndeces[CommNode->GetNumEndpoints()];
+          unsigned j = 0;
+          for(unsigned i = 0; i < CommNode->GetNumEndpoints(); i++){
+            // get the name of the next node
+            nextNodeName = CommNode->GetEndpoint(i)->GetName();
+            
+            // check if the node is in the list of user entered nodes
+            unsigned k = 0;
+            for(; k < nodeNames.size(); k++){
+              if(nodeNames[k] == nextNodeName) break;
+            }
+
+            // if node is not in the list mark it for deletion
+            if( k == nodeNames.size() ){
+              delIndeces[j] = i - j;
+              j++;
+            }
+          }
+
+          //delete the nodes that need to be deleted
+          for(unsigned i = 0; i < j; i++){
+            CommNode->DeleteEndpoint(delIndeces[i]);
+          }
       }
     }
     break;
     case CGCore:{
       // TODO: Handle isa, caches, regclasses, and extensions
       CoreGenCore *CoreNode = (CoreGenCore*)node;
+      std::vector<std::string> nodeNames;
+      int delIndeces[CoreNode->GetNumRegClass()];
       switch(InfoBoxIndex){
         case 0:
           CoreNode->SetName(BoxContents);
@@ -2275,11 +2329,119 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
             LogPane->AppendText("Could not find specified ISA.\n");
           break;
         }
-        case 4:
-          LogPane->AppendText("Set Register Class.\n");
+        case 4:{
+          std::getline(iss, nextNodeName);
+          
+          // add the nodes that need to be added
+          while(!iss.eof()){
+            CoreGenRegClass *N;
+            // check if a regclass with this name is already in the CoreNode
+            unsigned i;
+            for(i = 0; i < CoreNode->GetNumRegClass(); i++){
+              if(CoreNode->GetRegClass(i)->GetName() == nextNodeName) break;
+            }
+            
+
+            // check if the node was in the endpoints list
+            if(i == CoreNode->GetNumRegClass()){
+              // if node wasn't in endpoints see if it exists
+              // if it exists add it to the endpoints o/w note an error
+              N = CGProject->GetRegClassNodeByName(nextNodeName);
+              if(N){
+                CoreNode->InsertRegClass(N);
+              }
+              else{
+                LogPane->AppendText(nextNodeName + " is not a valid Register Class.\n");
+              }
+            }
+            //add the nodes to the list of user nodes
+            nodeNames.push_back(nextNodeName);
+            std::getline(iss, nextNodeName);
+          }
+
+          // find the nodes that need to be deleted
+          unsigned j = 0;
+          for(unsigned i = 0; i < CoreNode->GetNumRegClass(); i++){
+            // get the name of the next node
+            nextNodeName = CoreNode->GetRegClass(i)->GetName();
+            
+            // check if the node is in the list of user entered nodes
+            unsigned k = 0;
+            for(; k < nodeNames.size(); k++){
+              if(nodeNames[k] == nextNodeName) break;
+            }
+
+            // if node is not in the list mark it for deletion
+            if( k == nodeNames.size() ){
+              delIndeces[j] = i - j;
+              j++;
+            }
+          }
+
+          //delete the nodes that need to be deleted
+          for(unsigned i = 0; i < j; i++){
+            CoreNode->DeleteRegClass(delIndeces[i]);
+          }
+          //LogPane->AppendText("Set Register Class.\n");
           break;
-        case 5:
-          LogPane->AppendText("Set Extension.\n");
+        }
+        case 5:{
+          std::getline(iss, nextNodeName);
+          
+          // add the nodes that need to be added
+          while(!iss.eof()){
+            CoreGenExt *N;
+            // check if a regclass with this name is already in the CoreNode
+            unsigned i;
+            for(i = 0; i < CoreNode->GetNumExt(); i++){
+              if(CoreNode->GetExt(i)->GetName() == nextNodeName) break;
+            }
+            
+
+            // check if the node was in the endpoints list
+            if(i == CoreNode->GetNumExt()){
+              // if node wasn't in endpoints see if it exists
+              // if it exists add it to the endpoints o/w note an error
+              N = CGProject->GetExtNodeByName(nextNodeName);
+              if(N){
+                CoreNode->InsertExt(N);
+              }
+              else{
+                LogPane->AppendText(nextNodeName + " is not a valid Register Class.\n");
+              }
+            }
+            //add the nodes to the list of user nodes
+            nodeNames.push_back(nextNodeName);
+            std::getline(iss, nextNodeName);
+          }
+
+          // find the nodes that need to be deleted
+          unsigned j = 0;
+          for(unsigned i = 0; i < CoreNode->GetNumExt(); i++){
+            // get the name of the next node
+            nextNodeName = CoreNode->GetExt(i)->GetName();
+            
+            // check if the node is in the list of user entered nodes
+            unsigned k = 0;
+            for(; k < nodeNames.size(); k++){
+              if(nodeNames[k] == nextNodeName) break;
+            }
+
+            // if node is not in the list mark it for deletion
+            if( k == nodeNames.size() ){
+              delIndeces[j] = i - j;
+              j++;
+            }
+          }
+
+          //delete the nodes that need to be deleted
+          for(unsigned i = 0; i < j; i++){
+            CoreNode->DeleteExt(delIndeces[i]);
+          }
+          //LogPane->AppendText("Set Register Class.\n");
+          break;
+        }
+          //LogPane->AppendText("Set Extension.\n");
       }
     }
     break;
@@ -2327,8 +2489,11 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         }
         case 2:{
           CoreGenISA *newNode = CGProject->GetISANodeByName(BoxContents);
-          if(newNode) 
+          if(newNode){
             InstNode->SetISA(newNode);
+            CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+            if(PInst) PInst->SetISA(newNode);
+          } 
           else 
             LogPane->AppendText("Could not find specified Instruction Format.\n");
           break;
@@ -2338,9 +2503,12 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           LogPane->AppendText(BoxContents + ".\n");
           break;
         case 4:
+        //QUESTION: Is there any reason for this to be multi line?
           InstNode->SetImpl(BoxContents);
           break;
         case 5:
+        //QUESTION: are opcodes unique within each yaml?
+        //QUESTION: how to handle this if encoding nodes are not in the top level?
           LogPane->AppendText("Set Encoding.\n");
           break;
       }
@@ -2373,10 +2541,12 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           break;
         }
         case 2:
-          //perhaps make uneditable
+          //made uneditable 
           LogPane->AppendText("Set ISA.\n");
           break;
         case 3:
+        //QUESTION: are opcodes unique within each yaml?
+        //QUESTION: how to handle this if encoding nodes are not in the top level?
           LogPane->AppendText("Set Encoding.\n");
           break;
       }
@@ -2392,12 +2562,32 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           RegNode->SetIndex(std::stoi(BoxContents));
           break;
         case 2:
-          //Is it by design that there's no function to change the width?
+          //QUESTION: Is it by design that there's no function to change the width?
           LogPane->AppendText("Set register width.\n");
           break;
-        case 3:
-          LogPane->AppendText("Set Subregisters.\n");
+        case 3:{
+          getline(iss, nextNodeName);
+          getline(iss, nextNodeName);
+          std::string Name;
+          unsigned startbit;
+          unsigned endbit;
+
+
+          while(!iss.eof()){
+            Name = std::strtok((char*)nextNodeName.c_str(), ":");
+            startbit = std::stoi(std::strtok(NULL, ":"));
+            endbit = std::stoi(std::strtok(NULL, ":"));
+            for(unsigned i = 0; i < RegNode->GetNumSubRegs(); i ++){
+              if(RegNode->GetSubRegNameByIndex(i) == Name){
+                RegNode->DeleteSubRegByIndex(i);
+                i--;
+              }
+            }
+            RegNode->InsertSubReg(Name, startbit, endbit);
+            getline(iss, nextNodeName);
+          }
           break;
+        }
       }
     }
     break;
@@ -2407,9 +2597,69 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 0:
           RegClassNode->SetName(BoxContents);
           break;
-        case 1:
-          LogPane->AppendText("Set registers.\n");
-          break;
+        case 1:{
+          //clear current registers
+          while(RegClassNode->GetNumReg() > 0) RegClassNode->DeleteChild(RegClassNode->GetChild(0));
+          std::getline(iss, nextNodeName);
+          while(!iss.eof()){
+            CoreGenReg* N = CGProject->GetRegNodeByName(nextNodeName);
+            if(N) RegClassNode->InsertReg(N);
+            else LogPane->AppendText(nextNodeName + " is not a valid register. Deleting from registers list.\n");
+            getline(iss, nextNodeName);
+          }
+          /*
+          std::getline(iss, nextNodeName);
+          std::vector<std::string> nodeNames;
+
+          // add the nodes that need to be added
+          while(!iss.eof()){
+            // get an endpoint with the node name in the user list
+            CoreGenReg *N = RegClassNode->GetRegByName(nextNodeName);
+
+            // check if the node was in the endpoints list
+            if(!N){
+              // it node wasn't in endpoints see if it exists
+              // if it exists add it to the endpoints o/w note an error
+              N = CGProject->GetRegNodeByName(nextNodeName);
+              if(N){
+                RegClassNode->InsertReg(N);
+              }
+              else{
+                LogPane->AppendText(nextNodeName + " is not a valid node,\n");
+              }
+            }
+            //add the nodes to the list of user nodes
+            nodeNames.push_back(nextNodeName);
+            std::getline(iss, nextNodeName);
+          }
+
+          // find the nodes that need to be deleted
+          int delIndeces[RegClassNode->GetNumReg()];
+          unsigned j = 0;
+          for(unsigned i = 0; i < RegClassNode->GetNumReg(); i++){
+            // get the name of the next node
+            nextNodeName = RegClassNode->GetReg(i)->GetName();
+            
+            // check if the node is in the list of user entered nodes
+            unsigned k = 0;
+            for(; k < nodeNames.size(); k++){
+              if(nodeNames[k] == nextNodeName) break;
+            }
+
+            // if node is not in the list mark it for deletion
+            if( k == nodeNames.size() ){
+              delIndeces[j] = i - j;
+              j++;
+            }
+          }
+
+          //delete the nodes that need to be deleted
+          for(unsigned i = 0; i < j; i++){
+            RegClassNode->DeleteChild(RegClassNode->GetReg(i));
+          }
+          */
+        }
+          //LogPane->AppendText("Set registers.\n");
       }
     }
     break;
@@ -2419,9 +2669,20 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
         case 0:
           SoCNode->SetName(BoxContents);
           break;
-        case 1:
-          LogPane->AppendText("Set SoC Cores");
+        case 1:{
+          //clean current cores
+          while(SoCNode->GetNumCores() > 0) SoCNode->DeleteCore(SoCNode->GetCore(0));
+
+          //insert all valid cores in the user's list
+          std::getline(iss, nextNodeName);
+          while(!iss.eof()){
+            CoreGenCore* N = CGProject->GetCoreNodeByName(nextNodeName);
+            if(N) SoCNode->InsertCore(N);
+            else LogPane->AppendText(nextNodeName + " is not a valid core. Deleting from cores list.\n");
+            getline(iss, nextNodeName);
+          }
           break;
+        }
       }
     }
     break;

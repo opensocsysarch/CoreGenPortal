@@ -107,7 +107,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
                                  wxString(PInst->GetISA()->GetName()),
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 wxTE_READONLY,
                                  wxDefaultValidator,
                                  wxT("Inst Format Name") );
   ISANameSizer->Add( ISANameCtrl, 0, wxALL, 0 );

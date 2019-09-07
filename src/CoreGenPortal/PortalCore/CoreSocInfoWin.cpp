@@ -77,7 +77,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
 
   //-- cores
   CoreNameCtrl = new wxTextCtrl(this,
-                               wxID_ANY,
+                               1,
                                wxEmptyString,
                                wxDefaultPosition,
                                wxSize(320,100),
