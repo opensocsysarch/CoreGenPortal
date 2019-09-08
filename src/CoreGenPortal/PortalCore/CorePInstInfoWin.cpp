@@ -22,9 +22,6 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
                               CoreGenPseudoInst *PInst )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,350), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( PInst == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->PInstNode = PInst;
 
@@ -60,7 +57,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
 
   PInstNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(PInst->GetName()),
+                                 PInst ? wxString(PInst->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -82,7 +79,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
 
   InstNameCtrl = new wxTextCtrl( Wnd,
                                  1,
-                                 wxString(PInst->GetInst()->GetName()),
+                                 PInst ? wxString(PInst->GetInst()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -104,7 +101,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
 
   ISANameCtrl = new wxTextCtrl( Wnd,
                                  2,
-                                 wxString(PInst->GetISA()->GetName()),
+                                 PInst ? wxString(PInst->GetISA()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_READONLY,
@@ -129,15 +126,16 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("StoneCutter") );
-
-  for( unsigned i=0; i<PInst->GetNumEncodings(); i++ ){
-    wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
-                                    PInst->GetEncoding(i)->GetEncoding() );
-    EncCtrl->AppendText(wxString(PInst->GetEncoding(i)->GetField()) +
-                        wxT(" = ") + tmp + wxT("\n"));
+  if(PInst){
+    for( unsigned i=0; i<PInst->GetNumEncodings(); i++ ){
+      wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
+                                      PInst->GetEncoding(i)->GetEncoding() );
+      EncCtrl->AppendText(wxString(PInst->GetEncoding(i)->GetField()) +
+                          wxT(" = ") + tmp + wxT("\n"));
+    }
   }
   EncodingSizer->Add( EncCtrl, 0, wxALL, 0 );
   InnerSizer->Add( EncodingSizer, 0, wxALIGN_CENTER|wxALL, 5 );

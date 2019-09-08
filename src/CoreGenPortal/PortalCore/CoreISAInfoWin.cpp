@@ -22,9 +22,6 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
                               CoreGenISA *ISA )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,150), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( ISA == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->ISANode = ISA;
 
@@ -60,7 +57,7 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
 
   ISANameCtrl = new wxTextCtrl( Wnd,
                                 wxID_ANY,
-                                wxString(ISA->GetName()),
+                                ISA ? wxString(ISA->GetName()) : "",
                                 wxDefaultPosition,
                                 wxSize(320,25),
                                 wxTE_PROCESS_ENTER,

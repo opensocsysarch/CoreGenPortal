@@ -22,9 +22,6 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                               CoreGenRegClass *RegClass )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,250), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( RegClass == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   RegClassNode = RegClass;
 
@@ -60,7 +57,7 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
 
   RegClassNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(RegClass->GetName()),
+                                 RegClass ? wxString(RegClass->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -88,9 +85,10 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                             wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("registers") );
-
-  for( unsigned i=0; i<RegClass->GetNumReg(); i++ ){
-    RegNameCtrl->AppendText(wxString(RegClass->GetReg(i)->GetName())+wxT("\n") );
+  if(RegClass){
+    for( unsigned i=0; i<RegClass->GetNumReg(); i++ ){
+      RegNameCtrl->AppendText(wxString(RegClass->GetReg(i)->GetName())+wxT("\n") );
+    }
   }
   RegNameSizer->Add( RegNameCtrl, 0, wxALL, 0 );
   InnerSizer->Add( RegNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );

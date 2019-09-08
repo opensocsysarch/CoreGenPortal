@@ -154,6 +154,7 @@ private:
   void OpenSCFile(wxString NP, wxFileName NPF);
   void OpenProject(wxString NP);
 
+  CGNodeType TreeIdToCGType(wxTreeItemId ID);
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
 

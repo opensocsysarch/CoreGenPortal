@@ -22,9 +22,6 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
                               CoreGenSoC *Soc )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Soc == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   SoCNode = Soc;
   // init the internals
@@ -55,7 +52,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   //-- soc name box
   SocNameCtrl = new wxTextCtrl(this,
                                0,
-                               wxString(Soc->GetName()),
+                               Soc ? wxString(Soc->GetName()) : "",
                                wxDefaultPosition,
                                wxSize(320,25),
                                wxTE_PROCESS_ENTER,
@@ -84,8 +81,10 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
                                wxTE_MULTILINE|wxTE_PROCESS_ENTER,
                                wxDefaultValidator,
                                wxT("Cores") );
-  for( unsigned i=0; i<Soc->GetNumCores(); i++ ){
-    CoreNameCtrl->AppendText( wxString(Soc->GetCore(i)->GetName()) + wxT("\n"));
+  if(Soc){
+    for( unsigned i=0; i<Soc->GetNumCores(); i++ ){
+      CoreNameCtrl->AppendText( wxString(Soc->GetCore(i)->GetName()) + wxT("\n"));
+    }
   }
   CoreNameSizer->Add( CoreNameCtrl, 0, wxALL, 0 );
   bSizer2->Add( CoreNameSizer, 0, wxALIGN_CENTER|wxALL, 0 );

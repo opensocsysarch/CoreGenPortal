@@ -22,9 +22,6 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
                               CoreGenMCtrl *MCtrl )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,250), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( MCtrl == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->MCtrlNode = MCtrl;
 
@@ -60,7 +57,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
 
   MCtrlCtrl = new wxTextCtrl( Wnd,
                               0,
-                              wxString(MCtrl->GetName()),
+                              MCtrl ? wxString(MCtrl->GetName()) : "",
                               wxDefaultPosition,
                               wxSize(320,25),
                               wxTE_PROCESS_ENTER,
@@ -82,7 +79,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
 
   InputPortCtrl = new wxTextCtrl( Wnd,
                                   1,
-                                  wxString::Format(wxT("%i"),MCtrl->GetNumInputPorts()),
+                                  MCtrl ? wxString::Format(wxT("%i"),MCtrl->GetNumInputPorts()) : "",
                                   wxDefaultPosition,
                                   wxSize(320,25),
                                   wxTE_PROCESS_ENTER,

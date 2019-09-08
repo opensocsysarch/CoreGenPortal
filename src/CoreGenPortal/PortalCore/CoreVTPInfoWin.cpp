@@ -22,9 +22,6 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
                               CoreGenVTP *VTP )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,175), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( VTP == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->VTPNode = (CoreGenVTP*)VTP;
 
@@ -60,7 +57,7 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
 
   VTPCtrl = new wxTextCtrl( Wnd,
                             0,
-                            wxString(VTP->GetName()),
+                            VTP ? wxString(VTP->GetName()) : "",
                             wxDefaultPosition,
                             wxSize(320,25),
                             wxTE_PROCESS_ENTER,

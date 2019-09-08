@@ -22,9 +22,6 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               CoreGenReg *Reg )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Reg == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   RegNode = (CoreGenReg*)Reg;
 
@@ -60,7 +57,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   RegNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(Reg->GetName()),
+                                 Reg ? wxString(Reg->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -82,7 +79,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   RegIdxCtrl = new wxTextCtrl( Wnd,
                             1,
-                            wxString::Format(wxT("%i"),Reg->GetIndex()),
+                            Reg ? wxString::Format(wxT("%i"),Reg->GetIndex()) : "",
                             wxDefaultPosition,
                             wxSize(320,25),
                             wxTE_PROCESS_ENTER,
@@ -104,7 +101,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   WidthCtrl = new wxTextCtrl( Wnd,
                             2,
-                            wxString::Format(wxT("%i"),Reg->GetWidth()),
+                            Reg ? wxString::Format(wxT("%i"),Reg->GetWidth()): "",
                             wxDefaultPosition,
                             wxSize(320,25),
                             wxTE_PROCESS_ENTER,
@@ -136,11 +133,13 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   std::string SRName;
   unsigned SRStart;
   unsigned SREnd;
-  for( unsigned i=0; i<Reg->GetNumSubRegs(); i++ ){
-    Reg->GetSubReg(i,SRName,SRStart,SREnd);
-    SubRegCtrl->AppendText(wxString(SRName) + wxT(":") +
-                           wxString::Format(wxT("%i"),SRStart) + wxT(":") +
-                           wxString::Format(wxT("%i"),SREnd) + wxT("\n") );
+  if(Reg){
+    for( unsigned i=0; i<Reg->GetNumSubRegs(); i++ ){
+      Reg->GetSubReg(i,SRName,SRStart,SREnd);
+      SubRegCtrl->AppendText(wxString(SRName) + wxT(":") +
+                            wxString::Format(wxT("%i"),SRStart) + wxT(":") +
+                            wxString::Format(wxT("%i"),SREnd) + wxT("\n") );
+    }
   }
   SubRegSizer->Add( SubRegCtrl, 0, wxALL, 0 );
   InnerSizer->Add( SubRegSizer, 0, wxALIGN_CENTER|wxALL, 5 );
@@ -155,7 +154,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               wxALIGN_RIGHT,
                               wxDefaultValidator,
                               wxT("SIMDREGISTER") );
-  if( Reg->IsSIMD() )
+  if( Reg && Reg->IsSIMD() )
     SIMDCheck->SetValue(true);
   else
     SIMDCheck->SetValue(false);
@@ -171,7 +170,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               wxALIGN_RIGHT,
                               wxDefaultValidator,
                               wxT("RWREGISTER") );
-  if( Reg->IsRWAttr() )
+  if( Reg  && Reg->IsRWAttr() )
     RWCheck->SetValue(true);
   else
     RWCheck->SetValue(false);
@@ -187,7 +186,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               wxALIGN_RIGHT,
                               wxDefaultValidator,
                               wxT("ROREGISTER") );
-  if( Reg->IsROAttr() )
+  if( Reg && Reg->IsROAttr() )
     ROCheck->SetValue(true);
   else
     ROCheck->SetValue(false);
@@ -205,7 +204,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               wxALIGN_RIGHT,
                               wxDefaultValidator,
                               wxT("CSRREGISTER") );
-  if( Reg->IsCSRAttr() )
+  if( Reg && Reg->IsCSRAttr() )
     CSRCheck->SetValue(true);
   else
     CSRCheck->SetValue(false);
@@ -221,7 +220,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               wxALIGN_RIGHT,
                               wxDefaultValidator,
                               wxT("AMSREGISTER") );
-  if( Reg->IsAMSAttr() )
+  if( Reg && Reg->IsAMSAttr() )
     AMSCheck->SetValue(true);
   else
     AMSCheck->SetValue(false);
@@ -239,7 +238,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               wxALIGN_RIGHT,
                               wxDefaultValidator,
                               wxT("TUSREGISTER") );
-  if( Reg->IsTUSAttr() )
+  if( Reg && Reg->IsTUSAttr() )
     TUSCheck->SetValue(true);
   else
     TUSCheck->SetValue(false);
@@ -256,7 +255,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               wxALIGN_RIGHT,
                               wxDefaultValidator,
                               wxT("PCREGISTER") );
-  if( Reg->IsPCAttr() )
+  if( Reg && Reg->IsPCAttr() )
     PCCheck->SetValue(true);
   else
     PCCheck->SetValue(false);
@@ -272,7 +271,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                               wxALIGN_RIGHT,
                               wxDefaultValidator,
                               wxT("SHAREDREGISTER") );
-  if( Reg->IsShared() )
+  if( Reg && Reg->IsShared() )
     SharedCheck->SetValue(true);
   else
     SharedCheck->SetValue(false);

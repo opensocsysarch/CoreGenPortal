@@ -22,9 +22,6 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                               CoreGenComm *Comm )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,350), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Comm == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->CommNode = Comm;
 
@@ -60,7 +57,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
 
   CommNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(Comm->GetName()),
+                                 Comm ? wxString(Comm->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -88,21 +85,24 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                                  wxTE_PROCESS_ENTER,
                                  wxDefaultValidator,
                                  wxT("CommType") );
-  switch( Comm->GetCommType() ){
-  case CGCommP2P:
-    CommTypeCtrl->AppendText(wxT("Point-to-Point"));
+  if(Comm){
+    switch( Comm->GetCommType() ){
+    case CGCommP2P:
+      CommTypeCtrl->AppendText(wxT("Point-to-Point"));
+      break;
+    case CGCommBus:
+      CommTypeCtrl->AppendText(wxT("Bus"));
+      break;
+    case CGCommNoc:
+      CommTypeCtrl->AppendText(wxT("Network on Chip"));
+      break;
+    case CGCommUnk:
+    default:
+      CommTypeCtrl->AppendText(wxT("Unknown"));
     break;
-  case CGCommBus:
-    CommTypeCtrl->AppendText(wxT("Bus"));
-    break;
-  case CGCommNoc:
-    CommTypeCtrl->AppendText(wxT("Network on Chip"));
-    break;
-  case CGCommUnk:
-  default:
-    CommTypeCtrl->AppendText(wxT("Unknown"));
-    break;
+    }
   }
+  
   CommTypeSizer->Add( CommTypeCtrl, 0, wxALL, 0 );
   InnerSizer->Add( CommTypeSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
@@ -119,7 +119,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
 
   WidthCtrl = new wxTextCtrl( Wnd,
                               2,
-                              wxString::Format(wxT("%i"),Comm->GetWidth()),
+                              Comm ? wxString::Format(wxT("%i"),Comm->GetWidth()) : "",
                               wxDefaultPosition,
                               wxSize(320,25),
                               wxTE_PROCESS_ENTER,
@@ -147,9 +147,10 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                             wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("endpoints") );
-
-  for( unsigned i=0; i<Comm->GetNumEndpoints(); i++ ){
-    EndpointCtrl->AppendText(wxString(Comm->GetEndpoint(i)->GetName())+wxT("\n") );
+  if(Comm){
+    for( unsigned i=0; i<Comm->GetNumEndpoints(); i++ ){
+      EndpointCtrl->AppendText(wxString(Comm->GetEndpoint(i)->GetName())+wxT("\n") );
+    }
   }
   CommEndpointSizer->Add( EndpointCtrl, 0, wxALL, 0 );
   InnerSizer->Add( CommEndpointSizer, 0, wxALIGN_CENTER|wxALL, 5 );

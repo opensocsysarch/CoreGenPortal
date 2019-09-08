@@ -22,9 +22,6 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                               CoreGenCore *Core )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Core == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->CoreNode = Core;
 
@@ -61,7 +58,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- core name box
   CoreNameCtrl = new wxTextCtrl(Wnd,
                                0,
-                               wxString(Core->GetName()),
+                               Core ? wxString(Core->GetName()) : "",
                                wxDefaultPosition,
                                wxSize(320,25),
                                wxTE_PROCESS_ENTER,
@@ -84,7 +81,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- thread unit number
   ThreadUnitCtrl = new wxTextCtrl(Wnd,
                                1,
-                               wxString::Format(wxT("%i"),Core->GetNumThreadUnits()),
+                               Core ? wxString::Format(wxT("%i"),Core->GetNumThreadUnits()) : "",
                                wxDefaultPosition,
                                wxSize(320,25),
                                wxTE_PROCESS_ENTER,
@@ -107,7 +104,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- isa name ctrl
   ISACtrl = new wxTextCtrl(Wnd,
                            2,
-                           wxString(Core->GetISA()->GetName()),
+                           Core ? wxString(Core->GetISA()->GetName()) : "",
                            wxDefaultPosition,
                            wxSize(320,25),
                            wxTE_PROCESS_ENTER,
@@ -130,7 +127,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- cache name ctrl
   CacheCtrl = new wxTextCtrl(Wnd,
                            3,
-                           wxString(Core->GetCache()->GetName()),
+                           Core ? wxString(Core->GetCache()->GetName()) : "",
                            wxDefaultPosition,
                            wxSize(320,25),
                            wxTE_PROCESS_ENTER,
@@ -159,8 +156,10 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                            wxTE_MULTILINE|wxTE_PROCESS_ENTER,
                            wxDefaultValidator,
                            wxT("Reg Classes") );
-  for( unsigned i=0; i<Core->GetNumRegClass(); i++ ){
-    RegClassCtrl->AppendText(wxString(Core->GetRegClass(i)->GetName() + "\n"));
+  if(Core){
+    for( unsigned i=0; i<Core->GetNumRegClass(); i++ ){
+      RegClassCtrl->AppendText(wxString(Core->GetRegClass(i)->GetName() + "\n"));
+    }
   }
   RegClassSizer->Add( RegClassCtrl, 0, wxALL, 0 );
   InnerSizer->Add( RegClassSizer, 0, wxALIGN_CENTER|wxALL, 5 );
@@ -185,8 +184,10 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                            wxTE_MULTILINE|wxTE_PROCESS_ENTER,
                            wxDefaultValidator,
                            wxT("Extensions") );
-  for( unsigned i=0; i<Core->GetNumExt(); i++ ){
-    ExtCtrl->AppendText(wxString(Core->GetExt(i)->GetName() + "\n"));
+  if(Core){
+    for( unsigned i=0; i<Core->GetNumExt(); i++ ){
+      ExtCtrl->AppendText(wxString(Core->GetExt(i)->GetName() + "\n"));
+    }
   }
   ExtNameSizer->Add( ExtCtrl, 0, wxALL, 0 );
   InnerSizer->Add( ExtNameSizer, 0, wxALIGN_CENTER|wxALL, 5);

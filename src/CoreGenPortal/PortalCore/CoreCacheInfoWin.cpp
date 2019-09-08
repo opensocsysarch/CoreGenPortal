@@ -22,9 +22,6 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                               CoreGenCache *Cache)
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,350), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Cache == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->CacheNode = Cache;
 
@@ -60,7 +57,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
 
   CacheNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(Cache->GetName()),
+                                 Cache ? wxString(Cache->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320, 25),
                                  wxTE_PROCESS_ENTER,
@@ -82,7 +79,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
 
   SetsCtrl = new wxTextCtrl( Wnd,
                              1,
-                             wxString::Format(wxT("%i"),Cache->GetSets()),
+                             Cache ? wxString::Format(wxT("%i"),Cache->GetSets()) : "",
                              wxDefaultPosition,
                              wxSize(320,25),
                              wxTE_PROCESS_ENTER,
@@ -104,7 +101,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
 
   WaysCtrl = new wxTextCtrl( Wnd,
                              2,
-                             wxString::Format(wxT("%i"),Cache->GetWays()),
+                             Cache ? wxString::Format(wxT("%i"),Cache->GetWays()) : "",
                              wxDefaultPosition,
                              wxSize(320,25),
                              wxTE_PROCESS_ENTER,
@@ -132,7 +129,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                              wxTE_PROCESS_ENTER,
                              wxDefaultValidator,
                              wxT("ParentCache") );
-  if( Cache->IsParentLevel() ){
+  if( Cache && Cache->IsParentLevel() ){
     CoreGenCache *Parent = Cache->GetSubCache();
     if( Parent != nullptr )
       ParentCacheCtrl->AppendText(wxString(Parent->GetName()));
@@ -159,7 +156,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                              wxTE_PROCESS_ENTER,
                              wxDefaultValidator,
                              wxT("ChildCache") );
-  if( Cache->IsSubLevel() ){
+  if( Cache && Cache->IsSubLevel() ){
     CoreGenCache *Child = Cache->GetParentCache(0);
     if( Child != nullptr )
       ChildCacheCtrl->AppendText(wxString(Child->GetName()));

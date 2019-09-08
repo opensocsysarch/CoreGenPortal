@@ -22,9 +22,6 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                               CoreGenInst *Inst )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Inst == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->InstNode = Inst;
   
@@ -60,7 +57,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   InstNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(Inst->GetName()),
+                                 Inst ? wxString(Inst->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -82,7 +79,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   InstFNameCtrl = new wxTextCtrl( Wnd,
                                  1,
-                                 wxString(Inst->GetFormat()->GetName()),
+                                 Inst ? wxString(Inst->GetFormat()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -104,7 +101,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   ISANameCtrl = new wxTextCtrl( Wnd,
                                  2,
-                                 wxString(Inst->GetISA()->GetName()),
+                                 Inst ? wxString(Inst->GetISA()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -126,7 +123,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   SyntaxCtrl = new wxTextCtrl( Wnd,
                                  3,
-                                 wxString(Inst->GetSyntax()),
+                                 Inst ? wxString(Inst->GetSyntax()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -148,7 +145,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   StoneCCtrl = new wxTextCtrl( Wnd,
                                  4,
-                                 wxString(Inst->GetImpl()),
+                                 Inst ? wxString(Inst->GetImpl()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,100),
                                  wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
@@ -176,13 +173,14 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                             wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("StoneCutter") );
-
-  for( unsigned i=0; i<Inst->GetNumEncodings(); i++ ){
-    wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
-                                    Inst->GetEncoding(i)->GetEncoding() );
-    EncCtrl->AppendText(wxString(Inst->GetEncoding(i)->GetField()) +
-                        wxT(" = ") + tmp + wxT("\n"));
-  }
+  if(Inst){
+    for( unsigned i=0; i<Inst->GetNumEncodings(); i++ ){
+      wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
+                                      Inst->GetEncoding(i)->GetEncoding() );
+      EncCtrl->AppendText(wxString(Inst->GetEncoding(i)->GetField()) +
+                          wxT(" = ") + tmp + wxT("\n"));
+    }
+  } 
   EncodingSizer->Add( EncCtrl, 0, wxALL, 0 );
   InnerSizer->Add( EncodingSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 

@@ -1320,9 +1320,38 @@ void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
     DeleteNode(GetNodeFromItem(ModuleBox->GetFocusedItem()));
     break;
   case ID_TREE_ADDNODE:
-    AddNodeWin();
+    wxTreeItemId ID = ModuleBox->GetFocusedItem();
+    InfoWin = new CoreInfoWin(this, wxID_ANY, NULL, TreeIdToCGType(ID));
+    //delete InfoWin;
     break;
   }
+}
+
+CGNodeType PortalMainFrame::TreeIdToCGType(wxTreeItemId ID){
+  unsigned i;
+  for(i = 0; i < TreeItems.size(); i++){
+    if(TreeItems[i] == ID) break;
+  }
+
+  switch(i){
+    case 0: return CGCache;
+    case 1: return CGComm;
+    case 2: return CGCore;
+    case 3: return CGExt;
+    case 4: return CGISA;
+    case 5: return CGInst;
+    case 6: return CGInstF;
+    case 7: return CGMCtrl;
+    case 8: return CGPlugin;
+    case 9: return CGPInst;
+    case 10: return CGReg;
+    case 11: return CGRegC;
+    case 12: return CGSoc;
+    case 13: return CGSpad;
+    case 14: return CGVTP;
+    default: return CGTop;
+  }
+  
 }
 
 // PortalMainFrame::OnRightClickNode
@@ -2249,7 +2278,16 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           CommNode->SetWidth(std::stoi(BoxContents));
           break;
         case 3:
+          while( CommNode->GetNumEndpoints() > 0) CommNode->DeleteEndpoint((unsigned)0);
           std::getline(iss, nextNodeName);
+          while(!iss.eof()){
+            CoreGenNode* N = CGProject->GetNodeByName(nextNodeName);
+            if(N) CommNode->InsertEndpoint(N);
+            else LogPane->AppendText(nextNodeName + " is not a valid node. Deleting from endpoints list.\n");
+            getline(iss, nextNodeName);
+          }
+          break;
+          /*
           std::vector<std::string> nodeNames;
 
           // add the nodes that need to be added
@@ -2298,14 +2336,15 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           for(unsigned i = 0; i < j; i++){
             CommNode->DeleteEndpoint(delIndeces[i]);
           }
+          */
       }
     }
     break;
     case CGCore:{
       // TODO: Handle isa, caches, regclasses, and extensions
       CoreGenCore *CoreNode = (CoreGenCore*)node;
-      std::vector<std::string> nodeNames;
-      int delIndeces[CoreNode->GetNumRegClass()];
+      //std::vector<std::string> nodeNames;
+      //int delIndeces[CoreNode->GetNumRegClass()];
       switch(InfoBoxIndex){
         case 0:
           CoreNode->SetName(BoxContents);
@@ -2330,6 +2369,16 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           break;
         }
         case 4:{
+          while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
+          std::getline(iss, nextNodeName);
+          while(!iss.eof()){
+            CoreGenRegClass* N = CGProject->GetRegClassNodeByName(nextNodeName);
+            if(N) CoreNode->InsertRegClass(N);
+            else LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
+            getline(iss, nextNodeName);
+          }
+          break;
+          /*
           std::getline(iss, nextNodeName);
           
           // add the nodes that need to be added
@@ -2384,8 +2433,19 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           }
           //LogPane->AppendText("Set Register Class.\n");
           break;
+          */
         }
         case 5:{
+           while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
+          std::getline(iss, nextNodeName);
+          while(!iss.eof()){
+            CoreGenRegClass* N = CGProject->GetRegClassNodeByName(nextNodeName);
+            if(N) CoreNode->InsertRegClass(N);
+            else LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
+            getline(iss, nextNodeName);
+          }
+          break;
+          /*
           std::getline(iss, nextNodeName);
           
           // add the nodes that need to be added
@@ -2440,8 +2500,8 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           }
           //LogPane->AppendText("Set Register Class.\n");
           break;
+          */
         }
-          //LogPane->AppendText("Set Extension.\n");
       }
     }
     break;
@@ -2495,21 +2555,35 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
             if(PInst) PInst->SetISA(newNode);
           } 
           else 
-            LogPane->AppendText("Could not find specified Instruction Format.\n");
+            LogPane->AppendText("Could not find specified Instruction Set.\n");
           break;
         }
         case 3:
           InstNode->SetSyntax(BoxContents);
-          LogPane->AppendText(BoxContents + ".\n");
+          //LogPane->AppendText(BoxContents + ".\n");
           break;
         case 4:
-        //QUESTION: Is there any reason for this to be multi line?
+          //QUESTION: Is there any reason for this to be multi line?
           InstNode->SetImpl(BoxContents);
           break;
         case 5:
-        //QUESTION: are opcodes unique within each yaml?
-        //QUESTION: how to handle this if encoding nodes are not in the top level?
-          LogPane->AppendText("Set Encoding.\n");
+          CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+          std::string Field;
+          std::string op;
+          int Value;
+          InstNode->ClearEncodings();
+          getline(iss, nextNodeName);
+          while(!iss.eof()){
+            std::stringstream encodingStream(nextNodeName);
+            encodingStream >> Field;
+            encodingStream >> op;
+            encodingStream >> Value;
+            if(!InstNode->SetEncoding(Field, Value))
+              LogPane->AppendText("Invalid field: " + Field + ". Deleting from encodings");
+            else if(PInst)
+              PInst->SetEncoding(Field, Value);
+          }
+          //LogPane->AppendText("Set Encoding.\n");
           break;
       }
     }
@@ -2545,8 +2619,9 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
           LogPane->AppendText("Set ISA.\n");
           break;
         case 3:
-        //QUESTION: are opcodes unique within each yaml?
-        //QUESTION: how to handle this if encoding nodes are not in the top level?
+          //made uneditable
+          //QUESTION: are opcodes unique within each yaml?
+          //QUESTION: how to handle this if encoding nodes are not in the top level?
           LogPane->AppendText("Set Encoding.\n");
           break;
       }

@@ -12,100 +12,103 @@
 
 CoreInfoWin::CoreInfoWin( wxWindow *parent,
                           wxWindowID id,
-                          CoreGenNode *Node ){
-  if( Node->GetType() == CGSoc ){
+                          CoreGenNode *Node,
+                          CGNodeType Type){
+  if(Node) Type = Node->GetType();
+
+  if( Type == CGSoc ){
     CoreSocInfoWin *Win = new CoreSocInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New SoC",
                                               static_cast<CoreGenSoC *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGCore ){
+  }else if( Type == CGCore ){
     CoreCoreInfoWin *Win = new CoreCoreInfoWin( parent, id,
-                                                wxString(Node->GetName()),
+                                                Node ? Node->GetName() : "New Core",
                                                 static_cast<CoreGenCore *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGInstF ){
+  }else if( Type == CGInstF ){
     CoreInstFormatInfoWin *Win = new CoreInstFormatInfoWin(parent, id,
-                                                           wxString(Node->GetName()),
+                                                           Node ? Node->GetName() : "New Instruction Format",
                                                            static_cast<CoreGenInstFormat *>(Node));
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGInst ){
+  }else if( Type == CGInst ){
     CoreInstInfoWin *Win = new CoreInstInfoWin( parent, id,
-                                                wxString(Node->GetName()),
+                                                Node ? Node->GetName() : "New Instruction",
                                                 static_cast<CoreGenInst *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGPInst ){
+  }else if( Type == CGPInst ){
     CorePInstInfoWin *Win = new CorePInstInfoWin( parent, id,
-                                                  wxString(Node->GetName()),
+                                                  Node ? Node->GetName() : "New Pseudo Instruction",
                                                   static_cast<CoreGenPseudoInst *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGRegC ){
+  }else if( Type == CGRegC ){
     CoreRegClassInfoWin *Win = new CoreRegClassInfoWin( parent, id,
-                                                  wxString(Node->GetName()),
+                                                  Node ? Node->GetName() : "New Register Class",
                                                   static_cast<CoreGenRegClass *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGReg ){
+  }else if( Type == CGReg ){
     CoreRegInfoWin *Win = new CoreRegInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New Register",
                                               static_cast<CoreGenReg *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGISA ){
+  }else if( Type == CGISA ){
     CoreISAInfoWin *Win = new CoreISAInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New ISA",
                                               static_cast<CoreGenISA *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGCache ){
+  }else if( Type == CGCache ){
     CoreCacheInfoWin *Win = new CoreCacheInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New Cache",
                                               static_cast<CoreGenCache *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGEnc ){
+  }else if( Type == CGEnc ){
     CoreEncodingInfoWin *Win = new CoreEncodingInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New Encoding",
                                               static_cast<CoreGenEncoding *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGExt ){
+  }else if( Type == CGExt ){
     CoreExtInfoWin *Win = new CoreExtInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New Extension",
                                               static_cast<CoreGenExt *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGComm ){
+  }else if( Type == CGComm ){
     CoreCommInfoWin *Win = new CoreCommInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New Comm",
                                               static_cast<CoreGenComm *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGSpad ){
+  }else if( Type == CGSpad ){
     CoreSpadInfoWin *Win = new CoreSpadInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New Scratchpad",
                                               static_cast<CoreGenSpad *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGMCtrl ){
+  }else if( Type == CGMCtrl ){
     CoreMCtrlInfoWin *Win = new CoreMCtrlInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New Memory Controller",
                                               static_cast<CoreGenMCtrl *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGVTP ){
+  }else if( Type == CGVTP ){
     CoreVTPInfoWin *Win = new CoreVTPInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New VTP",
                                               static_cast<CoreGenVTP *>(Node) );
     Win->ShowModal();
     delete Win;
-  }else if( Node->GetType() == CGPlugin ){
+  }else if( Type == CGPlugin ){
     CorePluginInfoWin *Win = new CorePluginInfoWin( parent, id,
-                                              wxString(Node->GetName()),
+                                              Node ? Node->GetName() : "New Plugin",
                                               static_cast<CoreGenPlugin *>(Node) );
     Win->ShowModal();
     delete Win;

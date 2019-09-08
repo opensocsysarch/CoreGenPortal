@@ -21,9 +21,6 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
                               CoreGenPlugin *Plugin)
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Plugin == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
@@ -56,7 +53,7 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
 
   PluginNameCtrl = new wxTextCtrl( Wnd,
                                  wxID_ANY,
-                                 wxString(Plugin->GetName()),
+                                 Plugin ? wxString(Plugin->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(400,25),
                                  wxTE_READONLY,
@@ -76,7 +73,7 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
 
   LibNameCtrl = new wxTextCtrl( Wnd,
                                  wxID_ANY,
-                                 wxString(Plugin->GetPluginName()),
+                                 Plugin ? wxString(Plugin->GetPluginName()) : "",
                                  wxDefaultPosition,
                                  wxSize(400,25),
                                  wxTE_READONLY,
@@ -97,10 +94,17 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
   unsigned Major = 0;
   unsigned Minor = 0;
   unsigned Patch = 0;
-  Plugin->GetVersion(&Major,&Minor,&Patch);
-  wxString VersionInfo = wxString::Format(wxT("%i"),Major) + wxT(".") +
-                         wxString::Format(wxT("%i"),Minor) + wxT(".") +
-                         wxString::Format(wxT("%i"),Patch);
+  wxString VersionInfo;
+  if(Plugin){
+    Plugin->GetVersion(&Major,&Minor,&Patch);
+    VersionInfo = wxString::Format(wxT("%i"),Major) + wxT(".") +
+                  wxString::Format(wxT("%i"),Minor) + wxT(".") +
+                  wxString::Format(wxT("%i"),Patch);
+  }
+  else{
+    VersionInfo = "";
+  }
+    
   VersionCtrl = new wxTextCtrl( Wnd,
                                  wxID_ANY,
                                  VersionInfo,
@@ -130,9 +134,12 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
                                  wxDefaultValidator,
                                  wxT("Features") );
   FeatureCtrl->AppendText(wxT("FEATURE_NAME:FEATURE_TYPE:FEATURE_VALUE\n"));
-  for( unsigned i=0; i<Plugin->GetNumFeatures(); i++ ){
-    FeatureCtrl->AppendText(GetFeatureStr(Plugin,i));
+  if(Plugin){
+    for( unsigned i=0; i<Plugin->GetNumFeatures(); i++ ){
+      FeatureCtrl->AppendText(GetFeatureStr(Plugin,i));
+    }
   }
+  
 
   InnerSizer->Add( FeatureCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
 
@@ -145,7 +152,7 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
                                wxALIGN_RIGHT,
                                wxDefaultValidator,
                                wxT("HDLCodegen") );
-  if( Plugin->HasHDLCodegen() )
+  if( Plugin && Plugin->HasHDLCodegen() )
     HDLCodegen->SetValue(true);
   else
     HDLCodegen->SetValue(false);
@@ -159,7 +166,7 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
                                wxALIGN_RIGHT,
                                wxDefaultValidator,
                                wxT("LLVMCodegen") );
-  if( Plugin->HasLLVMCodegen() )
+  if( Plugin && Plugin->HasLLVMCodegen() )
     LLVMCodegen->SetValue(true);
   else
     LLVMCodegen->SetValue(false);

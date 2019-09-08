@@ -22,11 +22,9 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
                               CoreGenSpad *Spad )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,325), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Spad == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   SpadNode = Spad;
+
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
   this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -59,7 +57,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
 
   SpadNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(Spad->GetName()),
+                                 Spad ? wxString(Spad->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
                                  wxTE_PROCESS_ENTER,
@@ -81,7 +79,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
 
   SizeCtrl = new wxTextCtrl( Wnd,
                              1,
-                             wxString::Format(wxT("%i"),Spad->GetMemSize()),
+                             Spad ? wxString::Format(wxT("%i"),Spad->GetMemSize()) : "",
                              wxDefaultPosition,
                              wxSize(320,25),
                              wxTE_PROCESS_ENTER,
@@ -103,7 +101,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
 
   RqstCtrl = new wxTextCtrl( Wnd,
                              2,
-                             wxString::Format(wxT("%i"),Spad->GetRqstPorts()),
+                             Spad ? wxString::Format(wxT("%i"),Spad->GetRqstPorts()) : "",
                              wxDefaultPosition,
                              wxSize(320,25),
                              wxTE_PROCESS_ENTER,
@@ -125,7 +123,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
 
   RspCtrl = new wxTextCtrl( Wnd,
                             3,
-                            wxString::Format(wxT("%i"),Spad->GetRspPorts()),
+                            Spad ? wxString::Format(wxT("%i"),Spad->GetRspPorts()) : "",
                             wxDefaultPosition,
                             wxSize(320,25),
                             wxTE_PROCESS_ENTER,
@@ -146,8 +144,14 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
   StartNameSizer->Add( StartNameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   // TODO: print this in hex
-  wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
+  wxString tmp;
+  if(Spad){
+    wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
                                   Spad->GetStartAddr() );
+  }
+  else{
+    tmp = "";
+  }
   StartCtrl = new wxTextCtrl( Wnd,
                             4,
                             tmp,
