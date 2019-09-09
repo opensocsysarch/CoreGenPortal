@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreRegClassInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreRegClassInfoWin::OnPressOk)
+  EVT_BUTTON(wxID_SAVE, CoreRegClassInfoWin::OnSave)
   EVT_TEXT_ENTER(wxID_ANY, CoreRegClassInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
@@ -103,10 +104,13 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(RegClass) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -122,6 +126,12 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
 
 void CoreRegClassInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreRegClassInfoWin::OnSave(wxCommandEvent& save){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  if(PMF->OnSave(this, this->RegClassNode, CGRegC))
+    this->EndModal(wxID_SAVE);
 }
 
 void CoreRegClassInfoWin::OnPressEnter(wxCommandEvent& enter){

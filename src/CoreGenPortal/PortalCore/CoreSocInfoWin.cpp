@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreSocInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreSocInfoWin::OnPressOk)
+  EVT_BUTTON(wxID_SAVE, CoreSocInfoWin::OnSave)
   EVT_TEXT_ENTER(wxID_ANY, CoreSocInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
@@ -101,8 +102,11 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   wxBoxSizer *bSizer3 = new wxBoxSizer( wxVERTICAL );
 
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( this, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(Soc) m_userOK = new wxButton( this, wxID_OK );
+  else m_userOK = new wxButton( this, wxID_CANCEL );
+  m_userSAVE = new wxButton( this, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
 
   bSizer2->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
@@ -117,6 +121,12 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
 
 void CoreSocInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreSocInfoWin::OnSave(wxCommandEvent& save){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  if(PMF->OnSave(this, this->SoCNode, CGSoc))
+    this->EndModal(wxID_SAVE);
 }
 
 void CoreSocInfoWin::OnPressEnter(wxCommandEvent& enter){

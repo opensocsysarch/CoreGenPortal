@@ -84,6 +84,7 @@ public:
 
   // node info update handlers
   void OnPressEnter(wxCommandEvent &event, CoreGenNode *node, int InfoWinType);
+  bool OnSave(wxDialog *InfoWin, CoreGenNode *node, CGNodeType InfoWinType);
 
 private:
   // CoreGenHandlers

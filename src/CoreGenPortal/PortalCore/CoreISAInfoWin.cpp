@@ -13,6 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreISAInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreISAInfoWin::OnPressOk)
+  EVT_BUTTON(wxID_SAVE, CoreISAInfoWin::OnSave)
   EVT_TEXT_ENTER(wxID_ANY, CoreISAInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
@@ -56,7 +57,7 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
   ISANameSizer->Add( ISANameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   ISANameCtrl = new wxTextCtrl( Wnd,
-                                wxID_ANY,
+                                0,
                                 ISA ? wxString(ISA->GetName()) : "",
                                 wxDefaultPosition,
                                 wxSize(320,25),
@@ -76,10 +77,13 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(ISA) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -95,6 +99,12 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
 
 void CoreISAInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
+}
+
+void CoreISAInfoWin::OnSave(wxCommandEvent& save){
+  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
+  if(PMF->OnSave(this, this->ISANode, CGISA))
+    this->EndModal(wxID_SAVE);
 }
 
 void CoreISAInfoWin::OnPressEnter(wxCommandEvent& enter){

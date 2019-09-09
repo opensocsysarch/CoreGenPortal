@@ -72,6 +72,7 @@ public:
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
   wxButton *m_userOK;                         ///< ok button
+  wxButton *m_userSAVE;                       ///< save button
 
 private:
   // Event handler functions
@@ -83,6 +84,9 @@ private:
 
   /// handle the 'enter' key press
   void OnPressEnter (wxCommandEvent& event );
+
+  /// handles 'save' click
+  void OnSave( wxCommandEvent& save );
 };
 
 #endif

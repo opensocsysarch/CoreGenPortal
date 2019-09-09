@@ -2808,4 +2808,488 @@ void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
                       ".\n");
 }
 
+bool PortalMainFrame::OnSave(wxDialog *InfoWin,
+                                   CoreGenNode *node,
+                                   CGNodeType InfoWinType){
+  // get the box contents
+  bool savedAll = true;
+  bool createNewNode = false;
+  if(!node) createNewNode = true;
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+
+  // TODO: handle invalid inputs
+  // update yaml
+  switch(InfoWinType){
+    case CGCache:{
+      CoreGenCache *newNode;
+      CoreGenCache *CacheNode = (CoreGenCache*)node;
+
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CacheNode->SetName(BoxContents);
+
+      //set sets
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CacheNode->SetSets(std::stoi(BoxContents));
+
+      //set sets
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CacheNode->SetWays(std::stoi(BoxContents));
+
+      //set Childe Cache
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      newNode = CGProject->GetCacheNodeByName(BoxContents);
+      if(newNode){
+        CacheNode->SetChildCache(newNode);
+      }
+      else if(BoxContents != ""){
+        LogPane->AppendText("Could not find specified cache.\n");
+        savedAll = false;
+      }
+
+      //set Parent Cache
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      newNode = CGProject->GetCacheNodeByName(BoxContents);
+      if(newNode){ 
+        CacheNode->SetParentCache(newNode);
+      }
+      else if(BoxContents != ""){
+        LogPane->AppendText("Could not find specified cache.\n");
+        savedAll = false;
+      }
+    }
+    break;
+    case CGComm:{
+      // TODO: handle endpoints
+      CoreGenComm *CommNode = (CoreGenComm*)node;
+
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CommNode->SetName(BoxContents);
+
+      //set comm node type
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      if( BoxContents.compare("Point-to-Point") == 0 ){
+        CommNode->SetCommType(CGCommP2P);
+      }
+      else if( BoxContents.compare("Bus") == 0 ){
+        CommNode->SetCommType(CGCommBus);
+      }
+      else if( BoxContents.compare("Network on Chip") == 0 ){
+        CommNode->SetCommType(CGCommNoc);
+      }
+      else{
+        CommNode->SetCommType(CGCommUnk);
+      }
+
+      //set width
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CommNode->SetWidth(std::stoi(BoxContents));
+
+      //set endpoints
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      std::istringstream iss(BoxContents);
+      std::string nextNodeName;
+      while( CommNode->GetNumEndpoints() > 0) CommNode->DeleteEndpoint((unsigned)0);
+      std::getline(iss, nextNodeName);
+      while(!iss.eof()){
+        CoreGenNode* N = CGProject->GetNodeByName(nextNodeName);
+        if(N) CommNode->InsertEndpoint(N);
+        else LogPane->AppendText(nextNodeName + " is not a valid node. Deleting from endpoints list.\n");
+        getline(iss, nextNodeName);
+      }
+    }
+    break;
+        case CGCore:{
+      // TODO: Handle isa, caches, regclasses, and extensions
+      CoreGenCore *CoreNode = (CoreGenCore*)node;
+      CoreGenNode *newNode;
+      std::istringstream iss;
+      std::string nextNodeName;
+
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CoreNode->SetName(BoxContents);
+
+      //set number of thread units
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
+
+      //set ISA
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      newNode = CGProject->GetISANodeByName(BoxContents);
+      if(newNode){
+        CoreNode->SetISA((CoreGenISA*)newNode);
+      }
+      else{
+        LogPane->AppendText("Could not find specified ISA. Keeping old ISA.\n");
+        savedAll = false;
+      }
+
+      //set Cache
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      newNode = CGProject->GetCacheNodeByName(BoxContents);
+      if(newNode){ 
+        CoreNode->InsertCache((CoreGenCache*)newNode);
+      }
+      else{
+        LogPane->AppendText("Could not find specified Cache. Keeping old Cache.\n");
+        savedAll = false;
+      }
+          
+      //set Register Classes
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+      BoxContents = InfoBox->GetValue().ToStdString();  
+      iss.str(BoxContents);  
+      while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
+      std::getline(iss, nextNodeName);
+      while(!iss.eof()){
+        CoreGenRegClass* N = CGProject->GetRegClassNodeByName(nextNodeName);
+        if(N) CoreNode->InsertRegClass(N);
+        else LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
+        getline(iss, nextNodeName);
+      }
+
+      //set Extensions
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+      BoxContents = InfoBox->GetValue().ToStdString();  
+      iss.str(BoxContents);
+      while( CoreNode->GetNumExt() > 0) CoreNode->DeleteExt((unsigned)0);
+      std::getline(iss, nextNodeName);
+      while(!iss.eof()){
+        CoreGenExt* N = CGProject->GetExtNodeByName(nextNodeName);
+        if(N) CoreNode->InsertExt(N);
+        else LogPane->AppendText(nextNodeName + " is not a valid Extension. Deleting from Extensions list.\n");
+        getline(iss, nextNodeName);
+      }
+    }
+    break;
+    case CGExt:{
+      CoreGenExt *ExtNode = (CoreGenExt*)node;
+
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      ExtNode->SetName(BoxContents);
+
+      //set Extension type
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      if( BoxContents == "Template extension" ){
+        ExtNode->SetType(CGExtTemplate);
+      }
+      else if( BoxContents == "Module extension" ){
+        ExtNode->SetType(CGExtModule);
+      }
+      else if( BoxContents == "Communications extension" ){
+        ExtNode->SetType(CGExtComm);
+      }
+      else{
+        ExtNode->SetType(CGExtUnk);
+      }
+    }
+    break;
+    case CGISA:{
+      CoreGenISA *ISANode = (CoreGenISA*)node;
+
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      ISANode->SetName(BoxContents);
+    }
+    break;
+    case CGInst:{
+      CoreGenInst *InstNode = (CoreGenInst*)node;
+      CoreGenNode *newNode;
+      std::istringstream iss;
+      std::string nextNodeName;
+
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      InstNode->SetName(BoxContents);
+
+      //set instruction format
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      
+      newNode = CGProject->GetInstFormatNodeByName(BoxContents);
+      if(newNode){
+        //TODO: Fix SetFormat
+        LogPane->AppendText("Set Format");
+        //InstNode->SetFormat((CoreGenInstFormat*)newNode);
+      }
+      else{
+        LogPane->AppendText("Could not find specified Instruction Format.\n");
+        savedAll = false;
+      }
+
+      //set ISA
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      newNode = CGProject->GetISANodeByName(BoxContents);
+      if(newNode){
+        InstNode->SetISA((CoreGenISA*)newNode);
+        CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+        if(PInst) PInst->SetISA((CoreGenISA*)newNode);
+      } 
+      else{
+        LogPane->AppendText("Could not find specified Instruction Set.\n");
+        savedAll = false;
+      }
+      
+
+      //set syntax
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      InstNode->SetSyntax(BoxContents);
+
+      //set instruction format
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      InstNode->SetImpl(BoxContents);
+
+      //set instruction format
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+      std::string Field;
+      std::string op;
+      int Value;
+      iss.str(BoxContents);
+      InstNode->ClearEncodings();
+      getline(iss, nextNodeName);
+      while(!iss.eof()){
+        std::stringstream encodingStream(nextNodeName);
+        encodingStream >> Field;
+        encodingStream >> op;
+        encodingStream >> Value;
+        if(!InstNode->SetEncoding(Field, Value))
+          LogPane->AppendText("Invalid field: " + Field + ". Deleting from encodings");
+        else if(PInst)
+          PInst->SetEncoding(Field, Value);
+        getline(iss, nextNodeName);
+      }
+    }
+    break;
+    case CGMCtrl:{
+      CoreGenMCtrl *MCtrlNode = (CoreGenMCtrl*)node;
+      
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      MCtrlNode->SetName(BoxContents);
+      
+      //set input ports
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      MCtrlNode->SetNumInputPorts(std::stoi(BoxContents));
+    }
+    break;
+    case CGPInst:{
+      CoreGenPseudoInst *PInstNode = (CoreGenPseudoInst*)node;
+
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      PInstNode->SetName(BoxContents);
+
+      //set target instruction
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      CoreGenInst *newNode = CGProject->GetInstNodeByName(BoxContents);
+      if(newNode){
+        //TODO fix this inst
+        //PInstNode->SetTargetInst(newNode);
+        LogPane->AppendText("Set Target Instruction.\n");
+      }
+      else{
+        LogPane->AppendText("Could not find specified Instruction. Keeping old Instruction.\n");
+        savedAll = true;
+      }
+    }
+    break;
+    case CGReg:{
+      CoreGenReg *RegNode = (CoreGenReg*)node;
+      std::istringstream iss;
+      std::string nextNodeName;
+
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      RegNode->SetName(BoxContents);
+          
+      //set index
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      RegNode->SetIndex(std::stoi(BoxContents));
+
+      /*
+        case 2:
+          //QUESTION: Is it by design that there's no function to change the width?
+          LogPane->AppendText("Set register width.\n");
+          break;
+      */
+      
+
+      //set subregisters
+      //TODO: make sure works when subregs are added/deleted
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      iss.str(BoxContents);
+      getline(iss, nextNodeName);
+      getline(iss, nextNodeName);
+      std::string Name;
+      unsigned startbit;
+      unsigned endbit;
+      while(!iss.eof()){
+        Name = std::strtok((char*)nextNodeName.c_str(), ":");
+        startbit = std::stoi(std::strtok(NULL, ":"));
+        endbit = std::stoi(std::strtok(NULL, ":"));
+        for(unsigned i = 0; i < RegNode->GetNumSubRegs(); i ++){
+          if(RegNode->GetSubRegNameByIndex(i) == Name){
+            RegNode->DeleteSubRegByIndex(i);
+            i--;
+          }
+        }
+        RegNode->InsertSubReg(Name, startbit, endbit);
+        getline(iss, nextNodeName);
+      }
+    }
+    break;
+    case CGRegC:{
+      CoreGenRegClass *RegClassNode = (CoreGenRegClass*)node;
+      std::istringstream iss;
+      std::string nextNodeName;
+      
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      RegClassNode->SetName(BoxContents);
+      
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      iss.str(BoxContents);
+      //clear current registers
+      while(RegClassNode->GetNumReg() > 0) RegClassNode->DeleteChild(RegClassNode->GetChild(0));
+      std::getline(iss, nextNodeName);
+      while(!iss.eof()){
+        CoreGenReg* N = CGProject->GetRegNodeByName(nextNodeName);
+        if(N) RegClassNode->InsertReg(N);
+        else LogPane->AppendText(nextNodeName + " is not a valid register. Deleting from registers list.\n");
+        getline(iss, nextNodeName);
+      }
+    }
+    break;
+    case CGSoc:{
+      CoreGenSoC *SoCNode = (CoreGenSoC*)node;
+      std::istringstream iss;
+      std::string nextNodeName;
+    
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      SoCNode->SetName(BoxContents);
+      
+      //set cores
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      //clean current cores
+      while(SoCNode->GetNumCores() > 0) SoCNode->DeleteCore(SoCNode->GetCore(0));
+
+      //insert all valid cores in the user's list
+      iss.str(BoxContents);
+      std::getline(iss, nextNodeName);
+      while(!iss.eof()){
+        CoreGenCore* N = CGProject->GetCoreNodeByName(nextNodeName);
+        if(N){
+          SoCNode->InsertCore(N);
+        }
+        else{
+          LogPane->AppendText(nextNodeName + " is not a valid core. Deleting from cores list.\n");
+          savedAll;
+        }
+        getline(iss, nextNodeName);
+      }
+    }
+    break;
+    case CGSpad:{
+      CoreGenSpad *SpadNode = (CoreGenSpad*)node;
+     
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      SpadNode->SetName(BoxContents);
+    
+      //set mem size
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      SpadNode->SetMemSize(std::stoi(BoxContents));
+      
+      //set request ports
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      SpadNode->SetRqstPorts(std::stoi(BoxContents));
+      
+      //set response ports
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      SpadNode->SetRspPorts(std::stoi(BoxContents));
+
+
+      //set start addr
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      //TODO: get this working
+      LogPane->AppendText("Change start addr.\n");
+      //SpadNode->SetStartAddr();
+    }
+    break;
+    case CGVTP:{
+      CoreGenVTP *VTPNode = (CoreGenVTP*)node;
+      //set name
+      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+      BoxContents = InfoBox->GetValue().ToStdString();
+      VTPNode->SetName(BoxContents);
+    }
+    break;
+  }
+    
+    
+
+
+  // write out the new IR file
+  CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
+  /*
+  std::string tempName = std::string(IRFileName.mb_str()) + "tmp";
+  CGProject->WriteIR(tempName);
+  std::remove(IRFileName.mb_str());
+  std::rename(tempName.c_str(), IRFileName.mb_str());
+  std::remove(tempName.c_str());
+  */
+  ModuleBox->DeleteAllItems();
+  TreeItems.clear();
+  NodeItems.clear();
+  SetupModuleBox();
+  LoadModuleBox();
+  if(savedAll)
+    LogPane->AppendText("Updated " + wxString(node->GetName()) + ".\n");
+  return savedAll;
+}
+
 // EOF
