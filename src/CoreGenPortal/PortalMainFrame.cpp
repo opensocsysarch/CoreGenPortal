@@ -3274,19 +3274,22 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
 
 
   // write out the new IR file
-  CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
-  /*
+  //CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
+  
   std::string tempName = std::string(IRFileName.mb_str()) + "tmp";
   CGProject->WriteIR(tempName);
-  std::remove(IRFileName.mb_str());
-  std::rename(tempName.c_str(), IRFileName.mb_str());
+  std::string FName = static_cast<const char*>(IRFileName.c_str());
+  CloseProject();
+  std::remove(FName.c_str());
+  std::rename(tempName.c_str(), FName.c_str());
   std::remove(tempName.c_str());
-  */
   ModuleBox->DeleteAllItems();
   TreeItems.clear();
   NodeItems.clear();
   SetupModuleBox();
-  LoadModuleBox();
+  OpenProject(IRFileName);
+  //LoadModuleBox();
+  
   if(savedAll)
     LogPane->AppendText("Updated " + wxString(node->GetName()) + ".\n");
   return savedAll;
