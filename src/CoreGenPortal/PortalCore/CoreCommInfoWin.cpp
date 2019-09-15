@@ -61,7 +61,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                                  Comm ? wxString(Comm->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("CommName") );
   CommNameSizer->Add( CommNameCtrl, 0, wxALL, 0 );
@@ -83,7 +83,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                                  wxEmptyString,
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("CommType") );
   if(Comm){
@@ -123,7 +123,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                               Comm ? wxString::Format(wxT("%i"),Comm->GetWidth()) : "",
                               wxDefaultPosition,
                               wxSize(320,25),
-                              wxTE_PROCESS_ENTER,
+                              0,
                               wxDefaultValidator,
                               wxT("CommWidth") );
   CommWidthSizer->Add( WidthCtrl, 0, wxALL, 0 );
@@ -145,7 +145,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("endpoints") );
   if(Comm){

@@ -3279,6 +3279,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
   std::string tempName = std::string(IRFileName.mb_str()) + "tmp";
   CGProject->WriteIR(tempName);
   std::string FName = static_cast<const char*>(IRFileName.c_str());
+  std::string NodeName = node->GetName();
   CloseProject();
   std::remove(FName.c_str());
   std::rename(tempName.c_str(), FName.c_str());
@@ -3291,7 +3292,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
   //LoadModuleBox();
   
   if(savedAll)
-    LogPane->AppendText("Updated " + wxString(node->GetName()) + ".\n");
+    LogPane->AppendText("Updated " + NodeName + ".\n");
   return savedAll;
 }
 
