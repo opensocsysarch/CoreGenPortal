@@ -70,7 +70,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
   //-- sets
   CacheSetsSizer = new wxBoxSizer( wxHORIZONTAL );
   SetsText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   6,
                                    wxT("Cache Sets"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
