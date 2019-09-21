@@ -551,7 +551,7 @@ wxString PortalMainFrame::FindNodeStr( CoreGenNode *Parent ){
 
 // PortalMainFrame::LoadModuleBox
 // loads all the module box items
-void PortalMainFrame::LoadModuleBox(){
+void PortalMainFrame::LoadModuleBox(bool editing){
   CoreGenNode *Top = CGProject->GetTop();
 
   if( Top == nullptr ){
@@ -559,7 +559,7 @@ void PortalMainFrame::LoadModuleBox(){
     return ;
   }
 
-  LogPane->AppendText("Loading modules...\n" );
+  if(!editing) LogPane->AppendText("Loading modules...\n" );
 
   for( unsigned i=0; i<Top->GetNumChild(); i++ ){
     switch( Top->GetChild(i)->GetType() ){
@@ -1175,12 +1175,12 @@ void PortalMainFrame::LoadPInstEncodings( wxTreeItemId Parent,
 
 // PortalMainFrame::CloseProject
 // closes any open project files
-void PortalMainFrame::CloseProject(){
+void PortalMainFrame::CloseProject(bool editing){
   if( !CGProject ){
     return ;
   }
 
-  LogPane->AppendText("Closing open project...\n");
+  if(!editing) LogPane->AppendText("Closing open project...\n");
 
   // save the IR file
   IRPane->SaveFile(IRFileName);
@@ -1189,7 +1189,7 @@ void PortalMainFrame::CloseProject(){
   IRPane->ClearAll();
 
   // close out all the StoneCutter windows
-  LogPane->AppendText("Removing Pages\n" );
+  if(!editing) LogPane->AppendText("Removing Pages\n" );
   for( size_t i=1; i<EditorNotebook->GetPageCount(); i++ ){
     if( !EditorNotebook->RemovePage(i) )
       LogPane->AppendText("Error removing page\n" );
@@ -1225,7 +1225,7 @@ void PortalMainFrame::CloseProject(){
   CGProject = nullptr;
 
   // log the close project
-  LogPane->AppendText("Closed project\n");
+  if(!editing) LogPane->AppendText("Closed project\n");
 }
 
 // PortalMainFrame::OnQuit
@@ -2143,8 +2143,8 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
 }
 
 // PortalMainFrame::OpenProject
-void PortalMainFrame::OpenProject(wxString NP){
-  LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
+void PortalMainFrame::OpenProject(wxString NP, bool editing){
+  if(!editing) LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
   wxFileName NPF(NP);
 
   // create a new coregen object
@@ -2152,19 +2152,19 @@ void PortalMainFrame::OpenProject(wxString NP){
                                   std::string(NPF.GetPath().mb_str()),
                                   UserConfig->GetArchiveDir() );
   if( CGProject == nullptr ){
-    LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
+    if(!editing) LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
     return ;
   }
 
   // read the ir
   if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
-    LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
+    if(!editing) LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
     return ;
   }
 
   // Force the DAG to build
   if( !CGProject->BuildDAG() ){
-    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    if(!editing) LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
     return ;
   }
 
@@ -2176,13 +2176,13 @@ void PortalMainFrame::OpenProject(wxString NP){
   ProjDir->SetPath(NPF.GetPath());
 
   // load all the modules into the modulebox
-  LoadModuleBox();
+  LoadModuleBox(editing);
 
   // initialize the stonecutter message context
   Msgs = new SCMsg();
   //wxStreamToTextRedirector(LogPane, &SCBuf);
 
-  LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
+  if(!editing) LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
 }
 
 // PortalMainFrame::OnProjOpen
@@ -2864,7 +2864,6 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
         LogPane->AppendText("Could not find specified cache.\n");
         savedAll = false;
       }
-      LogPane->AppendText("Pause Here to inspect state");
     }
     break;
     case CGComm:{
@@ -3281,7 +3280,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
   CGProject->WriteIR(tempName);
   std::string FName = static_cast<const char*>(IRFileName.c_str());
   std::string NodeName = node->GetName();
-  CloseProject();
+  CloseProject(true);
   std::remove(FName.c_str());
   std::rename(tempName.c_str(), FName.c_str());
   std::remove(tempName.c_str());
@@ -3289,7 +3288,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
   TreeItems.clear();
   NodeItems.clear();
   SetupModuleBox();
-  OpenProject(IRFileName);
+  OpenProject(IRFileName, true);
   //LoadModuleBox();
   
   if(savedAll)

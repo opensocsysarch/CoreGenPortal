@@ -142,18 +142,18 @@ private:
   void CreateWindowLayout();
   void SetupModuleBox();
   void SetupPluginBox();
-  void LoadModuleBox();
+  void LoadModuleBox(bool editing = false);
   void LoadExtNodes(wxTreeItemId, CoreGenExt *Ext);
   void LoadPluginNodes(wxTreeItemId, CoreGenPlugin *Plugin);
   void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
   void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
-  void CloseProject();
+  void CloseProject(bool editing = false);
   void DeleteNode(CoreGenNode *N);
   void AddNodeWin();
   void OpenFileFromWin(wxString Path);
   void OpenYamlFile(wxString NP, wxFileName NPF);
   void OpenSCFile(wxString NP, wxFileName NPF);
-  void OpenProject(wxString NP);
+  void OpenProject(wxString NP, bool editing = false);
 
   CGNodeType TreeIdToCGType(wxTreeItemId ID);
   wxString FindNodeStr(CoreGenNode *Parent);
