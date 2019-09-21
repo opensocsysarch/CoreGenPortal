@@ -92,7 +92,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
   //-- ways
   CacheWaysSizer = new wxBoxSizer( wxHORIZONTAL );
   WaysText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   7,
                                    wxT("Cache Ways"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),

@@ -3287,7 +3287,14 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
   //set sets
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
   BoxContents = InfoBox->GetValue().ToStdString();
-  CacheNode->SetWays(std::stoi(BoxContents));
+  if(IsInteger(BoxContents)){
+    CacheNode->SetWays(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Cache ways will not be changed\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
 
   //set Childe Cache
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
