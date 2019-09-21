@@ -48,7 +48,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
   //-- cache
   CacheNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CacheNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   5,
                                    wxT("Cache Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),

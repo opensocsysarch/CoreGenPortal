@@ -2828,7 +2828,14 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       //set name
       InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
       BoxContents = InfoBox->GetValue().ToStdString();
-      CacheNode->SetName(BoxContents);
+      if(CGProject->IsValidName(BoxContents)){
+        CacheNode->SetName(BoxContents);
+      }
+      else{
+        LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+        InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
+        savedAll = false;
+      }
 
       //set sets
       InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
