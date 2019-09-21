@@ -182,6 +182,9 @@ private:
   void OnPopupNode(wxCommandEvent &event);
   void OnCopyText(wxCommandEvent &event );
   void OnPasteText(wxCommandEvent &event );
+  
+  bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
+  bool IsInteger(std::string TestString);
 };
 
 enum

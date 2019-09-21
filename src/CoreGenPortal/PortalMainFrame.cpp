@@ -2813,59 +2813,17 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
                                    CGNodeType InfoWinType){
   // get the box contents
   bool savedAll = true;
-  bool createNewNode = false;
-  if(!node) createNewNode = true;
+  //bool createNewNode = false;
+  //if(!node) createNewNode = true;
   wxTextCtrl *InfoBox;
   std::string BoxContents;
 
   // TODO: handle invalid inputs
   // update yaml
   switch(InfoWinType){
-    case CGCache:{
-      CoreGenCache *NewChild;
-      CoreGenCache *CacheNode = (CoreGenCache*)node;
-
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      if(CGProject->IsValidName(BoxContents)){
-        CacheNode->SetName(BoxContents);
-      }
-      else{
-        LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
-        InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
-        savedAll = false;
-      }
-
-      //set sets
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      CacheNode->SetSets(std::stoi(BoxContents));
-
-      //set sets
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      CacheNode->SetWays(std::stoi(BoxContents));
-
-      //set Childe Cache
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      NewChild = CGProject->GetCacheNodeByName(BoxContents);
-      if(NewChild){
-        CoreGenCache *OldChild = CacheNode->GetSubCache();
-        if(OldChild){
-          OldChild->DeleteParentCache(CacheNode);
-          CacheNode->SetNullChildCache();  
-        }
-        CacheNode->SetChildCache(NewChild);
-        NewChild->SetParentCache(CacheNode);
-      }
-      else if(BoxContents != ""){
-        LogPane->AppendText("Could not find specified cache.\n");
-        savedAll = false;
-      }
-    }
-    break;
+    case CGCache:
+      savedAll = SaveCache(InfoWin, (CoreGenCache*)node);
+      break;
     case CGComm:{
       // TODO: handle endpoints
       CoreGenComm *CommNode = (CoreGenComm*)node;
@@ -3294,6 +3252,62 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
   if(savedAll)
     LogPane->AppendText("Updated " + NodeName + ".\n");
   return savedAll;
+}
+
+bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
+  CoreGenCache *NewChild;
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    CacheNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set sets
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CacheNode->SetSets(std::stoi(BoxContents));
+
+  //set sets
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CacheNode->SetWays(std::stoi(BoxContents));
+
+  //set Childe Cache
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  NewChild = CGProject->GetCacheNodeByName(BoxContents);
+  if(NewChild){
+    CoreGenCache *OldChild = CacheNode->GetSubCache();
+    if(OldChild){
+      OldChild->DeleteParentCache(CacheNode);
+      CacheNode->SetNullChildCache();  
+    }
+    CacheNode->SetChildCache(NewChild);
+    NewChild->SetParentCache(CacheNode);
+  }
+  else if(BoxContents != ""){
+    LogPane->AppendText("Could not find specified cache.\n");
+    savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::IsInteger(std::string TestString){
+  for(unsigned i = 0; i < TestString.size(); i++)
+    if(!std::isdigit(TestString[i])) return false;
+  
+  return true;
 }
 
 // EOF
