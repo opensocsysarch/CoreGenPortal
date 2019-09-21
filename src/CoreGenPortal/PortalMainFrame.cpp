@@ -2822,7 +2822,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
   // update yaml
   switch(InfoWinType){
     case CGCache:{
-      CoreGenCache *newNode;
+      CoreGenCache *NewChild;
       CoreGenCache *CacheNode = (CoreGenCache*)node;
 
       //set name
@@ -2843,26 +2843,21 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       //set Childe Cache
       InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
       BoxContents = InfoBox->GetValue().ToStdString();
-      newNode = CGProject->GetCacheNodeByName(BoxContents);
-      if(newNode){
-        CacheNode->SetChildCache(newNode);
+      NewChild = CGProject->GetCacheNodeByName(BoxContents);
+      if(NewChild){
+        CoreGenCache *OldChild = CacheNode->GetSubCache();
+        if(OldChild){
+          OldChild->DeleteParentCache(CacheNode);
+          CacheNode->SetNullChildCache();  
+        }
+        CacheNode->SetChildCache(NewChild);
+        NewChild->SetParentCache(CacheNode);
       }
       else if(BoxContents != ""){
         LogPane->AppendText("Could not find specified cache.\n");
         savedAll = false;
       }
-
-      //set Parent Cache
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      newNode = CGProject->GetCacheNodeByName(BoxContents);
-      if(newNode){ 
-        CacheNode->SetParentCache(newNode);
-      }
-      else if(BoxContents != ""){
-        LogPane->AppendText("Could not find specified cache.\n");
-        savedAll = false;
-      }
+      LogPane->AppendText("Pause Here to inspect state");
     }
     break;
     case CGComm:{
@@ -3222,7 +3217,6 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
         }
         else{
           LogPane->AppendText(nextNodeName + " is not a valid core. Deleting from cores list.\n");
-          savedAll;
         }
         getline(iss, nextNodeName);
       }

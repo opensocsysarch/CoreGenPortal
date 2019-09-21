@@ -61,7 +61,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                                  Cache ? wxString(Cache->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320, 25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("CacheName") );
   CacheNameSizer->Add( CacheNameCtrl, 0, wxALL, 0 );
@@ -83,7 +83,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                              Cache ? wxString::Format(wxT("%i"),Cache->GetSets()) : "",
                              wxDefaultPosition,
                              wxSize(320,25),
-                             wxTE_PROCESS_ENTER,
+                             0,
                              wxDefaultValidator,
                              wxT("Sets") );
   CacheSetsSizer->Add( SetsCtrl, 0, wxALL, 0 );
@@ -105,65 +105,68 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                              Cache ? wxString::Format(wxT("%i"),Cache->GetWays()) : "",
                              wxDefaultPosition,
                              wxSize(320,25),
-                             wxTE_PROCESS_ENTER,
+                             0,
                              wxDefaultValidator,
                              wxT("Ways") );
   CacheWaysSizer->Add( WaysCtrl, 0, wxALL, 0 );
   InnerSizer->Add( CacheWaysSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
-  //-- parent cache
-  ParentCacheSizer = new wxBoxSizer( wxHORIZONTAL );
-  ParentCacheText = new wxStaticText( Wnd,
+  //-- child cache
+  ChildCacheSizer = new wxBoxSizer( wxHORIZONTAL );
+  ChildCacheText = new wxStaticText( Wnd,
                                    wxID_ANY,
                                    wxT("Child Cache Node"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
                                    0 );
-  ParentCacheText->Wrap(-1);
-  ParentCacheSizer->Add( ParentCacheText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
-
-  ParentCacheCtrl = new wxTextCtrl( Wnd,
-                             3,
-                             wxEmptyString,
-                             wxDefaultPosition,
-                             wxSize(320,25),
-                             wxTE_PROCESS_ENTER,
-                             wxDefaultValidator,
-                             wxT("ParentCache") );
-  if( Cache && Cache->IsParentLevel() ){
-    CoreGenCache *Parent = Cache->GetSubCache();
-    if( Parent != nullptr )
-      ParentCacheCtrl->AppendText(wxString(Parent->GetName()));
-  }
-  ParentCacheSizer->Add( ParentCacheCtrl, 0, wxALL, 0 );
-  InnerSizer->Add( ParentCacheSizer, 0, wxALIGN_CENTER, 5 );
-
-  //-- child cache
-  ChildCacheSizer = new wxBoxSizer( wxHORIZONTAL );
-  ChildCacheText = new wxStaticText( Wnd,
-                                   wxID_ANY,
-                                   wxT("Parent Cache Node"),
-                                   wxDefaultPosition,
-                                   wxSize(160, -1),
-                                   0 );
   ChildCacheText->Wrap(-1);
   ChildCacheSizer->Add( ChildCacheText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   ChildCacheCtrl = new wxTextCtrl( Wnd,
-                             4,
+                             3,
                              wxEmptyString,
                              wxDefaultPosition,
                              wxSize(320,25),
-                             wxTE_PROCESS_ENTER,
+                             0,
                              wxDefaultValidator,
                              wxT("ChildCache") );
-  if( Cache && Cache->IsSubLevel() ){
-    CoreGenCache *Child = Cache->GetParentCache(0);
+  if( Cache && Cache->IsParentLevel() ){
+    CoreGenCache *Child = Cache->GetSubCache();
     if( Child != nullptr )
       ChildCacheCtrl->AppendText(wxString(Child->GetName()));
   }
   ChildCacheSizer->Add( ChildCacheCtrl, 0, wxALL, 0 );
-  InnerSizer->Add( ChildCacheSizer, 0, wxALIGN_CENTER|wxALL, 5 );
+  InnerSizer->Add( ChildCacheSizer, 0, wxALIGN_CENTER, 5 );
+
+  //-- parent caches
+  ParentCacheSizer = new wxBoxSizer( wxHORIZONTAL );
+  ParentCacheText = new wxStaticText( Wnd,
+                                   wxID_ANY,
+                                   wxT("Parent Cache Nodes"),
+                                   wxDefaultPosition,
+                                   wxSize(160, -1),
+                                   0 );
+  ParentCacheText->Wrap(-1);
+  ParentCacheSizer->Add( ParentCacheText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+
+  ParentCacheCtrl = new wxTextCtrl( Wnd,
+                             4,
+                             wxEmptyString,
+                             wxDefaultPosition,
+                             wxSize(320,100),
+                             wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL,
+                             wxDefaultValidator,
+                             wxT("ParentCache") );
+  if( Cache && Cache->IsSubLevel() ){
+    CoreGenCache *Parent;
+    for(unsigned i = 0; i < Cache->GetNumParentCache(); i++){
+      Parent = Cache->GetParentCache(i);
+      if( Parent != nullptr )
+        ParentCacheCtrl->AppendText(wxString(Parent->GetName()) + "\n");
+    }
+  }
+  ParentCacheSizer->Add( ParentCacheCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( ParentCacheSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   // add space between info items and static line
   SpacerPanelSizer = new wxBoxSizer( wxVERTICAL );
