@@ -2824,52 +2824,10 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGCache:
       savedAll = SaveCache(InfoWin, (CoreGenCache*)node);
       break;
-    case CGComm:{
-      // TODO: handle endpoints
-      CoreGenComm *CommNode = (CoreGenComm*)node;
-
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      CommNode->SetName(BoxContents);
-
-      //set comm node type
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      if( BoxContents.compare("Point-to-Point") == 0 ){
-        CommNode->SetCommType(CGCommP2P);
-      }
-      else if( BoxContents.compare("Bus") == 0 ){
-        CommNode->SetCommType(CGCommBus);
-      }
-      else if( BoxContents.compare("Network on Chip") == 0 ){
-        CommNode->SetCommType(CGCommNoc);
-      }
-      else{
-        CommNode->SetCommType(CGCommUnk);
-      }
-
-      //set width
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      CommNode->SetWidth(std::stoi(BoxContents));
-
-      //set endpoints
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      std::istringstream iss(BoxContents);
-      std::string nextNodeName;
-      while( CommNode->GetNumEndpoints() > 0) CommNode->DeleteEndpoint((unsigned)0);
-      std::getline(iss, nextNodeName);
-      while(!iss.eof()){
-        CoreGenNode* N = CGProject->GetNodeByName(nextNodeName);
-        if(N) CommNode->InsertEndpoint(N);
-        else LogPane->AppendText(nextNodeName + " is not a valid node. Deleting from endpoints list.\n");
-        getline(iss, nextNodeName);
-      }
-    }
-    break;
-        case CGCore:{
+    case CGComm:
+      savedAll = SaveComm(InfoWin, (CoreGenComm*)node);
+      break;
+    case CGCore:{
       // TODO: Handle isa, caches, regclasses, and extensions
       CoreGenCore *CoreNode = (CoreGenCore*)node;
       CoreGenNode *newNode;
@@ -3330,6 +3288,54 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
     LogPane->AppendText("Could not find specified cache. No change made to child cache\n");
     InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CommNode->SetName(BoxContents);
+
+  //set comm node type
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if( BoxContents.compare("Point-to-Point") == 0 ){
+    CommNode->SetCommType(CGCommP2P);
+  }
+  else if( BoxContents.compare("Bus") == 0 ){
+    CommNode->SetCommType(CGCommBus);
+  }
+  else if( BoxContents.compare("Network on Chip") == 0 ){
+    CommNode->SetCommType(CGCommNoc);
+  }
+  else{
+    CommNode->SetCommType(CGCommUnk);
+  }
+
+  //set width
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CommNode->SetWidth(std::stoi(BoxContents));
+
+  //set endpoints
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  std::istringstream iss(BoxContents);
+  std::string nextNodeName;
+  while( CommNode->GetNumEndpoints() > 0) CommNode->DeleteEndpoint((unsigned)0);
+  std::getline(iss, nextNodeName);
+  while(!iss.eof()){
+    CoreGenNode* N = CGProject->GetNodeByName(nextNodeName);
+    if(N) CommNode->InsertEndpoint(N);
+    else LogPane->AppendText(nextNodeName + " is not a valid node. Deleting from endpoints list.\n");
+    getline(iss, nextNodeName);
   }
 
   return savedAll;
