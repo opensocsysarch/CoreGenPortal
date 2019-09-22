@@ -3355,8 +3355,9 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
       CoreNode->InsertRegClass(N);
     } 
     else if(nextNodeName != ""){
-      LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
-      savedAll = false
+      LogPane->AppendText(nextNodeName + " is not a valid Register Class. It will not be added to the Register Class list.\n");
+      InfoWin->FindWindow(10)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
     } 
     getline(iss, nextNodeName);
   }
@@ -3376,8 +3377,9 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
       CoreNode->InsertExt(N);
     } 
     else if(nextNodeName != ""){
-      LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
-      savedAll = false
+      LogPane->AppendText(nextNodeName + " is not a valid Extension. It will not be added to the Extension list.\n");
+      InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
     } 
     getline(iss, nextNodeName);
   }
