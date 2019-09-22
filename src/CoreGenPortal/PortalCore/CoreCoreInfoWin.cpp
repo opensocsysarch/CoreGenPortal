@@ -62,7 +62,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                                Core ? wxString(Core->GetName()) : "",
                                wxDefaultPosition,
                                wxSize(320,25),
-                               wxTE_PROCESS_ENTER,
+                               0,
                                wxDefaultValidator,
                                wxT("Core Name") );
   CoreNameSizer->Add( CoreNameCtrl, 0, wxALL, 0 );
@@ -85,7 +85,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                                Core ? wxString::Format(wxT("%i"),Core->GetNumThreadUnits()) : "",
                                wxDefaultPosition,
                                wxSize(320,25),
-                               wxTE_PROCESS_ENTER,
+                               0,
                                wxDefaultValidator,
                                wxT("Thread Units") );
   ThreadUnitSizer->Add( ThreadUnitCtrl, 0, wxALL, 0 );
@@ -108,7 +108,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                            Core ? wxString(Core->GetISA()->GetName()) : "",
                            wxDefaultPosition,
                            wxSize(320,25),
-                           wxTE_PROCESS_ENTER,
+                           0,
                            wxDefaultValidator,
                            wxT("ISA") );
   ISANameSizer->Add( ISACtrl, 0, wxALL, 0 );
@@ -131,7 +131,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                            Core ? wxString(Core->GetCache()->GetName()) : "",
                            wxDefaultPosition,
                            wxSize(320,25),
-                           wxTE_PROCESS_ENTER,
+                           0,
                            wxDefaultValidator,
                            wxT("Cache") );
   CacheNameSizer->Add( CacheCtrl, 0, wxALL, 0 );

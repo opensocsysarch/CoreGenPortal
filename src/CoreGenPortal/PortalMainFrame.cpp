@@ -2833,15 +2833,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGExt:
       savedAll = SaveExt(InfoWin, (CoreGenExt*)node);
       break;
-    case CGISA:{
-      CoreGenISA *ISANode = (CoreGenISA*)node;
-
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      ISANode->SetName(BoxContents);
-    }
-    break;
+    case CGISA:
+      savedAll = SaveISA(InfoWin, (CoreGenISA*)node);
+      break;
     case CGInst:{
       CoreGenInst *InstNode = (CoreGenInst*)node;
       CoreGenNode *newNode;
@@ -3396,6 +3390,26 @@ bool PortalMainFrame::SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode){
   }
   else{
     ExtNode->SetType(CGExtUnk);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    ISANode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
+    InfoWin->FindWindow(1)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
   }
 
   return savedAll;

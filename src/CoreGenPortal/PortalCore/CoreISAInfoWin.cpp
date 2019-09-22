@@ -48,7 +48,7 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
   // -- ISA
   ISANameSizer = new wxBoxSizer(wxHORIZONTAL);
   ISANameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   1,
                                    wxT("ISA Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),

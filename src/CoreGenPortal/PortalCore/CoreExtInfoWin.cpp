@@ -61,7 +61,7 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
                                 Ext ? wxString(Ext->GetName()) : "",
                                 wxDefaultPosition,
                                 wxSize(320,25),
-                                wxTE_PROCESS_ENTER,
+                                0,
                                 wxDefaultValidator,
                                 wxT("ExtName") );
   ExtNameSizer->Add( ExtNameCtrl, 0, wxALL, 0 );
@@ -83,7 +83,7 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
                                 wxEmptyString,
                                 wxDefaultPosition,
                                 wxSize(320,25),
-                                wxTE_PROCESS_ENTER,
+                                0,
                                 wxDefaultValidator,
                                 wxT("ExtType") );
   if(Ext){
