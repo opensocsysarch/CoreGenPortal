@@ -3398,9 +3398,16 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
   //set syntax
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
   BoxContents = InfoBox->GetValue().ToStdString();
-  InstNode->SetSyntax(BoxContents);
+  if(InstNode->ValidateSyntax(BoxContents)){
+    InstNode->SetSyntax(BoxContents);
+  }
+  else{
+    LogPane->AppendText("Invalid Syntax. No Changes will be made.\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
 
-  //set instruction format
+  //set implementation
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
   BoxContents = InfoBox->GetValue().ToStdString();
   InstNode->SetImpl(BoxContents);
@@ -3423,7 +3430,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
     encodingStream >> op;
     encodingStream >> Value;
     if(!InstNode->SetEncoding(Field, Value)){
-      LogPane->AppendText("Invalid field: " + Field + ". Deleting from encodings");
+      LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
       InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
     } 
