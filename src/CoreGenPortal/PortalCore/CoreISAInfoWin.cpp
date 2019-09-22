@@ -61,7 +61,7 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
                                 ISA ? wxString(ISA->GetName()) : "",
                                 wxDefaultPosition,
                                 wxSize(320,25),
-                                wxTE_PROCESS_ENTER,
+                                0,
                                 wxDefaultValidator,
                                 wxT("ISA Name") );
   ISANameSizer->Add( ISANameCtrl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
