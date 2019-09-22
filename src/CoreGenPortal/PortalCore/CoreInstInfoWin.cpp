@@ -61,7 +61,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                                  Inst ? wxString(Inst->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Inst Name") );
   InstNameSizer->Add( InstNameCtrl, 0, wxALL, 0 );
@@ -83,7 +83,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                                  Inst ? wxString(Inst->GetFormat()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Inst Format Name") );
   InstFNameSizer->Add( InstFNameCtrl, 0, wxALL, 0 );
@@ -105,7 +105,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                                  Inst ? wxString(Inst->GetISA()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("ISA Name") );
   ISANameSizer->Add( ISANameCtrl, 0, wxALL, 0 );
@@ -127,7 +127,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                                  Inst ? wxString(Inst->GetSyntax()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Inst Format Name") );
   SyntaxSizer->Add( SyntaxCtrl, 0, wxALL, 0 );
@@ -149,7 +149,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                                  Inst ? wxString(Inst->GetImpl()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,100),
-                                 wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                                 wxTE_MULTILINE|wxHSCROLL,
                                  wxDefaultValidator,
                                  wxT("StoneCutter") );
   StoneCutterSizer->Add( StoneCCtrl, 0, wxALL, 0 );
@@ -171,7 +171,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("StoneCutter") );
   if(Inst){
