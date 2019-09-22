@@ -2836,80 +2836,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGISA:
       savedAll = SaveISA(InfoWin, (CoreGenISA*)node);
       break;
-    case CGInst:{
-      CoreGenInst *InstNode = (CoreGenInst*)node;
-      CoreGenNode *newNode;
-      std::istringstream iss;
-      std::string nextNodeName;
-
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      InstNode->SetName(BoxContents);
-
-      //set instruction format
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      
-      newNode = CGProject->GetInstFormatNodeByName(BoxContents);
-      if(newNode){
-        //TODO: Fix SetFormat
-        LogPane->AppendText("Set Format");
-        //InstNode->SetFormat((CoreGenInstFormat*)newNode);
-      }
-      else{
-        LogPane->AppendText("Could not find specified Instruction Format.\n");
-        savedAll = false;
-      }
-
-      //set ISA
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      newNode = CGProject->GetISANodeByName(BoxContents);
-      if(newNode){
-        InstNode->SetISA((CoreGenISA*)newNode);
-        CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
-        if(PInst) PInst->SetISA((CoreGenISA*)newNode);
-      } 
-      else{
-        LogPane->AppendText("Could not find specified Instruction Set.\n");
-        savedAll = false;
-      }
-      
-
-      //set syntax
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      InstNode->SetSyntax(BoxContents);
-
-      //set instruction format
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      InstNode->SetImpl(BoxContents);
-
-      //set instruction format
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
-      std::string Field;
-      std::string op;
-      int Value;
-      iss.str(BoxContents);
-      InstNode->ClearEncodings();
-      getline(iss, nextNodeName);
-      while(!iss.eof()){
-        std::stringstream encodingStream(nextNodeName);
-        encodingStream >> Field;
-        encodingStream >> op;
-        encodingStream >> Value;
-        if(!InstNode->SetEncoding(Field, Value))
-          LogPane->AppendText("Invalid field: " + Field + ". Deleting from encodings");
-        else if(PInst)
-          PInst->SetEncoding(Field, Value);
-        getline(iss, nextNodeName);
-      }
-    }
-    break;
+    case CGInst:
+      savedAll = SaveInst(InfoWin, (CoreGenInst*)node);
+      break;
     case CGMCtrl:{
       CoreGenMCtrl *MCtrlNode = (CoreGenMCtrl*)node;
       
@@ -3410,6 +3339,98 @@ bool PortalMainFrame::SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode){
     LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
     InfoWin->FindWindow(1)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  CoreGenNode *newNode;
+  std::istringstream iss;
+  std::string nextNodeName;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    InstNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set instruction format
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  
+  newNode = CGProject->GetInstFormatNodeByName(BoxContents);
+  if(newNode){
+    InstNode->SetNullFormat();
+    InstNode->SetFormat((CoreGenInstFormat*)newNode);
+  }
+  else{
+    LogPane->AppendText("Could not find specified Instruction Format.\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set ISA
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  newNode = CGProject->GetISANodeByName(BoxContents);
+  if(newNode){
+    InstNode->SetISA((CoreGenISA*)newNode);
+    CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+    if(PInst) PInst->SetISA((CoreGenISA*)newNode);
+  } 
+  else{
+    LogPane->AppendText("Could not find specified Instruction Set.\n");
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+
+  //set syntax
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  InstNode->SetSyntax(BoxContents);
+
+  //set instruction format
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  InstNode->SetImpl(BoxContents);
+
+  //set encodings
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n"; 
+  CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+  std::string Field;
+  std::string op;
+  int Value;
+  iss.str(BoxContents);
+  InstNode->ClearEncodings();
+  getline(iss, nextNodeName);
+  while(!iss.eof()){
+    std::stringstream encodingStream(nextNodeName);
+    encodingStream >> Field;
+    encodingStream >> op;
+    encodingStream >> Value;
+    if(!InstNode->SetEncoding(Field, Value)){
+      LogPane->AppendText("Invalid field: " + Field + ". Deleting from encodings");
+      InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+    } 
+    else if(PInst){
+      PInst->SetEncoding(Field, Value);
+    }
+    getline(iss, nextNodeName);
   }
 
   return savedAll;

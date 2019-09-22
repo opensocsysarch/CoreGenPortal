@@ -48,7 +48,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- inst name
   InstNameSizer = new wxBoxSizer( wxHORIZONTAL );
   InstNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   6,
                                    wxT("Instruction Name"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -70,7 +70,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- inst format
   InstFNameSizer = new wxBoxSizer( wxHORIZONTAL );
   InstFNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   7,
                                    wxT("Instruction Format"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -92,7 +92,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- isa name
   ISANameSizer = new wxBoxSizer( wxHORIZONTAL );
   ISANameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   8,
                                    wxT("Instruction Set"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -114,7 +114,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- syntax
   SyntaxSizer = new wxBoxSizer( wxHORIZONTAL );
   SyntaxText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   9,
                                    wxT("Syntax"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -136,7 +136,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- stone cutter implementation
   StoneCutterSizer = new wxBoxSizer( wxHORIZONTAL );
   StoneCText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   10,
                                    wxT("StoneCutter Syntax"),
                                    wxDefaultPosition,
                                    wxSize(160, -1), 
@@ -158,7 +158,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- encodings
   EncodingSizer = new wxBoxSizer( wxHORIZONTAL );
   EncText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              11,
                               wxT("Inst Field Encodings"),
                               wxDefaultPosition,
                               wxSize(160, -1),

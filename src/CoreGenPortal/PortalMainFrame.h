@@ -189,6 +189,7 @@ private:
   bool SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode);
   bool SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode);
   bool SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode);
+  bool SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode);
   bool IsInteger(std::string TestString);
   bool HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache);
 };
