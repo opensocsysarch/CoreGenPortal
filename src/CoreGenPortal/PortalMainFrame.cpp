@@ -3296,18 +3296,35 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
     savedAll = false;
   }
 
-  //set Childe Cache
+  //set Child Cache
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
   BoxContents = InfoBox->GetValue().ToStdString();
   NewChild = CGProject->GetCacheNodeByName(BoxContents);
   if(NewChild){
-    CoreGenCache *OldChild = CacheNode->GetSubCache();
+    if(HasCacheCycle(CacheNode, NewChild)){
+      LogPane->AppendText("Inserting " + BoxContents + " would create a cache cycle. Old subcache will be kept.\n");
+       InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+       savedAll = false;
+    }
+    else {
+      CoreGenCache *OldChild = CacheNode->GetSubCache();
+      if(OldChild){
+        OldChild->DeleteParentCache(CacheNode);
+        CacheNode->SetNullChildCache();  
+      }
+      CacheNode->SetChildCache(NewChild);
+      NewChild->SetParentCache(CacheNode);
+    }
+  }
+  else if(BoxContents == ""){
+    CoreGenCache* OldChild = CacheNode->GetSubCache();
     if(OldChild){
       OldChild->DeleteParentCache(CacheNode);
-      CacheNode->SetNullChildCache();  
+      CacheNode->SetNullChildCache();
     }
-    CacheNode->SetChildCache(NewChild);
-    NewChild->SetParentCache(CacheNode);
+    else{
+      LogPane->AppendText("Warning: no subcache was entered and there was no subcache to delete.\n");
+    }
   }
   else{
     LogPane->AppendText("Could not find specified cache. No change made to child cache\n");
@@ -3323,6 +3340,12 @@ bool PortalMainFrame::IsInteger(std::string TestString){
     if(!std::isdigit(TestString[i])) return false;
   
   return true;
+}
+
+bool PortalMainFrame::HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache){
+  if(Cache == nullptr) return false;
+  if(SourceCache->GetName() == Cache->GetName()) return true;
+  return HasCacheCycle(SourceCache, Cache->GetSubCache());
 }
 
 // EOF
