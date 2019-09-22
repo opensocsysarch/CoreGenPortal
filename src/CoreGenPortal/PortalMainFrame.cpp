@@ -3301,7 +3301,14 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
   //set name
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
   BoxContents = InfoBox->GetValue().ToStdString();
-  CommNode->SetName(BoxContents);
+  if(CGProject->IsValidName(BoxContents)){
+    CommNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
 
   //set comm node type
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);

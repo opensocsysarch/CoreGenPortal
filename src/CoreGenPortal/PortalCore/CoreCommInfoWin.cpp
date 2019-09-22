@@ -48,7 +48,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   //-- comm
   CommNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CommNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   4,
                                    wxT("Comm Node Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
