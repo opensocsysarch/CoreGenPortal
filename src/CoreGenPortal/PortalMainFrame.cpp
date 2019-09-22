@@ -3327,7 +3327,9 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
       
   //set Register Classes
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
-  BoxContents = InfoBox->GetValue().ToStdString();  
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";  
   iss.str(BoxContents);  
   while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
   std::getline(iss, nextNodeName);
@@ -3340,7 +3342,10 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
 
   //set Extensions
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
-  BoxContents = InfoBox->GetValue().ToStdString();  
+  BoxContents = InfoBox->GetValue().ToStdString() + "\n";
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";
+  iss.clear();  
   iss.str(BoxContents);
   while( CoreNode->GetNumExt() > 0) CoreNode->DeleteExt((unsigned)0);
   std::getline(iss, nextNodeName);

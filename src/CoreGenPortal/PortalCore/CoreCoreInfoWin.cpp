@@ -48,7 +48,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- core name
   CoreNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CoreNameText = new wxStaticText(Wnd,
-                                 wxID_ANY,
+                                 6,
                                  wxT("Core Name"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -71,7 +71,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- thread unit name
   ThreadUnitSizer = new wxBoxSizer( wxHORIZONTAL );
   ThreadUnitText = new wxStaticText(Wnd,
-                                 wxID_ANY,
+                                 7,
                                  wxT("Thread Units"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -94,7 +94,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- isa name
   ISANameSizer = new wxBoxSizer( wxHORIZONTAL );
   ISANameText= new wxStaticText(Wnd,
-                                 wxID_ANY,
+                                 8,
                                  wxT("ISA Name"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -117,7 +117,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- cache name
   CacheNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CacheNameText = new wxStaticText(Wnd,
-                                 wxID_ANY,
+                                 9,
                                  wxT("Cache Name"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -140,7 +140,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- regclass name
   RegClassSizer = new wxBoxSizer( wxHORIZONTAL );
   RegClassNameText = new wxStaticText(Wnd,
-                                 wxID_ANY,
+                                 10,
                                  wxT("Register Classes"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -168,7 +168,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   //-- ext name
   ExtNameSizer = new wxBoxSizer( wxHORIZONTAL );
   ExtNameText = new wxStaticText(Wnd,
-                             wxID_ANY,
+                             11,
                              wxT("Extensions"),
                              wxDefaultPosition,
                              wxSize(160,-1),
