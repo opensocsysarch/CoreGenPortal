@@ -3294,12 +3294,26 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   //set name
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
   BoxContents = InfoBox->GetValue().ToStdString();
-  CoreNode->SetName(BoxContents);
+  if(CGProject->IsValidName(BoxContents)){
+    CoreNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
 
   //set number of thread units
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
   BoxContents = InfoBox->GetValue().ToStdString();
-  CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
+  if(IsInteger(BoxContents)){
+    CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Thread Units will not be changed\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
 
   //set ISA
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
@@ -3310,6 +3324,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   }
   else{
     LogPane->AppendText("Could not find specified ISA. Keeping old ISA.\n");
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
 
@@ -3322,6 +3337,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   }
   else{
     LogPane->AppendText("Could not find specified Cache. Keeping old Cache.\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
       
@@ -3335,8 +3351,13 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   std::getline(iss, nextNodeName);
   while(!iss.eof()){
     CoreGenRegClass* N = CGProject->GetRegClassNodeByName(nextNodeName);
-    if(N) CoreNode->InsertRegClass(N);
-    else LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
+    if(N){
+      CoreNode->InsertRegClass(N);
+    } 
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
+      savedAll = false
+    } 
     getline(iss, nextNodeName);
   }
 
@@ -3351,8 +3372,13 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   std::getline(iss, nextNodeName);
   while(!iss.eof()){
     CoreGenExt* N = CGProject->GetExtNodeByName(nextNodeName);
-    if(N) CoreNode->InsertExt(N);
-    else LogPane->AppendText(nextNodeName + " is not a valid Extension. Deleting from Extensions list.\n");
+    if(N){
+      CoreNode->InsertExt(N);
+    } 
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
+      savedAll = false
+    } 
     getline(iss, nextNodeName);
   }
 
