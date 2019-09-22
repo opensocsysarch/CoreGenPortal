@@ -114,7 +114,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
   //-- child cache
   ChildCacheSizer = new wxBoxSizer( wxHORIZONTAL );
   ChildCacheText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   8,
                                    wxT("Child Cache Node"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),

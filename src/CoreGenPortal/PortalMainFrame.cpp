@@ -3309,8 +3309,9 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
     CacheNode->SetChildCache(NewChild);
     NewChild->SetParentCache(CacheNode);
   }
-  else if(BoxContents != ""){
-    LogPane->AppendText("Could not find specified cache.\n");
+  else{
+    LogPane->AppendText("Could not find specified cache. No change made to child cache\n");
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
 

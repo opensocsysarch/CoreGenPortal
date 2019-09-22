@@ -185,6 +185,7 @@ private:
   
   bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
   bool IsInteger(std::string TestString);
+  bool HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache);
 };
 
 enum
