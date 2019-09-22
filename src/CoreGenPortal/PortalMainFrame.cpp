@@ -2830,31 +2830,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGCore:
       savedAll = SaveCore(InfoWin, (CoreGenCore*)node);
       break;
-    case CGExt:{
-      CoreGenExt *ExtNode = (CoreGenExt*)node;
-
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      ExtNode->SetName(BoxContents);
-
-      //set Extension type
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      if( BoxContents == "Template extension" ){
-        ExtNode->SetType(CGExtTemplate);
-      }
-      else if( BoxContents == "Module extension" ){
-        ExtNode->SetType(CGExtModule);
-      }
-      else if( BoxContents == "Communications extension" ){
-        ExtNode->SetType(CGExtComm);
-      }
-      else{
-        ExtNode->SetType(CGExtUnk);
-      }
-    }
-    break;
+    case CGExt:
+      savedAll = SaveExt(InfoWin, (CoreGenExt*)node);
+      break;
     case CGISA:{
       CoreGenISA *ISANode = (CoreGenISA*)node;
 
@@ -3382,6 +3360,42 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
       savedAll = false;
     } 
     getline(iss, nextNodeName);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    ExtNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set Extension type
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if( BoxContents == "Template extension" ){
+    ExtNode->SetType(CGExtTemplate);
+  }
+  else if( BoxContents == "Module extension" ){
+    ExtNode->SetType(CGExtModule);
+  }
+  else if( BoxContents == "Communications extension" ){
+    ExtNode->SetType(CGExtComm);
+  }
+  else{
+    ExtNode->SetType(CGExtUnk);
   }
 
   return savedAll;

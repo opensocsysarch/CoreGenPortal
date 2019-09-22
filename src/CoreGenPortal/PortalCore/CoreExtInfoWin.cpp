@@ -48,7 +48,7 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
   //-- extension name
   ExtNameSizer = new wxBoxSizer( wxHORIZONTAL );
   ExtNameText = new wxStaticText( Wnd,
-                                  wxID_ANY,
+                                  2,
                                   wxT("Extension Name"),
                                   wxDefaultPosition,
                                   wxSize(160,-1),
