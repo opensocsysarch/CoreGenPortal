@@ -186,6 +186,7 @@ private:
   //functions to save/edit node data
   bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
   bool SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode);
+  bool SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode);
   bool IsInteger(std::string TestString);
   bool HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache);
 };

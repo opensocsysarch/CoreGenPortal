@@ -2827,74 +2827,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGComm:
       savedAll = SaveComm(InfoWin, (CoreGenComm*)node);
       break;
-    case CGCore:{
-      // TODO: Handle isa, caches, regclasses, and extensions
-      CoreGenCore *CoreNode = (CoreGenCore*)node;
-      CoreGenNode *newNode;
-      std::istringstream iss;
-      std::string nextNodeName;
-
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      CoreNode->SetName(BoxContents);
-
-      //set number of thread units
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
-
-      //set ISA
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      newNode = CGProject->GetISANodeByName(BoxContents);
-      if(newNode){
-        CoreNode->SetISA((CoreGenISA*)newNode);
-      }
-      else{
-        LogPane->AppendText("Could not find specified ISA. Keeping old ISA.\n");
-        savedAll = false;
-      }
-
-      //set Cache
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      newNode = CGProject->GetCacheNodeByName(BoxContents);
-      if(newNode){ 
-        CoreNode->InsertCache((CoreGenCache*)newNode);
-      }
-      else{
-        LogPane->AppendText("Could not find specified Cache. Keeping old Cache.\n");
-        savedAll = false;
-      }
-          
-      //set Register Classes
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
-      BoxContents = InfoBox->GetValue().ToStdString();  
-      iss.str(BoxContents);  
-      while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
-      std::getline(iss, nextNodeName);
-      while(!iss.eof()){
-        CoreGenRegClass* N = CGProject->GetRegClassNodeByName(nextNodeName);
-        if(N) CoreNode->InsertRegClass(N);
-        else LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
-        getline(iss, nextNodeName);
-      }
-
-      //set Extensions
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
-      BoxContents = InfoBox->GetValue().ToStdString();  
-      iss.str(BoxContents);
-      while( CoreNode->GetNumExt() > 0) CoreNode->DeleteExt((unsigned)0);
-      std::getline(iss, nextNodeName);
-      while(!iss.eof()){
-        CoreGenExt* N = CGProject->GetExtNodeByName(nextNodeName);
-        if(N) CoreNode->InsertExt(N);
-        else LogPane->AppendText(nextNodeName + " is not a valid Extension. Deleting from Extensions list.\n");
-        getline(iss, nextNodeName);
-      }
-    }
-    break;
+    case CGCore:
+      savedAll = SaveCore(InfoWin, (CoreGenCore*)node);
+      break;
     case CGExt:{
       CoreGenExt *ExtNode = (CoreGenExt*)node;
 
@@ -3342,6 +3277,77 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
     CoreGenNode* N = CGProject->GetNodeByName(nextNodeName);
     if(N) CommNode->InsertEndpoint(N);
     else LogPane->AppendText(nextNodeName + " is not a valid node. Deleting from endpoints list.\n");
+    getline(iss, nextNodeName);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
+  CoreGenNode *newNode;
+  std::istringstream iss;
+  std::string nextNodeName;
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CoreNode->SetName(BoxContents);
+
+  //set number of thread units
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
+
+  //set ISA
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  newNode = CGProject->GetISANodeByName(BoxContents);
+  if(newNode){
+    CoreNode->SetISA((CoreGenISA*)newNode);
+  }
+  else{
+    LogPane->AppendText("Could not find specified ISA. Keeping old ISA.\n");
+    savedAll = false;
+  }
+
+  //set Cache
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  newNode = CGProject->GetCacheNodeByName(BoxContents);
+  if(newNode){ 
+    CoreNode->InsertCache((CoreGenCache*)newNode);
+  }
+  else{
+    LogPane->AppendText("Could not find specified Cache. Keeping old Cache.\n");
+    savedAll = false;
+  }
+      
+  //set Register Classes
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+  BoxContents = InfoBox->GetValue().ToStdString();  
+  iss.str(BoxContents);  
+  while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
+  std::getline(iss, nextNodeName);
+  while(!iss.eof()){
+    CoreGenRegClass* N = CGProject->GetRegClassNodeByName(nextNodeName);
+    if(N) CoreNode->InsertRegClass(N);
+    else LogPane->AppendText(nextNodeName + " is not a valid Register Class. Deleting from Register Class list.\n");
+    getline(iss, nextNodeName);
+  }
+
+  //set Extensions
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+  BoxContents = InfoBox->GetValue().ToStdString();  
+  iss.str(BoxContents);
+  while( CoreNode->GetNumExt() > 0) CoreNode->DeleteExt((unsigned)0);
+  std::getline(iss, nextNodeName);
+  while(!iss.eof()){
+    CoreGenExt* N = CGProject->GetExtNodeByName(nextNodeName);
+    if(N) CoreNode->InsertExt(N);
+    else LogPane->AppendText(nextNodeName + " is not a valid Extension. Deleting from Extensions list.\n");
     getline(iss, nextNodeName);
   }
 

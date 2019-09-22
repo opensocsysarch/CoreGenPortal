@@ -132,7 +132,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   //-- endpoints
   CommEndpointSizer = new wxBoxSizer( wxHORIZONTAL );
   EndpointText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              5,
                               wxT("Endpoints"),
                               wxDefaultPosition,
                               wxSize(160,-1),
