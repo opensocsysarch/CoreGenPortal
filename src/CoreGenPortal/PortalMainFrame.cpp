@@ -3508,7 +3508,7 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   //set simd width
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(16);
   BoxContents = InfoBox->GetValue().ToStdString();
-  if(BoxContents == "" || !std::stoi(BoxContents)){
+  if(BoxContents == "" || !std::stoi(BoxContents) || std::stoi(BoxContents) == 1){
     RegNode->UnsetSIMD();
   }
   else{
@@ -3577,6 +3577,7 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
     getline(iss, nextNodeName);
   }
 
+  //build attribute int
   wxCheckBox* CheckBox;
   uint32_t Attrs = 0x00;
   CheckBox = (wxCheckBox*)InfoWin->FindWindow(9);
@@ -3603,13 +3604,40 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   if( CheckBox->GetValue() ){
     Attrs |= CoreGenReg::CGRegPC;
   }
-  RegNode->UnsetAttrs(Attrs);
-  RegNode->SetAttrs(Attrs);
-  RegNode->UnsetAttrs(Attrs);
-  RegNode->SetAttrs(Attrs);
 
   CheckBox = (wxCheckBox*)InfoWin->FindWindow(15);
-  RegNode->SetShared(CheckBox->GetValue());
+  bool isShared = CheckBox->GetValue();
+
+  //check for conflicting attributes
+  bool noConflicts = true;
+  if((Attrs & CoreGenReg::CGRegRW) && (Attrs & CoreGenReg::CGRegRO)){
+    LogPane->AppendText("A register cannot be RW and RO. Attributes will not be changed.\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
+    InfoWin->FindWindow(10)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+    noConflicts = false;
+  }
+  if((Attrs & CoreGenReg::CGRegCSR) && (Attrs & CoreGenReg::CGRegAMS)){
+    LogPane->AppendText("A register cannot be CSR and AMS. Attributes will not be changed.\n");
+    InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
+    InfoWin->FindWindow(12)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+    noConflicts = false;
+  }
+  if((Attrs & CoreGenReg::CGRegTUS) && isShared){
+    LogPane->AppendText("A register cannot be TUS and Shared. RW/RO status will not be changed.\n");
+    InfoWin->FindWindow(13)->SetForegroundColour(wxColour(255, 0, 0));
+    InfoWin->FindWindow(15)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+    noConflicts = false;
+  }
+  if(noConflicts){
+    RegNode->UnsetAttrs(Attrs);
+    RegNode->SetAttrs(Attrs);
+    RegNode->UnsetAttrs(Attrs);
+    RegNode->SetAttrs(Attrs);
+    RegNode->SetShared(isShared);
+  }
 
   return savedAll;
 }

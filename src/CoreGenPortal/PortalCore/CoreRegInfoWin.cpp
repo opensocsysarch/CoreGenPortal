@@ -122,12 +122,9 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   SIMDText->Wrap(-1);
   SIMDSizer->Add( SIMDText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
-  std::string WidthString = "";
-  int SDWidth = Reg->GetSIMDWidth();
-  if(Reg && SDWidth > 1) WidthString = std::to_string(SDWidth);
   SIMDCtrl = new wxTextCtrl( Wnd,
                             16,
-                            WidthString,
+                            Reg ? std::to_string(Reg->GetSIMDWidth()) : "",
                             wxDefaultPosition,
                             wxSize(320,25),
                             0,
