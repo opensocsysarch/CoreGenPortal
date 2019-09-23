@@ -61,7 +61,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                                  Reg ? wxString(Reg->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Reg Name") );
   RegNameSizer->Add( RegNameCtrl, 0, wxALL, 0 );
@@ -83,7 +83,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                             Reg ? wxString::Format(wxT("%i"),Reg->GetIndex()) : "",
                             wxDefaultPosition,
                             wxSize(320,25),
-                            wxTE_PROCESS_ENTER,
+                            0,
                             wxDefaultValidator,
                             wxT("Register Index") );
   RegIdxSizer->Add( RegIdxCtrl, 0, wxALL, 0 );
@@ -127,7 +127,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("Subregisters ") );
   SubRegCtrl->AppendText(wxT("NAME:START_BIT:END_BIT\n"));
