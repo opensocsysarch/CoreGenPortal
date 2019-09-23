@@ -148,7 +148,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   HCheckSizer1 = new wxBoxSizer( wxHORIZONTAL );
   //-- simd check box
   SIMDCheck = new wxCheckBox( Wnd,
-                              wxID_ANY,
+                              8,
                               wxT("SIMD Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
@@ -164,7 +164,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   //-- rw check box
   RWCheck = new wxCheckBox( Wnd,
-                              wxID_ANY,
+                              9,
                               wxT("Read/Write Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
@@ -180,7 +180,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   //-- ro check box
   ROCheck = new wxCheckBox( Wnd,
-                              wxID_ANY,
+                              10,
                               wxT("Read-Only Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
@@ -198,7 +198,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   HCheckSizer2 = new wxBoxSizer( wxHORIZONTAL );
   //-- csr check box
   CSRCheck = new wxCheckBox( Wnd,
-                              wxID_ANY,
+                              11,
                               wxT("Config Status Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
@@ -214,7 +214,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   //-- ams check box
   AMSCheck = new wxCheckBox( Wnd,
-                              wxID_ANY,
+                              12,
                               wxT("Arithmetic Machine State Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
@@ -232,7 +232,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   HCheckSizer3 = new wxBoxSizer( wxHORIZONTAL );
   //-- tus check box
   TUSCheck = new wxCheckBox( Wnd,
-                              wxID_ANY,
+                              13,
                               wxT("Thread Unit Shared Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
@@ -249,7 +249,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   //-- pc check box
   PCCheck = new wxCheckBox( Wnd,
-                              wxID_ANY,
+                              14,
                               wxT("PC Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
@@ -265,7 +265,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   //-- shared check box
   SharedCheck = new wxCheckBox( Wnd,
-                              wxID_ANY,
+                              15,
                               wxT("Shared Register"),
                               wxDefaultPosition,
                               wxDefaultSize,
@@ -282,7 +282,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
-                                      wxID_ANY,
+                                      16,
                                       wxDefaultPosition,
                                       wxDefaultSize,
                                       wxLI_HORIZONTAL );

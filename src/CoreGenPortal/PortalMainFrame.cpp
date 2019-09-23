@@ -3554,6 +3554,40 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
     getline(iss, nextNodeName);
   }
 
+  wxCheckBox* CheckBox;
+  uint32_t Attrs = 0x00;
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(9);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegRW;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(10);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegRO;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(11);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegCSR;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(12);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegAMS;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(13);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegTUS;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(14);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegPC;
+  }
+  RegNode->UnsetAttrs(Attrs);
+  RegNode->SetAttrs(Attrs);
+  RegNode->UnsetAttrs(Attrs);
+  RegNode->SetAttrs(Attrs);
+
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(15);
+  RegNode->SetShared(CheckBox->GetValue());
+
   return savedAll;
 }
 
