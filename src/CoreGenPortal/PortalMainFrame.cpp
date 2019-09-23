@@ -2851,37 +2851,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGRegC:
       savedAll = SaveRegClass(InfoWin, (CoreGenRegClass*)node);
       break;
-    case CGSoc:{
-      CoreGenSoC *SoCNode = (CoreGenSoC*)node;
-      std::istringstream iss;
-      std::string nextNodeName;
-    
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      SoCNode->SetName(BoxContents);
-      
-      //set cores
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      //clean current cores
-      while(SoCNode->GetNumCores() > 0) SoCNode->DeleteCore(SoCNode->GetCore(0));
-
-      //insert all valid cores in the user's list
-      iss.str(BoxContents);
-      std::getline(iss, nextNodeName);
-      while(!iss.eof()){
-        CoreGenCore* N = CGProject->GetCoreNodeByName(nextNodeName);
-        if(N){
-          SoCNode->InsertCore(N);
-        }
-        else{
-          LogPane->AppendText(nextNodeName + " is not a valid core. Deleting from cores list.\n");
-        }
-        getline(iss, nextNodeName);
-      }
-    }
-    break;
+    case CGSoc:
+      savedAll = SaveSoC(InfoWin, (CoreGenSoC*)node);
+      break;
     case CGSpad:{
       CoreGenSpad *SpadNode = (CoreGenSpad*)node;
      
@@ -3470,7 +3442,6 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
     savedAll = false;
   }
   
-
   //set register width
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
   BoxContents = InfoBox->GetValue().ToStdString();
@@ -3499,8 +3470,6 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
       savedAll = false;
     }
   }
-  
-  
 
   //set subregisters
   //TODO: make sure works when subregs are added/deleted
@@ -3634,7 +3603,7 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
     RegClassNode->SetName(BoxContents);
   }
   else{
-    LogPane->AppendText(BoxContents + " is not a valid Register name. Keeping old Register name\n");
+    LogPane->AppendText(BoxContents + " is not a valid Register Class name. Keeping old Register Class name\n");
     InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
@@ -3654,6 +3623,50 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
     }
     else if(nextNodeName != ""){
       LogPane->AppendText(nextNodeName + " is not a valid register. It will not be added to the registers list.\n");
+      InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+    }
+    getline(iss, nextNodeName);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  std::istringstream iss;
+  std::string nextNodeName;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    SoCNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid SoC name. Keeping old SoC name\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  //set cores
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  //clean current cores
+  while(SoCNode->GetNumCores() > 0) SoCNode->DeleteCore(SoCNode->GetCore(0));
+
+  //insert all valid cores in the user's list
+  iss.str(BoxContents);
+  std::getline(iss, nextNodeName);
+  while(!iss.eof()){
+    CoreGenCore* N = CGProject->GetCoreNodeByName(nextNodeName);
+    if(N){
+      SoCNode->InsertCore(N);
+    }
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid core. It will not be added to the cores list.\n");
       InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
     }
