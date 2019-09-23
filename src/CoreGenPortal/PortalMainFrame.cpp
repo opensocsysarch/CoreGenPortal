@@ -2845,53 +2845,8 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGPInst:
       savedAll = SavePInst(InfoWin, (CoreGenPseudoInst*)node);
       break;
-    case CGReg:{
-      CoreGenReg *RegNode = (CoreGenReg*)node;
-      std::istringstream iss;
-      std::string nextNodeName;
-
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      RegNode->SetName(BoxContents);
-          
-      //set index
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      RegNode->SetIndex(std::stoi(BoxContents));
-
-      /*
-        case 2:
-          //QUESTION: Is it by design that there's no function to change the width?
-          LogPane->AppendText("Set register width.\n");
-          break;
-      */
-      
-
-      //set subregisters
-      //TODO: make sure works when subregs are added/deleted
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      iss.str(BoxContents);
-      getline(iss, nextNodeName);
-      getline(iss, nextNodeName);
-      std::string Name;
-      unsigned startbit;
-      unsigned endbit;
-      while(!iss.eof()){
-        Name = std::strtok((char*)nextNodeName.c_str(), ":");
-        startbit = std::stoi(std::strtok(NULL, ":"));
-        endbit = std::stoi(std::strtok(NULL, ":"));
-        for(unsigned i = 0; i < RegNode->GetNumSubRegs(); i ++){
-          if(RegNode->GetSubRegNameByIndex(i) == Name){
-            RegNode->DeleteSubRegByIndex(i);
-            i--;
-          }
-        }
-        RegNode->InsertSubReg(Name, startbit, endbit);
-        getline(iss, nextNodeName);
-      }
-    }
+    case CGReg:
+      savedAll = SaveReg(InfoWin, (CoreGenReg*)node);
     break;
     case CGRegC:{
       CoreGenRegClass *RegClassNode = (CoreGenRegClass*)node;
@@ -3500,6 +3455,73 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
       InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
     }
+    getline(iss, nextNodeName);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  std::istringstream iss;
+  std::string nextNodeName;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    RegNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid register name. Keeping old register name\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+      
+  //set index
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    RegNode->SetIndex(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Register Index will not be changed\n");
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+
+  /*
+    case 2:
+      //QUESTION: Is it by design that there's no function to change the width?
+      LogPane->AppendText("Set register width.\n");
+      break;
+  */
+  
+
+  //set subregisters
+  //TODO: make sure works when subregs are added/deleted
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  iss.str(BoxContents);
+  getline(iss, nextNodeName);
+  getline(iss, nextNodeName);
+  std::string Name;
+  unsigned startbit;
+  unsigned endbit;
+  while(!iss.eof()){
+    Name = std::strtok((char*)nextNodeName.c_str(), ":");
+    startbit = std::stoi(std::strtok(NULL, ":"));
+    endbit = std::stoi(std::strtok(NULL, ":"));
+    for(unsigned i = 0; i < RegNode->GetNumSubRegs(); i ++){
+      if(RegNode->GetSubRegNameByIndex(i) == Name){
+        RegNode->DeleteSubRegByIndex(i);
+        i--;
+      }
+    }
+    RegNode->InsertSubReg(Name, startbit, endbit);
     getline(iss, nextNodeName);
   }
 

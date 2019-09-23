@@ -48,7 +48,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   // -- reg name
   RegNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RegNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   4,
                                    wxT("Register Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -70,7 +70,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   //-- reg idx
   RegIdxSizer = new wxBoxSizer( wxHORIZONTAL );
   RegIdxText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              5,
                               wxT("Register Index"),
                               wxDefaultPosition,
                               wxSize(160, -1),
@@ -92,7 +92,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   //-- width
   WidthSizer = new wxBoxSizer( wxHORIZONTAL );
   WidthText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              6,
                               wxT("Register Width (in bits)"),
                               wxDefaultPosition,
                               wxSize(160, -1),
@@ -114,7 +114,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   //-- subregs
   SubRegSizer = new wxBoxSizer( wxHORIZONTAL );
   SubRegText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              7,
                               wxT("Subregister Fields"),
                               wxDefaultPosition,
                               wxSize(160, -1),
