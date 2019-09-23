@@ -194,6 +194,7 @@ private:
   bool SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode);
   bool SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode);
   bool SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassNode);
+  bool SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode);
   bool IsInteger(std::string TestString);
   bool HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache);
 };

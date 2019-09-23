@@ -42,7 +42,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   //-- soc name
   SoCNameSizer = new wxBoxSizer( wxHORIZONTAL );
   SocNameText = new wxStaticText(this,
-                                 wxID_ANY,
+                                 2,
                                  wxT("SoC Name"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -56,7 +56,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
                                Soc ? wxString(Soc->GetName()) : "",
                                wxDefaultPosition,
                                wxSize(320,25),
-                               wxTE_PROCESS_ENTER,
+                               0,
                                wxDefaultValidator,
                                wxT("SoC Name") );
   SoCNameSizer->Add( SocNameCtrl, 0, wxALL, 0 );
@@ -65,7 +65,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   //-- core name
   CoreNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CoreNameText = new wxStaticText(this,
-                                 wxID_ANY,
+                                 3,
                                  wxT("Cores"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -79,7 +79,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
                                wxEmptyString,
                                wxDefaultPosition,
                                wxSize(320,100),
-                               wxTE_MULTILINE|wxTE_PROCESS_ENTER,
+                               wxTE_MULTILINE|wxHSCROLL,
                                wxDefaultValidator,
                                wxT("Cores") );
   if(Soc){
