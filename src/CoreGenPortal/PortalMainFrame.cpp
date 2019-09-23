@@ -3013,27 +3013,26 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     
     
 
-
-  // write out the new IR file
-  //CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
-  
-  std::string tempName = std::string(IRFileName.mb_str()) + "tmp";
-  CGProject->WriteIR(tempName);
-  std::string FName = static_cast<const char*>(IRFileName.c_str());
-  std::string NodeName = node->GetName();
-  CloseProject(true);
-  std::remove(FName.c_str());
-  std::rename(tempName.c_str(), FName.c_str());
-  std::remove(tempName.c_str());
-  ModuleBox->DeleteAllItems();
-  TreeItems.clear();
-  NodeItems.clear();
-  SetupModuleBox();
-  OpenProject(IRFileName, true);
-  //LoadModuleBox();
-  
-  if(savedAll)
+  if(savedAll){
+    // write out the new IR file
+    std::string tempName = std::string(IRFileName.mb_str()) + "tmp";
+    CGProject->WriteIR(tempName);
+    std::string FName = static_cast<const char*>(IRFileName.c_str());
+    std::string NodeName = node->GetName();
+    CloseProject(true);
+    std::remove(FName.c_str());
+    std::rename(tempName.c_str(), FName.c_str());
+    std::remove(tempName.c_str());
+    ModuleBox->DeleteAllItems();
+    TreeItems.clear();
+    NodeItems.clear();
+    SetupModuleBox();
+    OpenProject(IRFileName, true);
     LogPane->AppendText("Updated " + NodeName + ".\n");
+  }
+  else{
+    LogPane->AppendText("Errors detected. Changes will not be saved to file until all fields are correct.\n");
+  }
   return savedAll;
 }
 
