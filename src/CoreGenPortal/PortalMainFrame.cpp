@@ -3493,12 +3493,17 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   }
   
 
-  /*
-    case 2:
-      //QUESTION: Is it by design that there's no function to change the width?
-      LogPane->AppendText("Set register width.\n");
-      break;
-  */
+  //set register width
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    RegNode->SetWidth(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Register Width will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
   
 
   //set subregisters

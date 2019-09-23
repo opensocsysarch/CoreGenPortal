@@ -105,7 +105,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
                             Reg ? wxString::Format(wxT("%i"),Reg->GetWidth()): "",
                             wxDefaultPosition,
                             wxSize(320,25),
-                            wxTE_READONLY,
+                            0,
                             wxDefaultValidator,
                             wxT("Register Width") );
   WidthSizer->Add( WidthCtrl, 0, wxALL, 0 );
