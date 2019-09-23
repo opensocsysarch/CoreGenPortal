@@ -3704,7 +3704,7 @@ bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
-    SpadNode->SetStartAddr(std::stoi(BoxContents));
+    SpadNode->SetStartAddr(std::stoull(BoxContents));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Response ports will not be changed\n");

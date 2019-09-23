@@ -147,7 +147,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
   // TODO: print this in hex
   wxString tmp;
   if(Spad){
-    wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
+    tmp = wxString::Format("%" wxLongLongFmtSpec "u",
                                   Spad->GetStartAddr() );
   }
   else{
