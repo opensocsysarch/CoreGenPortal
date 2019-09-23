@@ -2896,6 +2896,7 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     CacheNode->SetName(BoxContents);
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
@@ -2908,6 +2909,7 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     CacheNode->SetSets(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Cache sets will not be changed\n");
@@ -2920,6 +2922,7 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     CacheNode->SetWays(std::stoi(BoxContents));
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Cache ways will not be changed\n");
@@ -2938,6 +2941,7 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
        savedAll = false;
     }
     else {
+      InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
       CoreGenCache *OldChild = CacheNode->GetSubCache();
       if(OldChild){
         OldChild->DeleteParentCache(CacheNode);
@@ -2949,6 +2953,7 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
   }
   else if(BoxContents == ""){
     CoreGenCache* OldChild = CacheNode->GetSubCache();
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
     if(OldChild){
       OldChild->DeleteParentCache(CacheNode);
       CacheNode->SetNullChildCache();
