@@ -3505,23 +3505,52 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   //TODO: make sure works when subregs are added/deleted
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
   BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";
   iss.str(BoxContents);
   getline(iss, nextNodeName);
   getline(iss, nextNodeName);
   std::string Name;
-  unsigned startbit;
-  unsigned endbit;
+  std::string startbit;
+  std::string endbit;
+  unsigned i;
+  while(RegNode->GetNumSubRegs() > 0) RegNode->DeleteSubRegByIndex(0);
   while(!iss.eof()){
-    Name = std::strtok((char*)nextNodeName.c_str(), ":");
-    startbit = std::stoi(std::strtok(NULL, ":"));
-    endbit = std::stoi(std::strtok(NULL, ":"));
-    for(unsigned i = 0; i < RegNode->GetNumSubRegs(); i ++){
-      if(RegNode->GetSubRegNameByIndex(i) == Name){
-        RegNode->DeleteSubRegByIndex(i);
-        i--;
-      }
+    //clear strings
+    Name = "";
+    startbit = "";
+    endbit = "";
+
+    //extract name and start/end bit
+    for(i = 0; i < nextNodeName.size() && nextNodeName[i] != ':'; i++){
+      Name += nextNodeName[i];
     }
-    RegNode->InsertSubReg(Name, startbit, endbit);
+    i++;
+    for(; i < nextNodeName.size() && nextNodeName[i] != ':'; i++){
+      startbit += nextNodeName[i];
+    }
+    i++;
+    for(; i < nextNodeName.size() && nextNodeName[i] != ':'; i++){
+      endbit += nextNodeName[i];
+    }
+
+    if(Name == ""){
+      LogPane->AppendText("Name can not be empty. Subregister will not be added to the subregisters list.\n");
+      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      getline(iss, nextNodeName);
+      continue;
+    }
+
+    //make sure start and end bit are integers
+    if(!IsInteger(startbit) || !IsInteger(endbit)){
+      LogPane->AppendText("Start and end bit must be integers. " + Name + " will not be added to the subregisters list.\n");
+      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      getline(iss, nextNodeName);
+      continue;
+    }
+    RegNode->InsertSubReg(Name, std::stoi(startbit), std::stoi(endbit));
     getline(iss, nextNodeName);
   }
 
@@ -3529,6 +3558,8 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
 }
 
 bool PortalMainFrame::IsInteger(std::string TestString){
+  if(TestString == "") return false;
+
   for(unsigned i = 0; i < TestString.size(); i++)
     if(!std::isdigit(TestString[i])) return false;
   
