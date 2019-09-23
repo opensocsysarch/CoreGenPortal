@@ -2812,11 +2812,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
                                    CoreGenNode *node,
                                    CGNodeType InfoWinType){
   // get the box contents
-  bool savedAll = true;
+  bool savedAll;
   //bool createNewNode = false;
   //if(!node) createNewNode = true;
-  wxTextCtrl *InfoBox;
-  std::string BoxContents;
 
   // TODO: handle invalid inputs
   // update yaml
@@ -2857,14 +2855,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGSpad:
       savedAll = SaveSpad(InfoWin, (CoreGenSpad*)node);
       break;
-    case CGVTP:{
-      CoreGenVTP *VTPNode = (CoreGenVTP*)node;
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      VTPNode->SetName(BoxContents);
-    }
-    break;
+    case CGVTP:
+      savedAll = SaveVTP(InfoWin, (CoreGenVTP*)node);
+      break;
   }
     
     
@@ -3714,6 +3707,26 @@ bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
   //TODO: get this working
   //LogPane->AppendText("Change start addr.\n");
   //SpadNode->SetStartAddr();
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveVTP(wxDialog* InfoWin, CoreGenVTP* VTPNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    VTPNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid VTP name. Keeping old VTP name\n");
+    InfoWin->FindWindow(1)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
 
   return savedAll;
 }
