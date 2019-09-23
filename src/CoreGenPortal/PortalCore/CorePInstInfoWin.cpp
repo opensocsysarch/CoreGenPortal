@@ -48,7 +48,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
   //-- pseudo inst name
   PInstNameSizer = new wxBoxSizer( wxHORIZONTAL );
   PInstNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   4,
                                    wxT("Pseudo Instruction Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -61,7 +61,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
                                  PInst ? wxString(PInst->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Inst Name") );
   PInstNameSizer->Add( PInstNameCtrl, 0, wxALL, 0 );
@@ -70,7 +70,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
   //-- inst name
   InstNameSizer = new wxBoxSizer( wxHORIZONTAL );
   InstNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   5,
                                    wxT("Target Instruction Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -83,7 +83,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
                                  PInst ? wxString(PInst->GetInst()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Inst Name") );
   InstNameSizer->Add( InstNameCtrl, 0, wxALL, 0 );
