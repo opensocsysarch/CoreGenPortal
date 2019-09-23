@@ -48,7 +48,7 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
   //-- memory controller name
   NameSizer = new wxBoxSizer( wxHORIZONTAL );
   VTPNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   1,
                                    wxT("VTP Controller Name"),
                                    wxDefaultPosition,
                                    wxDefaultSize,
@@ -61,7 +61,7 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
                             VTP ? wxString(VTP->GetName()) : "",
                             wxDefaultPosition,
                             wxSize(320,25),
-                            wxTE_PROCESS_ENTER,
+                            0,
                             wxDefaultValidator,
                             wxT("VTPName") );
   NameSizer->Add( VTPCtrl, 0, wxALL, 0 );
