@@ -3385,7 +3385,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if (BoxContents[BoxContents.size()-1] != '\n')
     BoxContents += "\n"; 
-  CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+  //CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
   std::string Field;
   std::string op;
   int Value;
@@ -3401,10 +3401,12 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
       LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
       InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
-    } 
+    }
+    /*
     else if(PInst){
       PInst->SetEncoding(Field, Value);
     }
+    */
     getline(iss, nextNodeName);
   }
 
@@ -3447,6 +3449,8 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
   wxTextCtrl *InfoBox;
   std::string BoxContents;
   bool savedAll = true;
+  std::istringstream iss;
+  std::string nextNodeName;
 
   //set name
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
@@ -3473,6 +3477,30 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
     LogPane->AppendText("Could not find specified Instruction. Keeping old Instruction.\n");
     InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
+  }
+
+  //set encodings
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n"; 
+  std::string Field;
+  std::string op;
+  int Value;
+  PInstNode->ClearEncodings();
+  iss.str(BoxContents);
+  getline(iss, nextNodeName);
+  while(!iss.eof()){
+    std::stringstream encodingStream(nextNodeName);
+    encodingStream >> Field;
+    encodingStream >> op;
+    encodingStream >> Value;
+    if(!PInstNode->SetEncoding(Field, Value)){
+      LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
+      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+    }
+    getline(iss, nextNodeName);
   }
 
   return savedAll;

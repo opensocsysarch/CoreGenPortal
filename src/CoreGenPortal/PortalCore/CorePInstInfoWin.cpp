@@ -92,7 +92,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
   //-- isa name
   ISANameSizer = new wxBoxSizer( wxHORIZONTAL );
   ISANameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   6,
                                    wxT("Instruction Set"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -114,7 +114,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
   //-- encodings
   EncodingSizer = new wxBoxSizer( wxHORIZONTAL );
   EncText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              7,
                               wxT("Instruction Field Encodings"),
                               wxDefaultPosition,
                               wxSize(160,-1),
@@ -127,7 +127,7 @@ CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("StoneCutter") );
   if(PInst){
