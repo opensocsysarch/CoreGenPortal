@@ -2847,32 +2847,10 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       break;
     case CGReg:
       savedAll = SaveReg(InfoWin, (CoreGenReg*)node);
-    break;
-    case CGRegC:{
-      CoreGenRegClass *RegClassNode = (CoreGenRegClass*)node;
-      std::istringstream iss;
-      std::string nextNodeName;
-      
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      RegClassNode->SetName(BoxContents);
-      
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      iss.str(BoxContents);
-      //clear current registers
-      while(RegClassNode->GetNumReg() > 0) RegClassNode->DeleteChild(RegClassNode->GetChild(0));
-      std::getline(iss, nextNodeName);
-      while(!iss.eof()){
-        CoreGenReg* N = CGProject->GetRegNodeByName(nextNodeName);
-        if(N) RegClassNode->InsertReg(N);
-        else LogPane->AppendText(nextNodeName + " is not a valid register. Deleting from registers list.\n");
-        getline(iss, nextNodeName);
-      }
-    }
-    break;
+      break;
+    case CGRegC:
+      savedAll = SaveRegClass(InfoWin, (CoreGenRegClass*)node);
+      break;
     case CGSoc:{
       CoreGenSoC *SoCNode = (CoreGenSoC*)node;
       std::istringstream iss;
@@ -3637,6 +3615,49 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
     RegNode->UnsetAttrs(Attrs);
     RegNode->SetAttrs(Attrs);
     RegNode->SetShared(isShared);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  std::istringstream iss;
+  std::string nextNodeName;
+  bool savedAll = true;
+  
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    RegClassNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid Register name. Keeping old Register name\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  iss.str(BoxContents);
+  //clear current registers
+  while(RegClassNode->GetNumReg() > 0) RegClassNode->DeleteChild(RegClassNode->GetChild(0));
+  std::getline(iss, nextNodeName);
+  while(!iss.eof()){
+    CoreGenReg* N = CGProject->GetRegNodeByName(nextNodeName);
+    if(N){
+      RegClassNode->InsertReg(N);
+    }
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid register. It will not be added to the registers list.\n");
+      InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+    }
+    getline(iss, nextNodeName);
   }
 
   return savedAll;
