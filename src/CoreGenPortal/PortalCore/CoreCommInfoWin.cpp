@@ -14,7 +14,6 @@
 wxBEGIN_EVENT_TABLE(CoreCommInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreCommInfoWin::OnPressOk)
   EVT_BUTTON(wxID_SAVE, CoreCommInfoWin::OnSave)
-  EVT_TEXT_ENTER(wxID_ANY, CoreCommInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
@@ -70,7 +69,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   //-- comm type
   CommTypeSizer = new wxBoxSizer( wxHORIZONTAL );
   CommTypeText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   5,
                                    wxT("Comm Node Type"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -110,7 +109,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   //-- width
   CommWidthSizer = new wxBoxSizer( wxHORIZONTAL );
   WidthText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   6,
                                    wxT("Comm Channel Width"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -132,7 +131,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   //-- endpoints
   CommEndpointSizer = new wxBoxSizer( wxHORIZONTAL );
   EndpointText = new wxStaticText( Wnd,
-                              5,
+                              7,
                               wxT("Endpoints"),
                               wxDefaultPosition,
                               wxSize(160,-1),
@@ -199,11 +198,6 @@ void CoreCommInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
   if(PMF->OnSave(this, this->CommNode, CGComm))
     this->EndModal(wxID_SAVE);
-}
-
-void CoreCommInfoWin::OnPressEnter( wxCommandEvent& enter ){
-  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->CommNode, CGComm);
 }
 
 CoreCommInfoWin::~CoreCommInfoWin(){

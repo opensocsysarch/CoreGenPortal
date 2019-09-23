@@ -2981,6 +2981,7 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     CommNode->SetName(BoxContents);
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
@@ -3007,7 +3008,15 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
   //set width
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
   BoxContents = InfoBox->GetValue().ToStdString();
-  CommNode->SetWidth(std::stoi(BoxContents));
+  if(IsInteger(BoxContents)){
+    CommNode->SetWidth(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Comm width will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
 
   //set endpoints
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
@@ -3016,12 +3025,22 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
   std::string nextNodeName;
   while( CommNode->GetNumEndpoints() > 0) CommNode->DeleteEndpoint((unsigned)0);
   std::getline(iss, nextNodeName);
+  bool allValid = true;
   while(!iss.eof()){
     CoreGenNode* N = CGProject->GetNodeByName(nextNodeName);
-    if(N) CommNode->InsertEndpoint(N);
-    else LogPane->AppendText(nextNodeName + " is not a valid node. Deleting from endpoints list.\n");
+    if(N){
+      CommNode->InsertEndpoint(N);
+    }
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid node. It will not be added to the endpoints list.\n");
+      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+    }
     getline(iss, nextNodeName);
   }
+
+  if(allValid) InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
 
   return savedAll;
 }
