@@ -2854,38 +2854,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGSoc:
       savedAll = SaveSoC(InfoWin, (CoreGenSoC*)node);
       break;
-    case CGSpad:{
-      CoreGenSpad *SpadNode = (CoreGenSpad*)node;
-     
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      SpadNode->SetName(BoxContents);
-    
-      //set mem size
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      SpadNode->SetMemSize(std::stoi(BoxContents));
-      
-      //set request ports
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      SpadNode->SetRqstPorts(std::stoi(BoxContents));
-      
-      //set response ports
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      SpadNode->SetRspPorts(std::stoi(BoxContents));
-
-
-      //set start addr
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      //TODO: get this working
-      LogPane->AppendText("Change start addr.\n");
-      //SpadNode->SetStartAddr();
-    }
-    break;
+    case CGSpad:
+      savedAll = SaveSpad(InfoWin, (CoreGenSpad*)node);
+      break;
     case CGVTP:{
       CoreGenVTP *VTPNode = (CoreGenVTP*)node;
       //set name
@@ -3672,6 +3643,77 @@ bool PortalMainFrame::SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode){
     }
     getline(iss, nextNodeName);
   }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    SpadNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid SoC name. Keeping old SoC name\n");
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set mem size
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    SpadNode->SetMemSize(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Mem size will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  //set request ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    SpadNode->SetRqstPorts(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Request ports will not be changed\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  //set response ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    SpadNode->SetRspPorts(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Response ports will not be changed\n");
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set start addr
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    SpadNode->SetStartAddr(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Response ports will not be changed\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  //TODO: get this working
+  //LogPane->AppendText("Change start addr.\n");
+  //SpadNode->SetStartAddr();
 
   return savedAll;
 }
