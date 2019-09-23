@@ -2842,29 +2842,9 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGMCtrl:
       savedAll = SaveMCtrl(InfoWin, (CoreGenMCtrl*)node);
     break;
-    case CGPInst:{
-      CoreGenPseudoInst *PInstNode = (CoreGenPseudoInst*)node;
-
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      PInstNode->SetName(BoxContents);
-
-      //set target instruction
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      CoreGenInst *newNode = CGProject->GetInstNodeByName(BoxContents);
-      if(newNode){
-        //TODO fix this inst
-        //PInstNode->SetTargetInst(newNode);
-        LogPane->AppendText("Set Target Instruction.\n");
-      }
-      else{
-        LogPane->AppendText("Could not find specified Instruction. Keeping old Instruction.\n");
-        savedAll = true;
-      }
-    }
-    break;
+    case CGPInst:
+      savedAll = SavePInst(InfoWin, (CoreGenPseudoInst*)node);
+      break;
     case CGReg:{
       CoreGenReg *RegNode = (CoreGenReg*)node;
       std::istringstream iss;
@@ -3439,7 +3419,7 @@ bool PortalMainFrame::SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode){
   //set name
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
   BoxContents = InfoBox->GetValue().ToStdString();
- if(CGProject->IsValidName(BoxContents)){
+  if(CGProject->IsValidName(BoxContents)){
     MCtrlNode->SetName(BoxContents);
   }
   else{
@@ -3457,6 +3437,41 @@ bool PortalMainFrame::SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode){
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Input ports will not be changed\n");
     InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    PInstNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid pseudo-instruction name. Keeping old pseudo-instruction name\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set target instruction
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CoreGenInst *newNode = CGProject->GetInstNodeByName(BoxContents);
+  if(newNode){
+    PInstNode->SetNullInst();
+    PInstNode->SetTargetInst(newNode);
+    PInstNode->SetISA(newNode->GetISA());
+  }
+  else{
+    LogPane->AppendText("Could not find specified Instruction. Keeping old Instruction.\n");
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
 
