@@ -48,7 +48,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
   //-- memory controller name
   MCtrlNameSizer = new wxBoxSizer( wxHORIZONTAL );
   MCtrlNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   2,
                                    wxT("Memory Controller Name"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -61,7 +61,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
                               MCtrl ? wxString(MCtrl->GetName()) : "",
                               wxDefaultPosition,
                               wxSize(320,25),
-                              wxTE_PROCESS_ENTER,
+                              0,
                               wxDefaultValidator,
                               wxT("MCtrlName") );
   MCtrlNameSizer->Add( MCtrlCtrl, 0, wxALL, 0 );
@@ -70,7 +70,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
   //-- input ports
   InputPortSizer = new wxBoxSizer( wxHORIZONTAL );
   InputPortText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   3,
                                    wxT("Input Ports"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -83,7 +83,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
                                   MCtrl ? wxString::Format(wxT("%i"),MCtrl->GetNumInputPorts()) : "",
                                   wxDefaultPosition,
                                   wxSize(320,25),
-                                  wxTE_PROCESS_ENTER,
+                                  0,
                                   wxDefaultValidator,
                                   wxT("InputPorts") );
   InputPortSizer->Add( InputPortCtrl, 0, wxALL, 0 );

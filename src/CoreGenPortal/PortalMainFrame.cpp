@@ -2839,19 +2839,8 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     case CGInst:
       savedAll = SaveInst(InfoWin, (CoreGenInst*)node);
       break;
-    case CGMCtrl:{
-      CoreGenMCtrl *MCtrlNode = (CoreGenMCtrl*)node;
-      
-      //set name
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      MCtrlNode->SetName(BoxContents);
-      
-      //set input ports
-      InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
-      BoxContents = InfoBox->GetValue().ToStdString();
-      MCtrlNode->SetNumInputPorts(std::stoi(BoxContents));
-    }
+    case CGMCtrl:
+      savedAll = SaveMCtrl(InfoWin, (CoreGenMCtrl*)node);
     break;
     case CGPInst:{
       CoreGenPseudoInst *PInstNode = (CoreGenPseudoInst*)node;
@@ -3438,6 +3427,38 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
       PInst->SetEncoding(Field, Value);
     }
     getline(iss, nextNodeName);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+ if(CGProject->IsValidName(BoxContents)){
+    MCtrlNode->SetName(BoxContents);
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set input ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    MCtrlNode->SetNumInputPorts(std::stoi(BoxContents));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Input ports will not be changed\n");
+    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
   }
 
   return savedAll;

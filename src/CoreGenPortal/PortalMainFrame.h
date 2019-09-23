@@ -190,6 +190,7 @@ private:
   bool SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode);
   bool SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode);
   bool SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode);
+  bool SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode);
   bool IsInteger(std::string TestString);
   bool HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache);
 };
