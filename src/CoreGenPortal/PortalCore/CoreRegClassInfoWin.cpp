@@ -48,7 +48,7 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
   // -- reg class
   RegClassNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RegClassNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   2,
                                    wxT("Register Class Name"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -61,7 +61,7 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                                  RegClass ? wxString(RegClass->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Reg Class Name") );
   RegClassNameSizer->Add( RegClassNameCtrl, 0, wxALL, 0 );
@@ -70,7 +70,7 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
   //-- registers
   RegNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RegNameText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              3,
                               wxT("Registers"),
                               wxDefaultPosition,
                               wxSize(160,-1),
@@ -83,7 +83,7 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("registers") );
   if(RegClass){
