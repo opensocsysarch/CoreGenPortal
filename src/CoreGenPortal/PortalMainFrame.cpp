@@ -3504,6 +3504,24 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
     InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
+
+  //set simd width
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(16);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(BoxContents == "" || !std::stoi(BoxContents)){
+    RegNode->UnsetSIMD();
+  }
+  else{
+    if(IsInteger(BoxContents)){
+    RegNode->SetSIMD(std::stoi(BoxContents));
+    }
+    else{
+      LogPane->AppendText(BoxContents + " is not an integer. SIMD data will not be changed\n");
+      InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+    }
+  }
+  
   
 
   //set subregisters

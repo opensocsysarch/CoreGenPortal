@@ -111,6 +111,31 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   WidthSizer->Add( WidthCtrl, 0, wxALL, 0 );
   InnerSizer->Add( WidthSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
+  //-- simd 
+  SIMDSizer = new wxBoxSizer( wxHORIZONTAL );
+  SIMDText = new wxStaticText( Wnd,
+                              8,
+                              wxT("SIMD Width (in bits)"),
+                              wxDefaultPosition,
+                              wxSize(160, -1),
+                              0 );
+  SIMDText->Wrap(-1);
+  SIMDSizer->Add( SIMDText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+
+  std::string WidthString = "";
+  int SDWidth = Reg->GetSIMDWidth();
+  if(Reg && SDWidth > 1) WidthString = std::to_string(SDWidth);
+  SIMDCtrl = new wxTextCtrl( Wnd,
+                            16,
+                            WidthString,
+                            wxDefaultPosition,
+                            wxSize(320,25),
+                            0,
+                            wxDefaultValidator,
+                            wxT("Register Width") );
+  SIMDSizer->Add( SIMDCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( SIMDSizer, 0, wxALIGN_CENTER|wxALL, 5 );
+
   //-- subregs
   SubRegSizer = new wxBoxSizer( wxHORIZONTAL );
   SubRegText = new wxStaticText( Wnd,
@@ -146,21 +171,15 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   InnerSizer->Add( SubRegSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   HCheckSizer1 = new wxBoxSizer( wxHORIZONTAL );
-  //-- simd check box
-  SIMDCheck = new wxCheckBox( Wnd,
-                              8,
-                              wxT("SIMD Register"),
-                              wxDefaultPosition,
-                              wxDefaultSize,
-                              wxALIGN_RIGHT,
-                              wxDefaultValidator,
-                              wxT("SIMDREGISTER") );
+  
+  /*
   if( Reg && Reg->IsSIMD() )
     SIMDCheck->SetValue(true);
   else
     SIMDCheck->SetValue(false);
 
   HCheckSizer1->Add(SIMDCheck, 0, wxALL, 0);
+  */
 
   //-- rw check box
   RWCheck = new wxCheckBox( Wnd,
@@ -282,7 +301,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
-                                      16,
+                                      wxID_ANY,
                                       wxDefaultPosition,
                                       wxDefaultSize,
                                       wxLI_HORIZONTAL );

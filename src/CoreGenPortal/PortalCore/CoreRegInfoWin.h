@@ -62,6 +62,7 @@ protected:
   wxBoxSizer *RegIdxSizer;        ///< register index sizer
   wxBoxSizer *WidthSizer;         ///< register width sizer
   wxBoxSizer *SubRegSizer;        ///< subreg sizer
+  wxBoxSizer *SIMDSizer;          ///< SIMD width sizer
   wxBoxSizer *HCheckSizer1;       ///< first horizontal checkbox sizer 
   wxBoxSizer *HCheckSizer2;       ///< second horizontal checkbox sizer
   wxBoxSizer *HCheckSizer3;       ///< third horizontal checkbox sizer
@@ -73,13 +74,14 @@ protected:
   wxStaticText *RegIdxText;       ///< static text for reg idx
   wxStaticText *WidthText;        ///< static text for width
   wxStaticText *SubRegText;       ///< static text for sub registers
+  wxStaticText *SIMDText;         ///< static text for SIMD width
 
   wxTextCtrl *RegNameCtrl;        ///< reg name ctrl
   wxTextCtrl *RegIdxCtrl;         ///< reg idx ctrl
   wxTextCtrl *WidthCtrl;          ///< reg width ctrl
   wxTextCtrl *SubRegCtrl;         ///< sub register ctrl
+  wxTextCtrl *SIMDCtrl;           ///< SIMD width ctrl
 
-  wxCheckBox *SIMDCheck;          ///< simd reg check box
   wxCheckBox *RWCheck;            ///< rw reg check box
   wxCheckBox *ROCheck;            ///< ro reg check box
   wxCheckBox *CSRCheck;           ///< csr reg check box
