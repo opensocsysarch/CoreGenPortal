@@ -48,7 +48,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
   //-- spad name
   SpadNameSizer = new wxBoxSizer( wxHORIZONTAL );
   SpadNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   5,
                                    wxT("Scratchpad Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -61,7 +61,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
                                  Spad ? wxString(Spad->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("SpadName") );
   SpadNameSizer->Add( SpadNameCtrl, 0, wxALL, 0 );
@@ -70,7 +70,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
   //-- scratchpad size
   SizeNameSizer = new wxBoxSizer( wxHORIZONTAL );
   SizeNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   6,
                                    wxT("Scratchpad Size (bytes)"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -83,7 +83,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
                              Spad ? wxString::Format(wxT("%i"),Spad->GetMemSize()) : "",
                              wxDefaultPosition,
                              wxSize(320,25),
-                             wxTE_PROCESS_ENTER,
+                             0,
                              wxDefaultValidator,
                              wxT("SpadSize") );
   SizeNameSizer->Add( SizeCtrl, 0, wxALL, 0 );
@@ -92,7 +92,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
   //-- request ports
   RqstNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RqstNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   7,
                                    wxT("Request Ports"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -105,7 +105,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
                              Spad ? wxString::Format(wxT("%i"),Spad->GetRqstPorts()) : "",
                              wxDefaultPosition,
                              wxSize(320,25),
-                             wxTE_PROCESS_ENTER,
+                             0,
                              wxDefaultValidator,
                              wxT("RqstPorts") );
   RqstNameSizer->Add( RqstCtrl, 0, wxALL, 0 );
@@ -114,7 +114,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
   //-- response ports
   RspNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RspNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   8,
                                    wxT("Response Ports"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -127,7 +127,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
                             Spad ? wxString::Format(wxT("%i"),Spad->GetRspPorts()) : "",
                             wxDefaultPosition,
                             wxSize(320,25),
-                            wxTE_PROCESS_ENTER,
+                            0,
                             wxDefaultValidator,
                             wxT("RspPorts") );
   RspNameSizer->Add( RspCtrl, 0, wxALL, 0 );
@@ -136,7 +136,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
   //-- starting address
   StartNameSizer = new wxBoxSizer( wxHORIZONTAL );
   StartNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   9,
                                    wxT("Starting Mem Address"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -158,7 +158,7 @@ CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
                             tmp,
                             wxDefaultPosition,
                             wxSize(320,25),
-                            wxTE_PROCESS_ENTER,
+                            0,
                             wxDefaultValidator,
                             wxT("StartAddr") );
   StartNameSizer->Add( StartCtrl, 0, wxALL, 0 );
