@@ -3675,7 +3675,7 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
   }
 
   if(allValid) InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
-  
+
   return savedAll;
 }
 
@@ -3691,6 +3691,7 @@ bool PortalMainFrame::SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     SoCNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid SoC name. Keeping old SoC name\n");
@@ -3707,6 +3708,7 @@ bool PortalMainFrame::SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode){
   //insert all valid cores in the user's list
   iss.str(BoxContents);
   std::getline(iss, nextNodeName);
+  bool allValid = true;
   while(!iss.eof()){
     CoreGenCore* N = CGProject->GetCoreNodeByName(nextNodeName);
     if(N){
@@ -3716,9 +3718,12 @@ bool PortalMainFrame::SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode){
       LogPane->AppendText(nextNodeName + " is not a valid core. It will not be added to the cores list.\n");
       InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
+      allValid = false;
     }
     getline(iss, nextNodeName);
   }
+
+  if(allValid) InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
 
   return savedAll;
 }
