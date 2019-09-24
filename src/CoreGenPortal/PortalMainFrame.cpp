@@ -3171,6 +3171,7 @@ bool PortalMainFrame::SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     ExtNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
