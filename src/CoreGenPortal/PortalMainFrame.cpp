@@ -3374,6 +3374,7 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     PInstNode->SetName(BoxContents);
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid pseudo-instruction name. Keeping old pseudo-instruction name\n");
@@ -3389,6 +3390,7 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
     PInstNode->SetNullInst();
     PInstNode->SetTargetInst(newNode);
     PInstNode->SetISA(newNode->GetISA());
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText("Could not find specified Instruction. Keeping old Instruction.\n");
@@ -3407,6 +3409,7 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
   PInstNode->ClearEncodings();
   iss.str(BoxContents);
   getline(iss, nextNodeName);
+  bool allValid = true;
   while(!iss.eof()){
     std::stringstream encodingStream(nextNodeName);
     encodingStream >> Field;
@@ -3416,9 +3419,12 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
       LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
       InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
+      allValid = false;
     }
     getline(iss, nextNodeName);
   }
+
+  if(allValid) InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
 
   return savedAll;
 }

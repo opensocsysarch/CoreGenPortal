@@ -14,7 +14,6 @@
 wxBEGIN_EVENT_TABLE(CorePInstInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CorePInstInfoWin::OnPressOk)
   EVT_BUTTON(wxID_SAVE, CorePInstInfoWin::OnSave)
-  EVT_TEXT_ENTER(wxID_ANY, CorePInstInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CorePInstInfoWin::CorePInstInfoWin( wxWindow* parent,
@@ -179,11 +178,6 @@ void CorePInstInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
   if(PMF->OnSave(this, this->PInstNode, CGPInst))
     this->EndModal(wxID_SAVE);
-}
-
-void CorePInstInfoWin::OnPressEnter(wxCommandEvent& enter){
-  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->PInstNode, CGPInst);
 }
 
 CorePInstInfoWin::~CorePInstInfoWin(){
