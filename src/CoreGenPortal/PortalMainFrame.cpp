@@ -3338,6 +3338,7 @@ bool PortalMainFrame::SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     MCtrlNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
@@ -3350,6 +3351,7 @@ bool PortalMainFrame::SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     MCtrlNode->SetNumInputPorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Input ports will not be changed\n");

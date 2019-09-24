@@ -82,9 +82,6 @@ private:
   /// handles the 'ok' button press
   void OnPressOk( wxCommandEvent& event );
 
-  /// handles 'enter' press in textctrl box
-  void OnPressEnter( wxCommandEvent& event);
-
   /// handles 'save' click
   void OnSave( wxCommandEvent& save );
 };
