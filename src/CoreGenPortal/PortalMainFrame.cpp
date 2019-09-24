@@ -3058,6 +3058,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     CoreNode->SetName(BoxContents);
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
@@ -3070,6 +3071,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Thread Units will not be changed\n");
@@ -3083,6 +3085,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   newNode = CGProject->GetISANodeByName(BoxContents);
   if(newNode){
     CoreNode->SetISA((CoreGenISA*)newNode);
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText("Could not find specified ISA. Keeping old ISA.\n");
@@ -3096,6 +3099,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   newNode = CGProject->GetCacheNodeByName(BoxContents);
   if(newNode){ 
     CoreNode->InsertCache((CoreGenCache*)newNode);
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText("Could not find specified Cache. Keeping old Cache.\n");
@@ -3106,6 +3110,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   //set Register Classes
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
   BoxContents = InfoBox->GetValue().ToStdString();
+  bool allValid = true;
   if (BoxContents[BoxContents.size()-1] != '\n')
     BoxContents += "\n";  
   iss.str(BoxContents);  
@@ -3120,13 +3125,17 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
       LogPane->AppendText(nextNodeName + " is not a valid Register Class. It will not be added to the Register Class list.\n");
       InfoWin->FindWindow(10)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
+      allValid = false;
     } 
     getline(iss, nextNodeName);
   }
 
+  if(allValid) InfoWin->FindWindow(10)->SetForegroundColour(wxColour(0, 0, 0));
+
   //set Extensions
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
   BoxContents = InfoBox->GetValue().ToStdString() + "\n";
+  allValid = true;
   if (BoxContents[BoxContents.size()-1] != '\n')
     BoxContents += "\n";
   iss.clear();  
@@ -3142,9 +3151,12 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
       LogPane->AppendText(nextNodeName + " is not a valid Extension. It will not be added to the Extension list.\n");
       InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
+      allValid = false;
     } 
     getline(iss, nextNodeName);
   }
+
+  if(allValid) InfoWin->FindWindow(11)->SetForegroundColour(wxColour(0, 0, 0));
 
   return savedAll;
 }

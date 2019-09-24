@@ -93,8 +93,6 @@ private:
   /// handles the 'ok' button press
   void OnPressOk( wxCommandEvent& event );
 
-  void OnPressEnter( wxCommandEvent& event );
-
   /// handles 'save' click
   void OnSave( wxCommandEvent& save );
 };
