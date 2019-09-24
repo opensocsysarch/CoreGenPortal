@@ -3441,6 +3441,7 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     RegNode->SetName(BoxContents);
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid register name. Keeping old register name\n");
@@ -3453,6 +3454,7 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     RegNode->SetIndex(std::stoi(BoxContents));
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Register Index will not be changed\n");
@@ -3465,6 +3467,7 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     RegNode->SetWidth(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Register Width will not be changed\n");
@@ -3475,12 +3478,14 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   //set simd width
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(16);
   BoxContents = InfoBox->GetValue().ToStdString();
-  if(BoxContents == "" || !std::stoi(BoxContents) || std::stoi(BoxContents) == 1){
+  if(BoxContents == "" || (IsInteger(BoxContents) && std::stoi(BoxContents) < 2)){
     RegNode->UnsetSIMD();
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     if(IsInteger(BoxContents)){
-    RegNode->SetSIMD(std::stoi(BoxContents));
+      RegNode->SetSIMD(std::stoi(BoxContents));
+      InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
     }
     else{
       LogPane->AppendText(BoxContents + " is not an integer. SIMD data will not be changed\n");
@@ -3502,6 +3507,7 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
   std::string startbit;
   std::string endbit;
   unsigned i;
+  bool allValid = true;
   while(RegNode->GetNumSubRegs() > 0) RegNode->DeleteSubRegByIndex(0);
   while(!iss.eof()){
     //clear strings
@@ -3526,6 +3532,7 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
       LogPane->AppendText("Name can not be empty. Subregister will not be added to the subregisters list.\n");
       InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
+      allValid = false;
       getline(iss, nextNodeName);
       continue;
     }
@@ -3535,12 +3542,15 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
       LogPane->AppendText("Start and end bit must be integers. " + Name + " will not be added to the subregisters list.\n");
       InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
+      allValid = false;
       getline(iss, nextNodeName);
       continue;
     }
     RegNode->InsertSubReg(Name, std::stoi(startbit), std::stoi(endbit));
     getline(iss, nextNodeName);
   }
+
+  if(allValid) InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
 
   //build attribute int
   wxCheckBox* CheckBox;
@@ -3582,12 +3592,21 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
     savedAll = false;
     noConflicts = false;
   }
+  else{
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+    InfoWin->FindWindow(10)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+
   if((Attrs & CoreGenReg::CGRegCSR) && (Attrs & CoreGenReg::CGRegAMS)){
     LogPane->AppendText("A register cannot be CSR and AMS. Attributes will not be changed.\n");
     InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
     InfoWin->FindWindow(12)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
     noConflicts = false;
+  }
+  else{
+    InfoWin->FindWindow(11)->SetForegroundColour(wxColour(0, 0, 0));
+    InfoWin->FindWindow(12)->SetForegroundColour(wxColour(0, 0, 0));
   }
   if((Attrs & CoreGenReg::CGRegTUS) && isShared){
     LogPane->AppendText("A register cannot be TUS and Shared. RW/RO status will not be changed.\n");
@@ -3596,6 +3615,11 @@ bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
     savedAll = false;
     noConflicts = false;
   }
+  else{
+    InfoWin->FindWindow(13)->SetForegroundColour(wxColour(0, 0, 0));
+    InfoWin->FindWindow(15)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+
   if(noConflicts){
     RegNode->UnsetAttrs(Attrs);
     RegNode->SetAttrs(Attrs);
