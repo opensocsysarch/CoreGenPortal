@@ -14,7 +14,6 @@
 wxBEGIN_EVENT_TABLE(CoreISAInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreISAInfoWin::OnPressOk)
   EVT_BUTTON(wxID_SAVE, CoreISAInfoWin::OnSave)
-  EVT_TEXT_ENTER(wxID_ANY, CoreISAInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
@@ -105,11 +104,6 @@ void CoreISAInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
   if(PMF->OnSave(this, this->ISANode, CGISA))
     this->EndModal(wxID_SAVE);
-}
-
-void CoreISAInfoWin::OnPressEnter(wxCommandEvent& enter){
-  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->ISANode, CGISA);
 }
 
 CoreISAInfoWin::~CoreISAInfoWin(){

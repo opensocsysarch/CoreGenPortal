@@ -3208,6 +3208,7 @@ bool PortalMainFrame::SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     ISANode->SetName(BoxContents);
+    InfoWin->FindWindow(1)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
