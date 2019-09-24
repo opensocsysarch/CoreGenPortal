@@ -3643,6 +3643,7 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     RegClassNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid Register Class name. Keeping old Register Class name\n");
@@ -3655,6 +3656,7 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
   BoxContents = InfoBox->GetValue().ToStdString();
   iss.str(BoxContents);
+  bool allValid = true;
   //clear current registers
   while(RegClassNode->GetNumReg() > 0) RegClassNode->DeleteChild(RegClassNode->GetChild(0));
   std::getline(iss, nextNodeName);
@@ -3667,10 +3669,13 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
       LogPane->AppendText(nextNodeName + " is not a valid register. It will not be added to the registers list.\n");
       InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
+      allValid = false;
     }
     getline(iss, nextNodeName);
   }
 
+  if(allValid) InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
+  
   return savedAll;
 }
 
