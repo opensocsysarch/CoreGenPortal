@@ -3232,6 +3232,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     InstNode->SetName(BoxContents);
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
@@ -3247,6 +3248,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
   if(newNode){
     InstNode->SetNullFormat();
     InstNode->SetFormat((CoreGenInstFormat*)newNode);
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText("Could not find specified Instruction Format.\n");
@@ -3262,6 +3264,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
     InstNode->SetISA((CoreGenISA*)newNode);
     CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
     if(PInst) PInst->SetISA((CoreGenISA*)newNode);
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
   } 
   else{
     LogPane->AppendText("Could not find specified Instruction Set.\n");
@@ -3275,6 +3278,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(InstNode->ValidateSyntax(BoxContents)){
     InstNode->SetSyntax(BoxContents);
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText("Invalid Syntax. No Changes will be made.\n");
@@ -3299,6 +3303,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
   iss.str(BoxContents);
   InstNode->ClearEncodings();
   getline(iss, nextNodeName);
+  bool allValid = true;
   while(!iss.eof()){
     std::stringstream encodingStream(nextNodeName);
     encodingStream >> Field;
@@ -3308,6 +3313,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
       LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
       InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
       savedAll = false;
+      allValid = false;
     }
     /*
     else if(PInst){
@@ -3316,6 +3322,8 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
     */
     getline(iss, nextNodeName);
   }
+
+  if(allValid) InfoWin->FindWindow(11)->SetForegroundColour(wxColour(0, 0, 0));
 
   return savedAll;
 }
