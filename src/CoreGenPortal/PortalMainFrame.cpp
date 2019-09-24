@@ -3811,6 +3811,7 @@ bool PortalMainFrame::SaveVTP(wxDialog* InfoWin, CoreGenVTP* VTPNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     VTPNode->SetName(BoxContents);
+    InfoWin->FindWindow(1)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid VTP name. Keeping old VTP name\n");

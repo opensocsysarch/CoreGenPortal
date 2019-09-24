@@ -81,9 +81,6 @@ private:
 
   /// handles 'save' click
   void OnSave( wxCommandEvent& save );
-
-  /// handles 'enter' press in textctrl box
-  void OnPressEnter( wxCommandEvent& event);
 };
 
 #endif

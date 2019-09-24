@@ -14,7 +14,6 @@
 wxBEGIN_EVENT_TABLE(CoreVTPInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreVTPInfoWin::OnPressOk)
   EVT_BUTTON(wxID_SAVE, CoreVTPInfoWin::OnSave)
-  EVT_TEXT_ENTER(wxID_ANY, CoreVTPInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
@@ -105,11 +104,6 @@ void CoreVTPInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
   if(PMF->OnSave(this, this->VTPNode, CGVTP))
     this->EndModal(wxID_SAVE);
-}
-
-void CoreVTPInfoWin::OnPressEnter(wxCommandEvent& enter){
-  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->VTPNode, CGVTP);
 }
 
 CoreVTPInfoWin::~CoreVTPInfoWin(){
