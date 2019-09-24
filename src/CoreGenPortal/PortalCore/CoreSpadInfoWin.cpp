@@ -14,7 +14,6 @@
 wxBEGIN_EVENT_TABLE(CoreSpadInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreSpadInfoWin::OnPressOk)
   EVT_BUTTON(wxID_SAVE, CoreSpadInfoWin::OnSave)
-  EVT_TEXT_ENTER(wxID_ANY, CoreSpadInfoWin::OnPressEnter)
 wxEND_EVENT_TABLE()
 
 CoreSpadInfoWin::CoreSpadInfoWin( wxWindow* parent,
@@ -202,11 +201,6 @@ void CoreSpadInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
   if(PMF->OnSave(this, this->SpadNode, CGSpad))
     this->EndModal(wxID_SAVE);
-}
-
-void CoreSpadInfoWin::OnPressEnter(wxCommandEvent& enter){
-  PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->SpadNode, CGSpad);
 }
 
 CoreSpadInfoWin::~CoreSpadInfoWin(){

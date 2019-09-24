@@ -3738,6 +3738,7 @@ bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     SpadNode->SetName(BoxContents);
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not a valid SoC name. Keeping old SoC name\n");
@@ -3750,6 +3751,7 @@ bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     SpadNode->SetMemSize(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Mem size will not be changed\n");
@@ -3762,6 +3764,7 @@ bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     SpadNode->SetRqstPorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Request ports will not be changed\n");
@@ -3774,6 +3777,7 @@ bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     SpadNode->SetRspPorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Response ports will not be changed\n");
@@ -3786,15 +3790,13 @@ bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
     SpadNode->SetStartAddr(std::stoull(BoxContents));
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Response ports will not be changed\n");
     InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
-  //TODO: get this working
-  //LogPane->AppendText("Change start addr.\n");
-  //SpadNode->SetStartAddr();
 
   return savedAll;
 }
