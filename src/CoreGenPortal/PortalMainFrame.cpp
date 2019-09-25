@@ -2225,6 +2225,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveCore(InfoWin, (CoreGenCore*)node);
       break;
     case CGExt:
+      if(createNewNode) node = CGProject->InsertExt("NewExt");
       savedAll = SaveExt(InfoWin, (CoreGenExt*)node);
       break;
     case CGISA:
