@@ -2241,9 +2241,11 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveMCtrl(InfoWin, (CoreGenMCtrl*)node);
     break;
     case CGPInst:
+      //if(createNewNode) node = CGProject->InsertPseudoInst("NewPInst", nullptr);
       savedAll = SavePInst(InfoWin, (CoreGenPseudoInst*)node);
       break;
     case CGReg:
+      if(createNewNode) node = CGProject->InsertReg("NewReg", 0, 0);
       savedAll = SaveReg(InfoWin, (CoreGenReg*)node);
       break;
     case CGRegC:
