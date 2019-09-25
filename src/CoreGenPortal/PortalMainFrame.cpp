@@ -2208,15 +2208,12 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
 bool PortalMainFrame::OnSave(wxDialog *InfoWin,
                                    CoreGenNode *node,
                                    CGNodeType InfoWinType){
-  // get the box contents
   bool savedAll;
-  //bool createNewNode = false;
-  //if(!node) createNewNode = true;
-
-  // TODO: handle invalid inputs
-  // update yaml
+  bool createNewNode = false;
+  if(!node) createNewNode = true;
   switch(InfoWinType){
     case CGCache:
+      if(createNewNode) node = CGProject->InsertCache("Placeholder", 0, 0);
       savedAll = SaveCache(InfoWin, (CoreGenCache*)node);
       break;
     case CGComm:
@@ -2277,6 +2274,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     LogPane->AppendText("Updated " + NodeName + ".\n");
   }
   else{
+    if(createNewNode) CGProject->DeleteNode(node);
     LogPane->AppendText("Errors detected. Changes will not be saved to file until all fields are correct.\n");
   }
   return savedAll;
