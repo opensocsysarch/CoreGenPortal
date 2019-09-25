@@ -2213,13 +2213,15 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
   if(!node) createNewNode = true;
   switch(InfoWinType){
     case CGCache:
-      if(createNewNode) node = CGProject->InsertCache("Placeholder", 0, 0);
+      if(createNewNode) node = CGProject->InsertCache("NewCache", 0, 0);
       savedAll = SaveCache(InfoWin, (CoreGenCache*)node);
       break;
     case CGComm:
+       //if(createNewNode) node = CGProject->InsertComm("NewComm");
       savedAll = SaveComm(InfoWin, (CoreGenComm*)node);
       break;
     case CGCore:
+      if(createNewNode) node = CGProject->InsertCore("NewCore", nullptr);
       savedAll = SaveCore(InfoWin, (CoreGenCore*)node);
       break;
     case CGExt:
