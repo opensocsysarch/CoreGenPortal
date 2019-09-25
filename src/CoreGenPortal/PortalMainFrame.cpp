@@ -2261,6 +2261,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveSpad(InfoWin, (CoreGenSpad*)node);
       break;
     case CGVTP:
+      if(createNewNode) node = CGProject->InsertVTP("NewVTP");
       savedAll = SaveVTP(InfoWin, (CoreGenVTP*)node);
       break;
   }
