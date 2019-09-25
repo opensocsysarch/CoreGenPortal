@@ -2229,6 +2229,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveExt(InfoWin, (CoreGenExt*)node);
       break;
     case CGISA:
+      if(createNewNode) node = CGProject->InsertISA("NewISA");
       savedAll = SaveISA(InfoWin, (CoreGenISA*)node);
       break;
     case CGInst:
