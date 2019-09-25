@@ -2257,6 +2257,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveSoC(InfoWin, (CoreGenSoC*)node);
       break;
     case CGSpad:
+      if(createNewNode) node = CGProject->InsertSpad("NewSpad", 0, 0, 0);
       savedAll = SaveSpad(InfoWin, (CoreGenSpad*)node);
       break;
     case CGVTP:
