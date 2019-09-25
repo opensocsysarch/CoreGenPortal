@@ -2237,6 +2237,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveInst(InfoWin, (CoreGenInst*)node);
       break;
     case CGMCtrl:
+      if(createNewNode) node = CGProject->InsertMCtrl("NewMCtrl", 0);
       savedAll = SaveMCtrl(InfoWin, (CoreGenMCtrl*)node);
     break;
     case CGPInst:
