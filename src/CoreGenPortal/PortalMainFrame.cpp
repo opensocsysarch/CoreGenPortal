@@ -1318,9 +1318,14 @@ void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
     DeleteNode(GetNodeFromItem(ModuleBox->GetFocusedItem()));
     break;
   case ID_TREE_ADDNODE:
-    wxTreeItemId ID = ModuleBox->GetFocusedItem();
-    InfoWin = new CoreInfoWin(this, wxID_ANY, NULL, TreeIdToCGType(ID));
-    //delete InfoWin;
+    if(CGProject){
+      wxTreeItemId ID = ModuleBox->GetFocusedItem();
+      InfoWin = new CoreInfoWin(this, wxID_ANY, NULL, TreeIdToCGType(ID));
+      delete InfoWin;
+    }
+    else{
+      LogPane->AppendText("No project open. You must open a project before you can add a node.\n");
+    }
     break;
   }
 }
@@ -3135,7 +3140,7 @@ bool PortalMainFrame::SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode){
   BoxContents = InfoBox->GetValue().ToStdString();
   if (BoxContents[BoxContents.size()-1] != '\n')
     BoxContents += "\n";
-    
+
   //clean current cores
   while(SoCNode->GetNumCores() > 0) SoCNode->DeleteCore(SoCNode->GetCore(0));
 
