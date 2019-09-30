@@ -2217,7 +2217,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveCache(InfoWin, (CoreGenCache*)node);
       break;
     case CGComm:
-       //if(createNewNode) node = CGProject->InsertComm("NewComm");
+      if(createNewNode) node = CGProject->InsertComm("NewComm");
       savedAll = SaveComm(InfoWin, (CoreGenComm*)node);
       break;
     case CGCore:
@@ -2428,6 +2428,8 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
   //set endpoints
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
   BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";
   std::istringstream iss(BoxContents);
   std::string nextNodeName;
   while( CommNode->GetNumEndpoints() > 0) CommNode->DeleteEndpoint((unsigned)0);
