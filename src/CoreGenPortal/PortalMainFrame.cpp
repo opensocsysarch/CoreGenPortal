@@ -2719,7 +2719,7 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
       encodingStream >> Field;
       encodingStream >> op;
       encodingStream >> Value;
-      if(!InstNode->SetEncoding(Field, Value)){
+      if(nextNodeName != "" && !InstNode->SetEncoding(Field, Value)){
         LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
         InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
         savedAll = false;
@@ -2804,10 +2804,13 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
   BoxContents = InfoBox->GetValue().ToStdString();
   CoreGenInst *newNode = CGProject->GetInstNodeByName(BoxContents);
-  if(newNode){
+  if(BoxContents == "" || newNode){
     PInstNode->SetNullInst();
     PInstNode->SetTargetInst(newNode);
-    PInstNode->SetISA(newNode->GetISA());
+    if(newNode)
+      PInstNode->SetISA(newNode->GetISA());
+    else
+      PInstNode->SetNullISA();
     InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
@@ -2817,29 +2820,37 @@ bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode)
   }
 
   //set encodings
-  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
-  BoxContents = InfoBox->GetValue().ToStdString();
-  if (BoxContents[BoxContents.size()-1] != '\n')
-    BoxContents += "\n"; 
-  std::string Field;
-  std::string op;
-  int Value;
   PInstNode->ClearEncodings();
-  iss.str(BoxContents);
-  getline(iss, nextNodeName);
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
   bool allValid = true;
-  while(!iss.eof()){
-    std::stringstream encodingStream(nextNodeName);
-    encodingStream >> Field;
-    encodingStream >> op;
-    encodingStream >> Value;
-    if(!PInstNode->SetEncoding(Field, Value)){
-      LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
-      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
-      savedAll = false;
-      allValid = false;
-    }
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(PInstNode->GetInst()){
+    if (BoxContents[BoxContents.size()-1] != '\n')
+      BoxContents += "\n"; 
+    std::string Field;
+    std::string op;
+    int Value;
+    iss.str(BoxContents);
     getline(iss, nextNodeName);
+    while(!iss.eof()){
+      std::stringstream encodingStream(nextNodeName);
+      encodingStream >> Field;
+      encodingStream >> op;
+      encodingStream >> Value;
+      if(nextNodeName != "" && !PInstNode->SetEncoding(Field, Value)){
+        LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
+        InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+        savedAll = false;
+        allValid = false;
+      }
+      getline(iss, nextNodeName);
+    }
+  }
+  else if(BoxContents != ""){
+    LogPane->AppendText("Cannot add encodings without an Instruction.\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+    allValid = false;
   }
 
   if(allValid) InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
