@@ -3133,6 +3133,9 @@ bool PortalMainFrame::SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode){
   //set cores
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
   BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";
+    
   //clean current cores
   while(SoCNode->GetNumCores() > 0) SoCNode->DeleteCore(SoCNode->GetCore(0));
 
