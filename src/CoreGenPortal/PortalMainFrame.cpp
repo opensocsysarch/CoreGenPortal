@@ -2492,7 +2492,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
   BoxContents = InfoBox->GetValue().ToStdString();
   newNode = CGProject->GetISANodeByName(BoxContents);
-  if(newNode){
+  if(BoxContents == "" || newNode){
     CoreNode->SetISA((CoreGenISA*)newNode);
     InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
   }
@@ -2506,7 +2506,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
   BoxContents = InfoBox->GetValue().ToStdString();
   newNode = CGProject->GetCacheNodeByName(BoxContents);
-  if(newNode){ 
+  if(BoxContents == "" || newNode){ 
     CoreNode->InsertCache((CoreGenCache*)newNode);
     InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
   }
