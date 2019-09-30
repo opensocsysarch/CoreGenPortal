@@ -2241,7 +2241,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveMCtrl(InfoWin, (CoreGenMCtrl*)node);
     break;
     case CGPInst:
-      //if(createNewNode) node = CGProject->InsertPseudoInst("NewPInst", nullptr);
+      if(createNewNode) node = CGProject->InsertPseudoInst("NewPInst", nullptr);
       savedAll = SavePInst(InfoWin, (CoreGenPseudoInst*)node);
       break;
     case CGReg:
@@ -2249,7 +2249,7 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       savedAll = SaveReg(InfoWin, (CoreGenReg*)node);
       break;
     case CGRegC:
-      //if(createNewNode) node = CGProject->InsertRegClass("NewRegClass");
+      if(createNewNode) node = CGProject->InsertRegClass("NewRegClass");
       savedAll = SaveRegClass(InfoWin, (CoreGenRegClass*)node);
       break;
     case CGSoc:
@@ -3064,6 +3064,8 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
   //set name
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
   BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";
   iss.str(BoxContents);
   bool allValid = true;
   //clear current registers
