@@ -13,7 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreVTPInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreVTPInfoWin::OnPressOk)
-  EVT_TEXT_ENTER(wxID_ANY, CoreVTPInfoWin::OnPressEnter)
+  EVT_BUTTON(wxID_SAVE, CoreVTPInfoWin::OnSave)
 wxEND_EVENT_TABLE()
 
 CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
@@ -22,9 +22,6 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
                               CoreGenVTP *VTP )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,175), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( VTP == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->VTPNode = (CoreGenVTP*)VTP;
 
@@ -50,7 +47,7 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
   //-- memory controller name
   NameSizer = new wxBoxSizer( wxHORIZONTAL );
   VTPNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   1,
                                    wxT("VTP Controller Name"),
                                    wxDefaultPosition,
                                    wxDefaultSize,
@@ -60,10 +57,10 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
 
   VTPCtrl = new wxTextCtrl( Wnd,
                             0,
-                            wxString(VTP->GetName()),
+                            VTP ? wxString(VTP->GetName()) : "",
                             wxDefaultPosition,
                             wxSize(320,25),
-                            wxTE_PROCESS_ENTER,
+                            0,
                             wxDefaultValidator,
                             wxT("VTPName") );
   NameSizer->Add( VTPCtrl, 0, wxALL, 0 );
@@ -79,10 +76,13 @@ CoreVTPInfoWin::CoreVTPInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(VTP) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -100,9 +100,10 @@ void CoreVTPInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-void CoreVTPInfoWin::OnPressEnter(wxCommandEvent& enter){
+void CoreVTPInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->VTPNode, CGVTP);
+  if(PMF->OnSave(this, this->VTPNode, CGVTP))
+    this->EndModal(wxID_SAVE);
 }
 
 CoreVTPInfoWin::~CoreVTPInfoWin(){

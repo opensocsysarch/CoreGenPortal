@@ -13,7 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreSocInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreSocInfoWin::OnPressOk)
-  EVT_TEXT_ENTER(wxID_ANY, CoreSocInfoWin::OnPressEnter)
+  EVT_BUTTON(wxID_SAVE, CoreSocInfoWin::OnSave)
 wxEND_EVENT_TABLE()
 
 CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
@@ -22,9 +22,6 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
                               CoreGenSoC *Soc )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Soc == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   SoCNode = Soc;
   // init the internals
@@ -44,7 +41,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   //-- soc name
   SoCNameSizer = new wxBoxSizer( wxHORIZONTAL );
   SocNameText = new wxStaticText(this,
-                                 wxID_ANY,
+                                 2,
                                  wxT("SoC Name"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -55,10 +52,10 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   //-- soc name box
   SocNameCtrl = new wxTextCtrl(this,
                                0,
-                               wxString(Soc->GetName()),
+                               Soc ? wxString(Soc->GetName()) : "",
                                wxDefaultPosition,
                                wxSize(320,25),
-                               wxTE_PROCESS_ENTER,
+                               0,
                                wxDefaultValidator,
                                wxT("SoC Name") );
   SoCNameSizer->Add( SocNameCtrl, 0, wxALL, 0 );
@@ -67,7 +64,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   //-- core name
   CoreNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CoreNameText = new wxStaticText(this,
-                                 wxID_ANY,
+                                 3,
                                  wxT("Cores"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -77,15 +74,17 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
 
   //-- cores
   CoreNameCtrl = new wxTextCtrl(this,
-                               wxID_ANY,
+                               1,
                                wxEmptyString,
                                wxDefaultPosition,
                                wxSize(320,100),
-                               wxTE_MULTILINE|wxTE_PROCESS_ENTER,
+                               wxTE_MULTILINE|wxHSCROLL,
                                wxDefaultValidator,
                                wxT("Cores") );
-  for( unsigned i=0; i<Soc->GetNumCores(); i++ ){
-    CoreNameCtrl->AppendText( wxString(Soc->GetCore(i)->GetName()) + wxT("\n"));
+  if(Soc){
+    for( unsigned i=0; i<Soc->GetNumCores(); i++ ){
+      CoreNameCtrl->AppendText( wxString(Soc->GetCore(i)->GetName()) + wxT("\n"));
+    }
   }
   CoreNameSizer->Add( CoreNameCtrl, 0, wxALL, 0 );
   bSizer2->Add( CoreNameSizer, 0, wxALIGN_CENTER|wxALL, 0 );
@@ -102,8 +101,11 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   wxBoxSizer *bSizer3 = new wxBoxSizer( wxVERTICAL );
 
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( this, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(Soc) m_userOK = new wxButton( this, wxID_OK );
+  else m_userOK = new wxButton( this, wxID_CANCEL );
+  m_userSAVE = new wxButton( this, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
 
   bSizer2->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
@@ -120,9 +122,10 @@ void CoreSocInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-void CoreSocInfoWin::OnPressEnter(wxCommandEvent& enter){
+void CoreSocInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->SoCNode, CGSoc);
+  if(PMF->OnSave(this, this->SoCNode, CGSoc))
+    this->EndModal(wxID_SAVE);
 }
 
 CoreSocInfoWin::~CoreSocInfoWin(){

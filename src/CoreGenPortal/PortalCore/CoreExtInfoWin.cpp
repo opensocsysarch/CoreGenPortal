@@ -13,7 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreExtInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreExtInfoWin::OnPressOk)
-  EVT_TEXT_ENTER(wxID_ANY, CoreExtInfoWin::OnPressEnter)
+  EVT_BUTTON(wxID_SAVE, CoreExtInfoWin::OnSave)
 wxEND_EVENT_TABLE()
 
 CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
@@ -22,9 +22,6 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
                               CoreGenExt *Ext )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,200), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Ext == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->ExtNode = Ext;
 
@@ -50,7 +47,7 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
   //-- extension name
   ExtNameSizer = new wxBoxSizer( wxHORIZONTAL );
   ExtNameText = new wxStaticText( Wnd,
-                                  wxID_ANY,
+                                  2,
                                   wxT("Extension Name"),
                                   wxDefaultPosition,
                                   wxSize(160,-1),
@@ -60,10 +57,10 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
 
   ExtNameCtrl = new wxTextCtrl( Wnd,
                                 0,
-                                wxString(Ext->GetName()),
+                                Ext ? wxString(Ext->GetName()) : "",
                                 wxDefaultPosition,
                                 wxSize(320,25),
-                                wxTE_PROCESS_ENTER,
+                                0,
                                 wxDefaultValidator,
                                 wxT("ExtName") );
   ExtNameSizer->Add( ExtNameCtrl, 0, wxALL, 0 );
@@ -85,23 +82,25 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
                                 wxEmptyString,
                                 wxDefaultPosition,
                                 wxSize(320,25),
-                                wxTE_PROCESS_ENTER,
+                                0,
                                 wxDefaultValidator,
                                 wxT("ExtType") );
-  switch(Ext->GetType()){
-  case CGExtTemplate:
-    ExtTypeCtrl->AppendText(wxT("Template extension"));
-    break;
-  case CGExtModule:
-    ExtTypeCtrl->AppendText(wxT("Module extension"));
-    break;
-  case CGExtComm:
-    ExtTypeCtrl->AppendText(wxT("Communications extension"));
-    break;
-  case CGExtUnk:
-  default:
-    ExtTypeCtrl->AppendText(wxT("Unknown extension"));
-    break;
+  if(Ext){
+    switch(Ext->GetType()){
+    case CGExtTemplate:
+      ExtTypeCtrl->AppendText(wxT("Template extension"));
+      break;
+    case CGExtModule:
+      ExtTypeCtrl->AppendText(wxT("Module extension"));
+      break;
+    case CGExtComm:
+      ExtTypeCtrl->AppendText(wxT("Communications extension"));
+      break;
+    case CGExtUnk:
+    default:
+      ExtTypeCtrl->AppendText(wxT("Unknown extension"));
+      break;
+    }
   }
   ExtTypeSizer->Add( ExtTypeCtrl, 0, wxALL, 0 );
   InnerSizer->Add( ExtTypeSizer, 0, wxALIGN_CENTER|wxALL, 5);
@@ -116,10 +115,13 @@ CoreExtInfoWin::CoreExtInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(Ext) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -137,9 +139,10 @@ void CoreExtInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-void CoreExtInfoWin::OnPressEnter(wxCommandEvent& enter){
+void CoreExtInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->ExtNode, CGExt);
+  if(PMF->OnSave(this, this->ExtNode, CGExt))
+    this->EndModal(wxID_SAVE);
 }
 
 CoreExtInfoWin::~CoreExtInfoWin(){

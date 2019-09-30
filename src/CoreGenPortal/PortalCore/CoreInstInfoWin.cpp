@@ -13,7 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreInstInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreInstInfoWin::OnPressOk)
-  EVT_TEXT_ENTER(wxID_ANY, CoreInstInfoWin::OnPressEnter)
+  EVT_BUTTON(wxID_SAVE, CoreInstInfoWin::OnSave)
 wxEND_EVENT_TABLE()
 
 CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
@@ -22,9 +22,6 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                               CoreGenInst *Inst )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Inst == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->InstNode = Inst;
   
@@ -50,7 +47,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- inst name
   InstNameSizer = new wxBoxSizer( wxHORIZONTAL );
   InstNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   6,
                                    wxT("Instruction Name"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -60,10 +57,10 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   InstNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(Inst->GetName()),
+                                 Inst ? wxString(Inst->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Inst Name") );
   InstNameSizer->Add( InstNameCtrl, 0, wxALL, 0 );
@@ -72,7 +69,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- inst format
   InstFNameSizer = new wxBoxSizer( wxHORIZONTAL );
   InstFNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   7,
                                    wxT("Instruction Format"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -82,10 +79,10 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   InstFNameCtrl = new wxTextCtrl( Wnd,
                                  1,
-                                 wxString(Inst->GetFormat()->GetName()),
+                                 Inst ? wxString(Inst->GetFormat()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Inst Format Name") );
   InstFNameSizer->Add( InstFNameCtrl, 0, wxALL, 0 );
@@ -94,7 +91,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- isa name
   ISANameSizer = new wxBoxSizer( wxHORIZONTAL );
   ISANameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   8,
                                    wxT("Instruction Set"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -104,10 +101,10 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   ISANameCtrl = new wxTextCtrl( Wnd,
                                  2,
-                                 wxString(Inst->GetISA()->GetName()),
+                                 Inst ? wxString(Inst->GetISA()->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("ISA Name") );
   ISANameSizer->Add( ISANameCtrl, 0, wxALL, 0 );
@@ -116,7 +113,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- syntax
   SyntaxSizer = new wxBoxSizer( wxHORIZONTAL );
   SyntaxText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   9,
                                    wxT("Syntax"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -126,10 +123,10 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   SyntaxCtrl = new wxTextCtrl( Wnd,
                                  3,
-                                 wxString(Inst->GetSyntax()),
+                                 Inst ? wxString(Inst->GetSyntax()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Inst Format Name") );
   SyntaxSizer->Add( SyntaxCtrl, 0, wxALL, 0 );
@@ -138,7 +135,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- stone cutter implementation
   StoneCutterSizer = new wxBoxSizer( wxHORIZONTAL );
   StoneCText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   10,
                                    wxT("StoneCutter Syntax"),
                                    wxDefaultPosition,
                                    wxSize(160, -1), 
@@ -148,10 +145,10 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   StoneCCtrl = new wxTextCtrl( Wnd,
                                  4,
-                                 wxString(Inst->GetImpl()),
+                                 Inst ? wxString(Inst->GetImpl()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,100),
-                                 wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                                 wxTE_MULTILINE|wxHSCROLL,
                                  wxDefaultValidator,
                                  wxT("StoneCutter") );
   StoneCutterSizer->Add( StoneCCtrl, 0, wxALL, 0 );
@@ -160,7 +157,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
   //-- encodings
   EncodingSizer = new wxBoxSizer( wxHORIZONTAL );
   EncText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              11,
                               wxT("Inst Field Encodings"),
                               wxDefaultPosition,
                               wxSize(160, -1),
@@ -173,16 +170,17 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("StoneCutter") );
-
-  for( unsigned i=0; i<Inst->GetNumEncodings(); i++ ){
-    wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
-                                    Inst->GetEncoding(i)->GetEncoding() );
-    EncCtrl->AppendText(wxString(Inst->GetEncoding(i)->GetField()) +
-                        wxT(" = ") + tmp + wxT("\n"));
-  }
+  if(Inst){
+    for( unsigned i=0; i<Inst->GetNumEncodings(); i++ ){
+      wxString tmp = wxString::Format("%" wxLongLongFmtSpec "u",
+                                      Inst->GetEncoding(i)->GetEncoding() );
+      EncCtrl->AppendText(wxString(Inst->GetEncoding(i)->GetField()) +
+                          wxT(" = ") + tmp + wxT("\n"));
+    }
+  } 
   EncodingSizer->Add( EncCtrl, 0, wxALL, 0 );
   InnerSizer->Add( EncodingSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
@@ -196,10 +194,13 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(Inst) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -217,9 +218,10 @@ void CoreInstInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-void CoreInstInfoWin::OnPressEnter(wxCommandEvent& enter){
+void CoreInstInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->InstNode, CGInst);
+  if(PMF->OnSave(this, this->InstNode, CGInst))
+    this->EndModal(wxID_SAVE);
 }
 
 CoreInstInfoWin::~CoreInstInfoWin(){

@@ -8,6 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
+#include <sstream>
+#include <vector>
 #include "PortalMainFrame.h"
 
 // PortalMainFrame::PortalMainFrame
@@ -36,8 +38,6 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
   // create the status bar
   CreateStatusBar();
   SetStatusText( "Welcome to CoreGenPortal!" );
-
-  //Bind(wxEVT_TEXT_ENTER, &PortalMainFrame::OnPressEnter, this);
 
   // update the aui manager
   UpdateAuiMgr();
@@ -549,7 +549,7 @@ wxString PortalMainFrame::FindNodeStr( CoreGenNode *Parent ){
 
 // PortalMainFrame::LoadModuleBox
 // loads all the module box items
-void PortalMainFrame::LoadModuleBox(){
+void PortalMainFrame::LoadModuleBox(bool editing){
   CoreGenNode *Top = CGProject->GetTop();
 
   if( Top == nullptr ){
@@ -557,7 +557,7 @@ void PortalMainFrame::LoadModuleBox(){
     return ;
   }
 
-  LogPane->AppendText("Loading modules...\n" );
+  if(!editing) LogPane->AppendText("Loading modules...\n" );
 
   for( unsigned i=0; i<Top->GetNumChild(); i++ ){
     switch( Top->GetChild(i)->GetType() ){
@@ -1173,12 +1173,12 @@ void PortalMainFrame::LoadPInstEncodings( wxTreeItemId Parent,
 
 // PortalMainFrame::CloseProject
 // closes any open project files
-void PortalMainFrame::CloseProject(){
+void PortalMainFrame::CloseProject(bool editing){
   if( !CGProject ){
     return ;
   }
 
-  LogPane->AppendText("Closing open project...\n");
+  if(!editing) LogPane->AppendText("Closing open project...\n");
 
   // save the IR file
   IRPane->SaveFile(IRFileName);
@@ -1187,7 +1187,7 @@ void PortalMainFrame::CloseProject(){
   IRPane->ClearAll();
 
   // close out all the StoneCutter windows
-  LogPane->AppendText("Removing Pages\n" );
+  if(!editing) LogPane->AppendText("Removing Pages\n" );
   for( size_t i=1; i<EditorNotebook->GetPageCount(); i++ ){
     if( !EditorNotebook->RemovePage(i) )
       LogPane->AppendText("Error removing page\n" );
@@ -1223,7 +1223,7 @@ void PortalMainFrame::CloseProject(){
   CGProject = nullptr;
 
   // log the close project
-  LogPane->AppendText("Closed project\n");
+  if(!editing) LogPane->AppendText("Closed project\n");
 }
 
 // PortalMainFrame::OnQuit
@@ -1318,9 +1318,38 @@ void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
     DeleteNode(GetNodeFromItem(ModuleBox->GetFocusedItem()));
     break;
   case ID_TREE_ADDNODE:
-    AddNodeWin();
+    wxTreeItemId ID = ModuleBox->GetFocusedItem();
+    InfoWin = new CoreInfoWin(this, wxID_ANY, NULL, TreeIdToCGType(ID));
+    //delete InfoWin;
     break;
   }
+}
+
+CGNodeType PortalMainFrame::TreeIdToCGType(wxTreeItemId ID){
+  unsigned i;
+  for(i = 0; i < TreeItems.size(); i++){
+    if(TreeItems[i] == ID) break;
+  }
+
+  switch(i){
+    case 0: return CGCache;
+    case 1: return CGComm;
+    case 2: return CGCore;
+    case 3: return CGExt;
+    case 4: return CGISA;
+    case 5: return CGInst;
+    case 6: return CGInstF;
+    case 7: return CGMCtrl;
+    case 8: return CGPlugin;
+    case 9: return CGPInst;
+    case 10: return CGReg;
+    case 11: return CGRegC;
+    case 12: return CGSoc;
+    case 13: return CGSpad;
+    case 14: return CGVTP;
+    default: return CGTop;
+  }
+  
 }
 
 // PortalMainFrame::OnRightClickNode
@@ -2112,8 +2141,8 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent& WXUNUSED(event)){
 }
 
 // PortalMainFrame::OpenProject
-void PortalMainFrame::OpenProject(wxString NP){
-  LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
+void PortalMainFrame::OpenProject(wxString NP, bool editing){
+  if(!editing) LogPane->AppendText( "Opening project from IR at " + NP + wxT("\n") );
   wxFileName NPF(NP);
 
   // create a new coregen object
@@ -2121,19 +2150,19 @@ void PortalMainFrame::OpenProject(wxString NP){
                                   std::string(NPF.GetPath().mb_str()),
                                   UserConfig->GetArchiveDir() );
   if( CGProject == nullptr ){
-    LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
+    if(!editing) LogPane->AppendText( "Error opening project from IR at " + NP + wxT("\n") );
     return ;
   }
 
   // read the ir
   if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
-    LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
+    if(!editing) LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
     return ;
   }
 
   // Force the DAG to build
   if( !CGProject->BuildDAG() ){
-    LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
+    if(!editing) LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
     return ;
   }
 
@@ -2145,13 +2174,13 @@ void PortalMainFrame::OpenProject(wxString NP){
   ProjDir->SetPath(NPF.GetPath());
 
   // load all the modules into the modulebox
-  LoadModuleBox();
+  LoadModuleBox(editing);
 
   // initialize the stonecutter message context
   Msgs = new SCMsg();
   //wxStreamToTextRedirector(LogPane, &SCBuf);
 
-  LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
+  if(!editing) LogPane->AppendText( "Successfully opened project from IR at " + NP + wxT("\n" ));
 }
 
 // PortalMainFrame::OnProjOpen
@@ -2176,300 +2205,1045 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
   OpenDialog->Destroy();
 }
 
-void PortalMainFrame::OnPressEnter(wxCommandEvent& enter,
+bool PortalMainFrame::OnSave(wxDialog *InfoWin,
                                    CoreGenNode *node,
-                                   int InfoWinType){
-  // get the box contents
-  wxTextCtrl *ClickedBox = (wxTextCtrl*)enter.GetEventObject();
-  std::string BoxContents = ClickedBox->GetValue().ToStdString();
-  // get the box id
-  int InfoBoxIndex = ClickedBox->GetId();
-
-  // TODO: handle invalid inputs
-  // update yaml
+                                   CGNodeType InfoWinType){
+  bool savedAll;
+  bool createNewNode = false;
+  if(!node) createNewNode = true;
   switch(InfoWinType){
-    case CGCache:{
-      // TODO: handle adding parent and child caches
-      CoreGenCache *CacheNode = (CoreGenCache*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          CacheNode->SetName(BoxContents);
-          break;
-        case 1:
-          CacheNode->SetSets(std::stoi(BoxContents));
-          break;
-        case 2:
-          CacheNode->SetWays(std::stoi(BoxContents));
-          break;
-        case 3:{
-          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
-          if(newNode) 
-            CacheNode->SetChildCache(newNode);
-          else 
-            LogPane->AppendText("Could not find specified cache.\n");
-          break;
-        }
-        case 4:{
-          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
-          if(newNode) 
-            CacheNode->SetParentCache(newNode);
-          else 
-            LogPane->AppendText("Could not find specified cache.\n");
-          break;
-        }
-      }
-    }
+    case CGCache:
+      if(createNewNode) node = CGProject->InsertCache("NewCache", 0, 0);
+      savedAll = SaveCache(InfoWin, (CoreGenCache*)node);
+      break;
+    case CGComm:
+      if(createNewNode) node = CGProject->InsertComm("NewComm");
+      savedAll = SaveComm(InfoWin, (CoreGenComm*)node);
+      break;
+    case CGCore:
+      if(createNewNode) node = CGProject->InsertCore("NewCore", nullptr);
+      savedAll = SaveCore(InfoWin, (CoreGenCore*)node);
+      break;
+    case CGExt:
+      if(createNewNode) node = CGProject->InsertExt("NewExt");
+      savedAll = SaveExt(InfoWin, (CoreGenExt*)node);
+      break;
+    case CGISA:
+      if(createNewNode) node = CGProject->InsertISA("NewISA");
+      savedAll = SaveISA(InfoWin, (CoreGenISA*)node);
+      break;
+    case CGInst:
+      if(createNewNode) node = CGProject->InsertInst("NewInst", nullptr, nullptr);
+      savedAll = SaveInst(InfoWin, (CoreGenInst*)node);
+      break;
+    case CGMCtrl:
+      if(createNewNode) node = CGProject->InsertMCtrl("NewMCtrl", 0);
+      savedAll = SaveMCtrl(InfoWin, (CoreGenMCtrl*)node);
     break;
-    case CGComm:{
-      // TODO: handle endpoints
-      CoreGenComm *CommNode = (CoreGenComm*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          CommNode->SetName(BoxContents);
-          break;
-        case 1:
-          if( BoxContents.compare("Point-to-Point") == 0 ){
-            CommNode->SetCommType(CGCommP2P);
-          }
-          else if( BoxContents.compare("Bus") == 0 ){
-            CommNode->SetCommType(CGCommBus);
-          }
-          else if( BoxContents.compare("Network on Chip") == 0 ){
-            CommNode->SetCommType(CGCommNoc);
-          }
-          else{
-            CommNode->SetCommType(CGCommUnk);
-          }
-          break;
-        case 2:
-          CommNode->SetWidth(std::stoi(BoxContents));
-          break;
-        case 3:
-          LogPane->AppendText("Set Endpoint.\n");
-      }
-    }
-    break;
-    case CGCore:{
-      // TODO: Handle isa, caches, regclasses, and extensions
-      CoreGenCore *CoreNode = (CoreGenCore*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          CoreNode->SetName(BoxContents);
-          break;
-        case 1:
-          CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
-          break;
-        case 2:{
-          CoreGenISA *newNode = CGProject->GetISANodeByName(BoxContents);
-          if(newNode) 
-            CoreNode->SetISA(newNode);
-          else 
-            LogPane->AppendText("Could not find specified ISA.\n");
-          break;
-        }
-        case 3:{
-          CoreGenCache *newNode = CGProject->GetCacheNodeByName(BoxContents);
-          if(newNode) 
-            CoreNode->InsertCache(newNode);
-          else 
-            LogPane->AppendText("Could not find specified ISA.\n");
-          break;
-        }
-        case 4:
-          LogPane->AppendText("Set Register Class.\n");
-          break;
-        case 5:
-          LogPane->AppendText("Set Extension.\n");
-      }
-    }
-    break;
-    case CGExt:{
-      CoreGenExt *ExtNode = (CoreGenExt*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          ExtNode->SetName(BoxContents);
-          break;
-        case 1:
-          if( BoxContents.compare("Template extension") == 0 ){
-            ExtNode->SetType(CGExtTemplate);
-          }
-          else if( BoxContents.compare("Module extension") == 0 ){
-            ExtNode->SetType(CGExtModule);
-          }
-          else if( BoxContents.compare("Communications extension") == 0 ){
-            ExtNode->SetType(CGExtComm);
-          }
-          else{
-            ExtNode->SetType(CGExtUnk);
-          }
-          break;
-      }
-    }
-    break;
-    case CGISA:{
-      CoreGenISA *ISANode = (CoreGenISA*)node;
-      ISANode->SetName(BoxContents);
-    }
-    break;
-    case CGInst:{
-      CoreGenInst *InstNode = (CoreGenInst*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          InstNode->SetName(BoxContents);
-          break;
-        case 1:{
-          CoreGenInstFormat *newNode = CGProject->GetInstFormatNodeByName(BoxContents);
-          if(newNode) 
-            InstNode->SetFormat(newNode);
-          else 
-            LogPane->AppendText("Could not find specified Instruction Format.\n");
-          break;
-        }
-        case 2:{
-          CoreGenISA *newNode = CGProject->GetISANodeByName(BoxContents);
-          if(newNode) 
-            InstNode->SetISA(newNode);
-          else 
-            LogPane->AppendText("Could not find specified Instruction Format.\n");
-          break;
-        }
-        case 3:
-          InstNode->SetSyntax(BoxContents);
-          LogPane->AppendText(BoxContents + ".\n");
-          break;
-        case 4:
-          InstNode->SetImpl(BoxContents);
-          break;
-        case 5:
-          LogPane->AppendText("Set Encoding.\n");
-          break;
-      }
-    }
-    break;
-    case CGMCtrl:{
-      CoreGenMCtrl *MCtrlNode = (CoreGenMCtrl*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          MCtrlNode->SetName(BoxContents);
-          break;
-        case 2:
-          MCtrlNode->SetNumInputPorts(std::stoi(BoxContents));
-          break;
-      }
-    }
-    break;
-    case CGPInst:{
-      CoreGenPseudoInst *PInstNode = (CoreGenPseudoInst*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          PInstNode->SetName(BoxContents);
-          break;
-        case 1:{
-          CoreGenInst *newNode = CGProject->GetInstNodeByName(BoxContents);
-          if(newNode) 
-            PInstNode->SetTargetInst(newNode);
-          else 
-            LogPane->AppendText("Could not find specified Instruction.\n");
-          break;
-        }
-        case 2:
-          //perhaps make uneditable
-          LogPane->AppendText("Set ISA.\n");
-          break;
-        case 3:
-          LogPane->AppendText("Set Encoding.\n");
-          break;
-      }
-    }
-    break;
-    case CGReg:{
-      CoreGenReg *RegNode = (CoreGenReg*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          RegNode->SetName(BoxContents);
-          break;
-        case 1:
-          RegNode->SetIndex(std::stoi(BoxContents));
-          break;
-        case 2:
-          //Is it by design that there's no function to change the width?
-          LogPane->AppendText("Set register width.\n");
-          break;
-        case 3:
-          LogPane->AppendText("Set Subregisters.\n");
-          break;
-      }
-    }
-    break;
-    case CGRegC:{
-      CoreGenRegClass *RegClassNode = (CoreGenRegClass*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          RegClassNode->SetName(BoxContents);
-          break;
-        case 1:
-          LogPane->AppendText("Set registers.\n");
-          break;
-      }
-    }
-    break;
-    case CGSoc:{
-      CoreGenSoC *SoCNode = (CoreGenSoC*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          SoCNode->SetName(BoxContents);
-          break;
-        case 1:
-          LogPane->AppendText("Set SoC Cores");
-          break;
-      }
-    }
-    break;
-    case CGSpad:{
-      CoreGenSpad *SpadNode = (CoreGenSpad*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          SpadNode->SetName(BoxContents);
-          break;
-        case 1:
-          SpadNode->SetMemSize(std::stoi(BoxContents));
-          break;
-        case 2:
-          SpadNode->SetRqstPorts(std::stoi(BoxContents));
-          break;
-        case 3:
-          SpadNode->SetRspPorts(std::stoi(BoxContents));
-          break;
-        case 4:
-          LogPane->AppendText("Change start addr.\n");
-          //SpadNode->SetStartAddr();
-          break;
-      }
-    }
-    break;
-    case CGVTP:{
-      CoreGenVTP *VTPNode = (CoreGenVTP*)node;
-      switch(InfoBoxIndex){
-        case 0:
-          VTPNode->SetName(BoxContents);
-          break;
-      }
-    }
-    break;
+    case CGPInst:
+      //if(createNewNode) node = CGProject->InsertPseudoInst("NewPInst", nullptr);
+      savedAll = SavePInst(InfoWin, (CoreGenPseudoInst*)node);
+      break;
+    case CGReg:
+      if(createNewNode) node = CGProject->InsertReg("NewReg", 0, 0);
+      savedAll = SaveReg(InfoWin, (CoreGenReg*)node);
+      break;
+    case CGRegC:
+      //if(createNewNode) node = CGProject->InsertRegClass("NewRegClass");
+      savedAll = SaveRegClass(InfoWin, (CoreGenRegClass*)node);
+      break;
+    case CGSoc:
+      if(createNewNode) node = CGProject->InsertSoC("NewSoC");
+      savedAll = SaveSoC(InfoWin, (CoreGenSoC*)node);
+      break;
+    case CGSpad:
+      if(createNewNode) node = CGProject->InsertSpad("NewSpad", 0, 0, 0);
+      savedAll = SaveSpad(InfoWin, (CoreGenSpad*)node);
+      break;
+    case CGVTP:
+      if(createNewNode) node = CGProject->InsertVTP("NewVTP");
+      savedAll = SaveVTP(InfoWin, (CoreGenVTP*)node);
+      break;
+  }
+    
+    
+
+  if(savedAll){
+    // write out the new IR file
+    std::string tempName = std::string(IRFileName.mb_str()) + "tmp";
+    CGProject->WriteIR(tempName);
+    std::string FName = static_cast<const char*>(IRFileName.c_str());
+    std::string NodeName = node->GetName();
+    CloseProject(true);
+    std::remove(FName.c_str());
+    std::rename(tempName.c_str(), FName.c_str());
+    std::remove(tempName.c_str());
+    ModuleBox->DeleteAllItems();
+    TreeItems.clear();
+    NodeItems.clear();
+    SetupModuleBox();
+    OpenProject(IRFileName, true);
+    LogPane->AppendText("Updated " + NodeName + ".\n");
+  }
+  else{
+    if(createNewNode) CGProject->DeleteNode(node);
+    LogPane->AppendText("Errors detected. Changes will not be saved to file until all fields are correct.\n");
+  }
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
+  CoreGenCache *NewChild;
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    CacheNode->SetName(BoxContents);
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
   }
 
-  // write out the new IR file
-  LogPane->AppendText(std::string(this->IRFileName.mb_str()) + "\n");
-  //CGProject->WriteIR(std::string(IRFileName.mb_str()));
-  CGProject->WriteIR("/home/fconlon/OpenSysArch/test.yaml");
-  ModuleBox->DeleteAllItems();
-  TreeItems.clear();
-  NodeItems.clear();
-  SetupModuleBox();
-  LoadModuleBox();
-  LogPane->AppendText("Updated " + wxString(node->GetName()) +
-                      " Box " + wxString(std::to_string(InfoBoxIndex)) +
-                      ".\n");
+  //set sets
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    CacheNode->SetSets(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Cache sets will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  //set sets
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    CacheNode->SetWays(std::stoi(BoxContents));
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Cache ways will not be changed\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set Child Cache
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  NewChild = CGProject->GetCacheNodeByName(BoxContents);
+  if(NewChild){
+    if(HasCacheCycle(CacheNode, NewChild)){
+      LogPane->AppendText("Inserting " + BoxContents + " would create a cache cycle. Old subcache will be kept.\n");
+       InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+       savedAll = false;
+    }
+    else {
+      InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
+      CoreGenCache *OldChild = CacheNode->GetSubCache();
+      if(OldChild){
+        OldChild->DeleteParentCache(CacheNode);
+        CacheNode->SetNullChildCache();  
+      }
+      CacheNode->SetChildCache(NewChild);
+      NewChild->SetParentCache(CacheNode);
+    }
+  }
+  else if(BoxContents == ""){
+    CoreGenCache* OldChild = CacheNode->GetSubCache();
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
+    if(OldChild){
+      OldChild->DeleteParentCache(CacheNode);
+      CacheNode->SetNullChildCache();
+    }
+    else{
+      LogPane->AppendText("Warning: no subcache was entered and there was no subcache to delete.\n");
+    }
+  }
+  else{
+    LogPane->AppendText("Could not find specified cache. No change made to child cache\n");
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    CommNode->SetName(BoxContents);
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set comm node type
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if( BoxContents.compare("Point-to-Point") == 0 ){
+    CommNode->SetCommType(CGCommP2P);
+  }
+  else if( BoxContents.compare("Bus") == 0 ){
+    CommNode->SetCommType(CGCommBus);
+  }
+  else if( BoxContents.compare("Network on Chip") == 0 ){
+    CommNode->SetCommType(CGCommNoc);
+  }
+  else{
+    CommNode->SetCommType(CGCommUnk);
+  }
+
+  //set width
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    CommNode->SetWidth(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Comm width will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set endpoints
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";
+  std::istringstream iss(BoxContents);
+  std::string nextNodeName;
+  while( CommNode->GetNumEndpoints() > 0) CommNode->DeleteEndpoint((unsigned)0);
+  std::getline(iss, nextNodeName);
+  bool allValid = true;
+  while(!iss.eof()){
+    CoreGenNode* N = CGProject->GetNodeByName(nextNodeName);
+    if(N){
+      CommNode->InsertEndpoint(N);
+    }
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid node. It will not be added to the endpoints list.\n");
+      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+    }
+    getline(iss, nextNodeName);
+  }
+
+  if(allValid) InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
+  CoreGenNode *newNode;
+  std::istringstream iss;
+  std::string nextNodeName;
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    CoreNode->SetName(BoxContents);
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set number of thread units
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    CoreNode->SetNumThreadUnits(std::stoi(BoxContents));
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Thread Units will not be changed\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set ISA
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  newNode = CGProject->GetISANodeByName(BoxContents);
+  if(newNode){
+    CoreNode->SetISA((CoreGenISA*)newNode);
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText("Could not find specified ISA. Keeping old ISA.\n");
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set Cache
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  newNode = CGProject->GetCacheNodeByName(BoxContents);
+  if(newNode){ 
+    CoreNode->InsertCache((CoreGenCache*)newNode);
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText("Could not find specified Cache. Keeping old Cache.\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+      
+  //set Register Classes
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  bool allValid = true;
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";  
+  iss.str(BoxContents);  
+  while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
+  std::getline(iss, nextNodeName);
+  while(!iss.eof()){
+    CoreGenRegClass* N = CGProject->GetRegClassNodeByName(nextNodeName);
+    if(N){
+      CoreNode->InsertRegClass(N);
+    } 
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid Register Class. It will not be added to the Register Class list.\n");
+      InfoWin->FindWindow(10)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+    } 
+    getline(iss, nextNodeName);
+  }
+
+  if(allValid) InfoWin->FindWindow(10)->SetForegroundColour(wxColour(0, 0, 0));
+
+  //set Extensions
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+  BoxContents = InfoBox->GetValue().ToStdString() + "\n";
+  allValid = true;
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";
+  iss.clear();  
+  iss.str(BoxContents);
+  while( CoreNode->GetNumExt() > 0) CoreNode->DeleteExt((unsigned)0);
+  std::getline(iss, nextNodeName);
+  while(!iss.eof()){
+    CoreGenExt* N = CGProject->GetExtNodeByName(nextNodeName);
+    if(N){
+      CoreNode->InsertExt(N);
+    } 
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid Extension. It will not be added to the Extension list.\n");
+      InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+    } 
+    getline(iss, nextNodeName);
+  }
+
+  if(allValid) InfoWin->FindWindow(11)->SetForegroundColour(wxColour(0, 0, 0));
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    ExtNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set Extension type
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if( BoxContents == "Template extension" ){
+    ExtNode->SetType(CGExtTemplate);
+  }
+  else if( BoxContents == "Module extension" ){
+    ExtNode->SetType(CGExtModule);
+  }
+  else if( BoxContents == "Communications extension" ){
+    ExtNode->SetType(CGExtComm);
+  }
+  else{
+    ExtNode->SetType(CGExtUnk);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    ISANode->SetName(BoxContents);
+    InfoWin->FindWindow(1)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
+    InfoWin->FindWindow(1)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  CoreGenNode *newNode;
+  std::istringstream iss;
+  std::string nextNodeName;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    InstNode->SetName(BoxContents);
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid extension name. Keeping old extension name\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set instruction format
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  
+  newNode = CGProject->GetInstFormatNodeByName(BoxContents);
+  if(newNode){
+    InstNode->SetNullFormat();
+    InstNode->SetFormat((CoreGenInstFormat*)newNode);
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText("Could not find specified Instruction Format.\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set ISA
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  newNode = CGProject->GetISANodeByName(BoxContents);
+  if(newNode){
+    InstNode->SetISA((CoreGenISA*)newNode);
+    CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+    if(PInst) PInst->SetISA((CoreGenISA*)newNode);
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
+  } 
+  else{
+    LogPane->AppendText("Could not find specified Instruction Set.\n");
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+
+  //set syntax
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(InstNode->ValidateSyntax(BoxContents)){
+    InstNode->SetSyntax(BoxContents);
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText("Invalid Syntax. No Changes will be made.\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set implementation
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  InstNode->SetImpl(BoxContents);
+
+  //set encodings
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n"; 
+  //CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+  std::string Field;
+  std::string op;
+  int Value;
+  iss.str(BoxContents);
+  InstNode->ClearEncodings();
+  getline(iss, nextNodeName);
+  bool allValid = true;
+  while(!iss.eof()){
+    std::stringstream encodingStream(nextNodeName);
+    encodingStream >> Field;
+    encodingStream >> op;
+    encodingStream >> Value;
+    if(!InstNode->SetEncoding(Field, Value)){
+      LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
+      InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+    }
+    /*
+    else if(PInst){
+      PInst->SetEncoding(Field, Value);
+    }
+    */
+    getline(iss, nextNodeName);
+  }
+
+  if(allValid) InfoWin->FindWindow(11)->SetForegroundColour(wxColour(0, 0, 0));
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    MCtrlNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set input ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    MCtrlNode->SetNumInputPorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Input ports will not be changed\n");
+    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  std::istringstream iss;
+  std::string nextNodeName;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    PInstNode->SetName(BoxContents);
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid pseudo-instruction name. Keeping old pseudo-instruction name\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set target instruction
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CoreGenInst *newNode = CGProject->GetInstNodeByName(BoxContents);
+  if(newNode){
+    PInstNode->SetNullInst();
+    PInstNode->SetTargetInst(newNode);
+    PInstNode->SetISA(newNode->GetISA());
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText("Could not find specified Instruction. Keeping old Instruction.\n");
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set encodings
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n"; 
+  std::string Field;
+  std::string op;
+  int Value;
+  PInstNode->ClearEncodings();
+  iss.str(BoxContents);
+  getline(iss, nextNodeName);
+  bool allValid = true;
+  while(!iss.eof()){
+    std::stringstream encodingStream(nextNodeName);
+    encodingStream >> Field;
+    encodingStream >> op;
+    encodingStream >> Value;
+    if(!PInstNode->SetEncoding(Field, Value)){
+      LogPane->AppendText("Invalid field: " + Field + ". Field will not be added to encodings.\n");
+      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+    }
+    getline(iss, nextNodeName);
+  }
+
+  if(allValid) InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  std::istringstream iss;
+  std::string nextNodeName;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    RegNode->SetName(BoxContents);
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid register name. Keeping old register name\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+      
+  //set index
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    RegNode->SetIndex(std::stoi(BoxContents));
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Register Index will not be changed\n");
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  //set register width
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    RegNode->SetWidth(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Register Width will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set simd width
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(16);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(BoxContents == "" || (IsInteger(BoxContents) && std::stoi(BoxContents) < 2)){
+    RegNode->UnsetSIMD();
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    if(IsInteger(BoxContents)){
+      RegNode->SetSIMD(std::stoi(BoxContents));
+      InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
+    }
+    else{
+      LogPane->AppendText(BoxContents + " is not an integer. SIMD data will not be changed\n");
+      InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+    }
+  }
+
+  //set subregisters
+  //TODO: make sure works when subregs are added/deleted
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if (BoxContents[BoxContents.size()-1] != '\n')
+    BoxContents += "\n";
+  iss.str(BoxContents);
+  getline(iss, nextNodeName);
+  getline(iss, nextNodeName);
+  std::string Name;
+  std::string startbit;
+  std::string endbit;
+  unsigned i;
+  bool allValid = true;
+  while(RegNode->GetNumSubRegs() > 0) RegNode->DeleteSubRegByIndex(0);
+  while(!iss.eof()){
+    //clear strings
+    Name = "";
+    startbit = "";
+    endbit = "";
+
+    //extract name and start/end bit
+    for(i = 0; i < nextNodeName.size() && nextNodeName[i] != ':'; i++){
+      Name += nextNodeName[i];
+    }
+    i++;
+    for(; i < nextNodeName.size() && nextNodeName[i] != ':'; i++){
+      startbit += nextNodeName[i];
+    }
+    i++;
+    for(; i < nextNodeName.size() && nextNodeName[i] != ':'; i++){
+      endbit += nextNodeName[i];
+    }
+
+    if(Name == ""){
+      LogPane->AppendText("Name can not be empty. Subregister will not be added to the subregisters list.\n");
+      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+      getline(iss, nextNodeName);
+      continue;
+    }
+
+    //make sure start and end bit are integers
+    if(!IsInteger(startbit) || !IsInteger(endbit)){
+      LogPane->AppendText("Start and end bit must be integers. " + Name + " will not be added to the subregisters list.\n");
+      InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+      getline(iss, nextNodeName);
+      continue;
+    }
+    RegNode->InsertSubReg(Name, std::stoi(startbit), std::stoi(endbit));
+    getline(iss, nextNodeName);
+  }
+
+  if(allValid) InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
+
+  //build attribute int
+  wxCheckBox* CheckBox;
+  uint32_t Attrs = 0x00;
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(9);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegRW;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(10);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegRO;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(11);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegCSR;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(12);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegAMS;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(13);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegTUS;
+  }
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(14);
+  if( CheckBox->GetValue() ){
+    Attrs |= CoreGenReg::CGRegPC;
+  }
+
+  CheckBox = (wxCheckBox*)InfoWin->FindWindow(15);
+  bool isShared = CheckBox->GetValue();
+
+  //check for conflicting attributes
+  bool noConflicts = true;
+  if((Attrs & CoreGenReg::CGRegRW) && (Attrs & CoreGenReg::CGRegRO)){
+    LogPane->AppendText("A register cannot be RW and RO. Attributes will not be changed.\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
+    InfoWin->FindWindow(10)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+    noConflicts = false;
+  }
+  else{
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+    InfoWin->FindWindow(10)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+
+  if((Attrs & CoreGenReg::CGRegCSR) && (Attrs & CoreGenReg::CGRegAMS)){
+    LogPane->AppendText("A register cannot be CSR and AMS. Attributes will not be changed.\n");
+    InfoWin->FindWindow(11)->SetForegroundColour(wxColour(255, 0, 0));
+    InfoWin->FindWindow(12)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+    noConflicts = false;
+  }
+  else{
+    InfoWin->FindWindow(11)->SetForegroundColour(wxColour(0, 0, 0));
+    InfoWin->FindWindow(12)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  if((Attrs & CoreGenReg::CGRegTUS) && isShared){
+    LogPane->AppendText("A register cannot be TUS and Shared. RW/RO status will not be changed.\n");
+    InfoWin->FindWindow(13)->SetForegroundColour(wxColour(255, 0, 0));
+    InfoWin->FindWindow(15)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+    noConflicts = false;
+  }
+  else{
+    InfoWin->FindWindow(13)->SetForegroundColour(wxColour(0, 0, 0));
+    InfoWin->FindWindow(15)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+
+  if(noConflicts){
+    RegNode->UnsetAttrs(Attrs);
+    RegNode->SetAttrs(Attrs);
+    RegNode->UnsetAttrs(Attrs);
+    RegNode->SetAttrs(Attrs);
+    RegNode->SetShared(isShared);
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  std::istringstream iss;
+  std::string nextNodeName;
+  bool savedAll = true;
+  
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    RegClassNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid Register Class name. Keeping old Register Class name\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  iss.str(BoxContents);
+  bool allValid = true;
+  //clear current registers
+  while(RegClassNode->GetNumReg() > 0) RegClassNode->DeleteChild(RegClassNode->GetChild(0));
+  std::getline(iss, nextNodeName);
+  while(!iss.eof()){
+    CoreGenReg* N = CGProject->GetRegNodeByName(nextNodeName);
+    if(N){
+      RegClassNode->InsertReg(N);
+    }
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid register. It will not be added to the registers list.\n");
+      InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+    }
+    getline(iss, nextNodeName);
+  }
+
+  if(allValid) InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  std::istringstream iss;
+  std::string nextNodeName;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    SoCNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid SoC name. Keeping old SoC name\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  //set cores
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  //clean current cores
+  while(SoCNode->GetNumCores() > 0) SoCNode->DeleteCore(SoCNode->GetCore(0));
+
+  //insert all valid cores in the user's list
+  iss.str(BoxContents);
+  std::getline(iss, nextNodeName);
+  bool allValid = true;
+  while(!iss.eof()){
+    CoreGenCore* N = CGProject->GetCoreNodeByName(nextNodeName);
+    if(N){
+      SoCNode->InsertCore(N);
+    }
+    else if(nextNodeName != ""){
+      LogPane->AppendText(nextNodeName + " is not a valid core. It will not be added to the cores list.\n");
+      InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+      allValid = false;
+    }
+    getline(iss, nextNodeName);
+  }
+
+  if(allValid) InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    SpadNode->SetName(BoxContents);
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid SoC name. Keeping old SoC name\n");
+    InfoWin->FindWindow(5)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set mem size
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    SpadNode->SetMemSize(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Mem size will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  //set request ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    SpadNode->SetRqstPorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Request ports will not be changed\n");
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  
+  //set response ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    SpadNode->SetRspPorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Response ports will not be changed\n");
+    InfoWin->FindWindow(8)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set start addr
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    SpadNode->SetStartAddr(std::stoull(BoxContents));
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Response ports will not be changed\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::SaveVTP(wxDialog* InfoWin, CoreGenVTP* VTPNode){
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+
+  //set name
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    VTPNode->SetName(BoxContents);
+    InfoWin->FindWindow(1)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid VTP name. Keeping old VTP name\n");
+    InfoWin->FindWindow(1)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  return savedAll;
+}
+
+bool PortalMainFrame::IsInteger(std::string TestString){
+  if(TestString == "") return false;
+
+  for(unsigned i = 0; i < TestString.size(); i++)
+    if(!std::isdigit(TestString[i])) return false;
+  
+  return true;
+}
+
+bool PortalMainFrame::HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache){
+  if(Cache == nullptr) return false;
+  if(SourceCache->GetName() == Cache->GetName()) return true;
+  return HasCacheCycle(SourceCache, Cache->GetSubCache());
 }
 
 // EOF

@@ -13,7 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreRegClassInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreRegClassInfoWin::OnPressOk)
-  EVT_TEXT_ENTER(wxID_ANY, CoreRegClassInfoWin::OnPressEnter)
+  EVT_BUTTON(wxID_SAVE, CoreRegClassInfoWin::OnSave)
 wxEND_EVENT_TABLE()
 
 CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
@@ -22,9 +22,6 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                               CoreGenRegClass *RegClass )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,250), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( RegClass == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   RegClassNode = RegClass;
 
@@ -50,7 +47,7 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
   // -- reg class
   RegClassNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RegClassNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   2,
                                    wxT("Register Class Name"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -60,10 +57,10 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
 
   RegClassNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(RegClass->GetName()),
+                                 RegClass ? wxString(RegClass->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("Reg Class Name") );
   RegClassNameSizer->Add( RegClassNameCtrl, 0, wxALL, 0 );
@@ -72,7 +69,7 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
   //-- registers
   RegNameSizer = new wxBoxSizer( wxHORIZONTAL );
   RegNameText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              3,
                               wxT("Registers"),
                               wxDefaultPosition,
                               wxSize(160,-1),
@@ -85,12 +82,13 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("registers") );
-
-  for( unsigned i=0; i<RegClass->GetNumReg(); i++ ){
-    RegNameCtrl->AppendText(wxString(RegClass->GetReg(i)->GetName())+wxT("\n") );
+  if(RegClass){
+    for( unsigned i=0; i<RegClass->GetNumReg(); i++ ){
+      RegNameCtrl->AppendText(wxString(RegClass->GetReg(i)->GetName())+wxT("\n") );
+    }
   }
   RegNameSizer->Add( RegNameCtrl, 0, wxALL, 0 );
   InnerSizer->Add( RegNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
@@ -105,10 +103,13 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(RegClass) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -126,9 +127,10 @@ void CoreRegClassInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-void CoreRegClassInfoWin::OnPressEnter(wxCommandEvent& enter){
+void CoreRegClassInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->RegClassNode, CGRegC);
+  if(PMF->OnSave(this, this->RegClassNode, CGRegC))
+    this->EndModal(wxID_SAVE);
 }
 
 CoreRegClassInfoWin::~CoreRegClassInfoWin(){

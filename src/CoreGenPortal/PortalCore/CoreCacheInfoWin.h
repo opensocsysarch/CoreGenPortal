@@ -83,6 +83,7 @@ protected:
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
   wxButton *m_userOK;                         ///< ok button
+  wxButton *m_userSAVE;                       ///< save button
 
 private:
   // Event handler functions
@@ -91,9 +92,9 @@ private:
 
   /// handles the 'ok' button press
   void OnPressOk( wxCommandEvent& event );
-  
-  /// handles 'enter' press in textctrl box
-  void OnPressEnter( wxCommandEvent& event);
+
+  /// handles 'save' click
+  void OnSave( wxCommandEvent& save );
 };
 
 #endif

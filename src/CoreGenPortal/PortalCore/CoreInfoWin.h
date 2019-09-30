@@ -59,7 +59,8 @@ class CoreInfoWin{
 public:
   CoreInfoWin( wxWindow* parent,
                wxWindowID id = wxID_ANY,
-               CoreGenNode *Node = nullptr);
+               CoreGenNode *Node = nullptr,
+               CGNodeType Type = CGTop);
   ~CoreInfoWin();
 
 protected:

@@ -83,7 +83,7 @@ public:
   ~PortalMainFrame();
 
   // node info update handlers
-  void OnPressEnter(wxCommandEvent &event, CoreGenNode *node, int InfoWinType);
+  bool OnSave(wxDialog *InfoWin, CoreGenNode *node, CGNodeType InfoWinType);
 
 private:
   // CoreGenHandlers
@@ -141,19 +141,20 @@ private:
   void CreateWindowLayout();
   void SetupModuleBox();
   void SetupPluginBox();
-  void LoadModuleBox();
+  void LoadModuleBox(bool editing = false);
   void LoadExtNodes(wxTreeItemId, CoreGenExt *Ext);
   void LoadPluginNodes(wxTreeItemId, CoreGenPlugin *Plugin);
   void LoadInstEncodings(wxTreeItemId, CoreGenInst *Inst);
   void LoadPInstEncodings(wxTreeItemId, CoreGenPseudoInst *PInst);
-  void CloseProject();
+  void CloseProject(bool editing = false);
   void DeleteNode(CoreGenNode *N);
   void AddNodeWin();
   void OpenFileFromWin(wxString Path);
   void OpenYamlFile(wxString NP, wxFileName NPF);
   void OpenSCFile(wxString NP, wxFileName NPF);
-  void OpenProject(wxString NP);
+  void OpenProject(wxString NP, bool editing = false);
 
+  CGNodeType TreeIdToCGType(wxTreeItemId ID);
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
 
@@ -180,6 +181,23 @@ private:
   void OnPopupNode(wxCommandEvent &event);
   void OnCopyText(wxCommandEvent &event );
   void OnPasteText(wxCommandEvent &event );
+  
+  //functions to save/edit node data
+  bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
+  bool SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode);
+  bool SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode);
+  bool SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode);
+  bool SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode);
+  bool SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode);
+  bool SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode);
+  bool SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode);
+  bool SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode);
+  bool SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassNode);
+  bool SaveSoC(wxDialog* InfoWin, CoreGenSoC* SoCNode);
+  bool SaveSpad(wxDialog* InfoWin, CoreGenSpad* SpadNode);
+  bool SaveVTP(wxDialog* InfoWin, CoreGenVTP* VTPNode);
+  bool IsInteger(std::string TestString);
+  bool HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache);
 };
 
 enum

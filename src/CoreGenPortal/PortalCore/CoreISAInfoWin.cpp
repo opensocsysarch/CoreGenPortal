@@ -13,7 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreISAInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreISAInfoWin::OnPressOk)
-  EVT_TEXT_ENTER(wxID_ANY, CoreISAInfoWin::OnPressEnter)
+  EVT_BUTTON(wxID_SAVE, CoreISAInfoWin::OnSave)
 wxEND_EVENT_TABLE()
 
 CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
@@ -22,9 +22,6 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
                               CoreGenISA *ISA )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,150), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( ISA == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->ISANode = ISA;
 
@@ -50,7 +47,7 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
   // -- ISA
   ISANameSizer = new wxBoxSizer(wxHORIZONTAL);
   ISANameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   1,
                                    wxT("ISA Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -59,11 +56,11 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
   ISANameSizer->Add( ISANameText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
   ISANameCtrl = new wxTextCtrl( Wnd,
-                                wxID_ANY,
-                                wxString(ISA->GetName()),
+                                0,
+                                ISA ? wxString(ISA->GetName()) : "",
                                 wxDefaultPosition,
                                 wxSize(320,25),
-                                wxTE_PROCESS_ENTER,
+                                0,
                                 wxDefaultValidator,
                                 wxT("ISA Name") );
   ISANameSizer->Add( ISANameCtrl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
@@ -79,10 +76,13 @@ CoreISAInfoWin::CoreISAInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(ISA) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -100,9 +100,10 @@ void CoreISAInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-void CoreISAInfoWin::OnPressEnter(wxCommandEvent& enter){
+void CoreISAInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->ISANode, CGISA);
+  if(PMF->OnSave(this, this->ISANode, CGISA))
+    this->EndModal(wxID_SAVE);
 }
 
 CoreISAInfoWin::~CoreISAInfoWin(){

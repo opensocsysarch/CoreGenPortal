@@ -13,7 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreMCtrlInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreMCtrlInfoWin::OnPressOk)
-  EVT_TEXT_ENTER(wxID_ANY, CoreMCtrlInfoWin::OnPressEnter)
+  EVT_BUTTON(wxID_SAVE, CoreMCtrlInfoWin::OnSave)
 wxEND_EVENT_TABLE()
 
 CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
@@ -22,9 +22,6 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
                               CoreGenMCtrl *MCtrl )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,250), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( MCtrl == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->MCtrlNode = MCtrl;
 
@@ -50,7 +47,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
   //-- memory controller name
   MCtrlNameSizer = new wxBoxSizer( wxHORIZONTAL );
   MCtrlNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   2,
                                    wxT("Memory Controller Name"),
                                    wxDefaultPosition,
                                    wxSize(160, -1),
@@ -60,10 +57,10 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
 
   MCtrlCtrl = new wxTextCtrl( Wnd,
                               0,
-                              wxString(MCtrl->GetName()),
+                              MCtrl ? wxString(MCtrl->GetName()) : "",
                               wxDefaultPosition,
                               wxSize(320,25),
-                              wxTE_PROCESS_ENTER,
+                              0,
                               wxDefaultValidator,
                               wxT("MCtrlName") );
   MCtrlNameSizer->Add( MCtrlCtrl, 0, wxALL, 0 );
@@ -72,7 +69,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
   //-- input ports
   InputPortSizer = new wxBoxSizer( wxHORIZONTAL );
   InputPortText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   3,
                                    wxT("Input Ports"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -82,10 +79,10 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
 
   InputPortCtrl = new wxTextCtrl( Wnd,
                                   1,
-                                  wxString::Format(wxT("%i"),MCtrl->GetNumInputPorts()),
+                                  MCtrl ? wxString::Format(wxT("%i"),MCtrl->GetNumInputPorts()) : "",
                                   wxDefaultPosition,
                                   wxSize(320,25),
-                                  wxTE_PROCESS_ENTER,
+                                  0,
                                   wxDefaultValidator,
                                   wxT("InputPorts") );
   InputPortSizer->Add( InputPortCtrl, 0, wxALL, 0 );
@@ -101,10 +98,13 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(MCtrl) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -122,9 +122,10 @@ void CoreMCtrlInfoWin::OnPressOk(wxCommandEvent& ok){
   this->EndModal(wxID_OK);
 }
 
-void CoreMCtrlInfoWin::OnPressEnter(wxCommandEvent& enter){
+void CoreMCtrlInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->MCtrlNode, CGMCtrl);
+  if(PMF->OnSave(this, this->MCtrlNode, CGMCtrl))
+    this->EndModal(wxID_SAVE);
 }
 
 CoreMCtrlInfoWin::~CoreMCtrlInfoWin(){

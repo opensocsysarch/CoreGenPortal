@@ -13,7 +13,7 @@
 // Event Table
 wxBEGIN_EVENT_TABLE(CoreCommInfoWin, wxDialog)
   EVT_BUTTON(wxID_OK, CoreCommInfoWin::OnPressOk)
-  EVT_TEXT_ENTER(wxID_ANY, CoreCommInfoWin::OnPressEnter)
+  EVT_BUTTON(wxID_SAVE, CoreCommInfoWin::OnSave)
 wxEND_EVENT_TABLE()
 
 CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
@@ -22,9 +22,6 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                               CoreGenComm *Comm )
   : wxDialog( parent, id, title, wxDefaultPosition,
               wxSize(500,350), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
-  if( Comm == nullptr ){
-    this->EndModal(wxID_OK);
-  }
 
   this->CommNode = Comm;
 
@@ -50,7 +47,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   //-- comm
   CommNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CommNameText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   4,
                                    wxT("Comm Node Name"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -60,10 +57,10 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
 
   CommNameCtrl = new wxTextCtrl( Wnd,
                                  0,
-                                 wxString(Comm->GetName()),
+                                 Comm ? wxString(Comm->GetName()) : "",
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("CommName") );
   CommNameSizer->Add( CommNameCtrl, 0, wxALL, 0 );
@@ -72,7 +69,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   //-- comm type
   CommTypeSizer = new wxBoxSizer( wxHORIZONTAL );
   CommTypeText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   5,
                                    wxT("Comm Node Type"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -85,31 +82,34 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                                  wxEmptyString,
                                  wxDefaultPosition,
                                  wxSize(320,25),
-                                 wxTE_PROCESS_ENTER,
+                                 0,
                                  wxDefaultValidator,
                                  wxT("CommType") );
-  switch( Comm->GetCommType() ){
-  case CGCommP2P:
-    CommTypeCtrl->AppendText(wxT("Point-to-Point"));
+  if(Comm){
+    switch( Comm->GetCommType() ){
+    case CGCommP2P:
+      CommTypeCtrl->AppendText(wxT("Point-to-Point"));
+      break;
+    case CGCommBus:
+      CommTypeCtrl->AppendText(wxT("Bus"));
+      break;
+    case CGCommNoc:
+      CommTypeCtrl->AppendText(wxT("Network on Chip"));
+      break;
+    case CGCommUnk:
+    default:
+      CommTypeCtrl->AppendText(wxT("Unknown"));
     break;
-  case CGCommBus:
-    CommTypeCtrl->AppendText(wxT("Bus"));
-    break;
-  case CGCommNoc:
-    CommTypeCtrl->AppendText(wxT("Network on Chip"));
-    break;
-  case CGCommUnk:
-  default:
-    CommTypeCtrl->AppendText(wxT("Unknown"));
-    break;
+    }
   }
+  
   CommTypeSizer->Add( CommTypeCtrl, 0, wxALL, 0 );
   InnerSizer->Add( CommTypeSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   //-- width
   CommWidthSizer = new wxBoxSizer( wxHORIZONTAL );
   WidthText = new wxStaticText( Wnd,
-                                   wxID_ANY,
+                                   6,
                                    wxT("Comm Channel Width"),
                                    wxDefaultPosition,
                                    wxSize(160,-1),
@@ -119,10 +119,10 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
 
   WidthCtrl = new wxTextCtrl( Wnd,
                               2,
-                              wxString::Format(wxT("%i"),Comm->GetWidth()),
+                              Comm ? wxString::Format(wxT("%i"),Comm->GetWidth()) : "",
                               wxDefaultPosition,
                               wxSize(320,25),
-                              wxTE_PROCESS_ENTER,
+                              0,
                               wxDefaultValidator,
                               wxT("CommWidth") );
   CommWidthSizer->Add( WidthCtrl, 0, wxALL, 0 );
@@ -131,7 +131,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
   //-- endpoints
   CommEndpointSizer = new wxBoxSizer( wxHORIZONTAL );
   EndpointText = new wxStaticText( Wnd,
-                              wxID_ANY,
+                              7,
                               wxT("Endpoints"),
                               wxDefaultPosition,
                               wxSize(160,-1),
@@ -144,12 +144,13 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
                             wxEmptyString,
                             wxDefaultPosition,
                             wxSize(320,100),
-                            wxTE_PROCESS_ENTER|wxTE_MULTILINE|wxHSCROLL,
+                            wxTE_MULTILINE|wxHSCROLL,
                             wxDefaultValidator,
                             wxT("endpoints") );
-
-  for( unsigned i=0; i<Comm->GetNumEndpoints(); i++ ){
-    EndpointCtrl->AppendText(wxString(Comm->GetEndpoint(i)->GetName())+wxT("\n") );
+  if(Comm){
+    for( unsigned i=0; i<Comm->GetNumEndpoints(); i++ ){
+      EndpointCtrl->AppendText(wxString(Comm->GetEndpoint(i)->GetName())+wxT("\n") );
+    }
   }
   CommEndpointSizer->Add( EndpointCtrl, 0, wxALL, 0 );
   InnerSizer->Add( CommEndpointSizer, 0, wxALIGN_CENTER|wxALL, 5 );
@@ -169,10 +170,13 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  m_userOK = new wxButton( Wnd, wxID_OK );
-  m_socbuttonsizer->AddButton( m_userOK );
+  if(Comm) m_userOK = new wxButton( Wnd, wxID_OK );
+  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userSAVE = new wxButton( Wnd, wxID_SAVE);
+  m_socbuttonsizer->SetAffirmativeButton( m_userOK );
+  m_socbuttonsizer->SetCancelButton( m_userSAVE );
   m_socbuttonsizer->Realize();
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 0, wxALL, 5 );
 
   Wnd->SetScrollbars(20,20,50,50);
   Wnd->SetSizer( InnerSizer );
@@ -190,9 +194,10 @@ void CoreCommInfoWin::OnPressOk( wxCommandEvent& ok ){
   this->EndModal(wxID_OK);
 }
 
-void CoreCommInfoWin::OnPressEnter( wxCommandEvent& enter ){
+void CoreCommInfoWin::OnSave(wxCommandEvent& save){
   PortalMainFrame *PMF = (PortalMainFrame*)this->GetParent();
-  PMF->OnPressEnter(enter, this->CommNode, CGComm);
+  if(PMF->OnSave(this, this->CommNode, CGComm))
+    this->EndModal(wxID_SAVE);
 }
 
 CoreCommInfoWin::~CoreCommInfoWin(){
