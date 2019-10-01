@@ -2213,7 +2213,7 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent& WXUNUSED(event)){
 bool PortalMainFrame::OnSave(wxDialog *InfoWin,
                                    CoreGenNode *node,
                                    CGNodeType InfoWinType){
-  bool savedAll;
+  bool savedAll = false;
   bool createNewNode = false;
   if(!node) createNewNode = true;
   switch(InfoWinType){
@@ -2269,9 +2269,14 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       if(createNewNode) node = CGProject->InsertVTP("NewVTP");
       savedAll = SaveVTP(InfoWin, (CoreGenVTP*)node);
       break;
+    case CGInstF:
+    case CGEnc:
+    case CGPlugin:
+    default:
+      LogPane->AppendText("Node not supported\n");
+      savedAll = false;
+      break;
   }
-    
-    
 
   if(savedAll){
     // write out the new IR file
