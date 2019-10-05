@@ -2667,6 +2667,10 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
   if(BoxContents == "" || newNode){
     InstNode->SetNullFormat();
     InstNode->SetFormat((CoreGenInstFormat*)newNode);
+    CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+    if(PInst){
+      PInst->ClearEncodings();
+    }
     InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
@@ -2693,16 +2697,22 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
   
 
   //set syntax
-  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
-  BoxContents = InfoBox->GetValue().ToStdString();
-  if(InstNode->ValidateSyntax(BoxContents)){
-    InstNode->SetSyntax(BoxContents);
-    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+  if(InstNode->GetFormat()){
+    InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
+    BoxContents = InfoBox->GetValue().ToStdString();
+    if(InstNode->ValidateSyntax(BoxContents)){
+      InstNode->SetSyntax(BoxContents);
+      InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+    }
+    else{
+      LogPane->AppendText("Invalid Syntax. No Changes will be made.\n");
+      InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
+      savedAll = false;
+    }
   }
   else{
-    LogPane->AppendText("Invalid Syntax. No Changes will be made.\n");
-    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
-    savedAll = false;
+    LogPane->AppendText("Syntax can not be set when there is no instruction format. Syntax will be set to empty.\n");
+    InstNode->SetSyntax("");
   }
 
   //set implementation
