@@ -2668,6 +2668,12 @@ bool PortalMainFrame::SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode){
     InstNode->SetNullFormat();
     InstNode->SetFormat((CoreGenInstFormat*)newNode);
     CoreGenPseudoInst *PInst = CGProject->GetPInstNodeByInstName(InstNode->GetName());
+    //clear syntax if IF is deleted
+    if(BoxContents == ""){
+      InstNode->SetSyntax("");
+      if(PInst)
+        PInst->SetSyntax("");
+    }
     if(PInst){
       PInst->ClearEncodings();
     }
