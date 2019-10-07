@@ -117,6 +117,8 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->Append(wxID_SAVE);
   ProjectMenu->Append(wxID_SAVEAS);
   ProjectMenu->AppendSeparator();
+  ProjectMenu->Append( ID_PROJFILESAVE, wxT("&Save File"));
+  ProjectMenu->AppendSeparator();
   ProjectMenu->Append( ID_PROJSCOPEN, wxT("&Open StoneCutter"));
   ProjectMenu->Append( ID_PROJSUMMARY, wxT("&Project Summary"));
   ProjectMenu->Append( ID_PROJSPECDOC, wxT("&Build Specification Doc"));
@@ -180,6 +182,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjSummary));
   Connect( ID_PROJSPECDOC, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjSpecDoc));
+  Connect( ID_PROJFILESAVE, wxEVT_COMMAND_MENU_SELECTED,
+           wxCommandEventHandler(PortalMainFrame::OnProjSaveFile));
 
   //-- build menu
   Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
@@ -1668,6 +1672,35 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
     LogPane->AppendText("Committed user preferences\n");
   }
   UP->Destroy();
+}
+
+// PortalMainFrame::OnProjSaveFile
+void PortalMainFrame::OnProjSaveFile(wxCommandEvent &event){
+  if( !CGProject ){
+    LogPane->AppendText( "No project is open!\n" );
+    return ;
+  }
+
+  wxStyledTextCtrl *SW = (wxStyledTextCtrl *)(EditorNotebook->GetPage(
+                                              EditorNotebook->GetSelection()));
+  if( SW == IRPane ){
+    // write out the new IR file
+    IRPane->SaveFile(IRFileName);
+    CloseProject(true);
+    ModuleBox->DeleteAllItems();
+    TreeItems.clear();
+    NodeItems.clear();
+    SetupModuleBox();
+    OpenProject(IRFileName, true);
+    LogPane->AppendText("Updated modules\n");
+  }else{
+    // just save the file
+    for( unsigned i = 0; i<SCPanes.size(); i++ ){
+      if( std::get<0>(SCPanes[i]) == SW ){
+        SW->SaveFile(std::get<1>(SCPanes[i]));
+      }
+    }
+  }
 }
 
 // PortalMainFrame::OnProjSpecDoc
