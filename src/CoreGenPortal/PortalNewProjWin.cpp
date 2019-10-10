@@ -64,7 +64,7 @@ PortalNewProjWin::PortalNewProjWin( wxWindow *parent,
   // -- project name input box
   ProjNameCtrl = new wxTextCtrl( this,
                                  wxID_ANY,
-                                 wxT("PROJECT_NAME"),
+                                 wxT("PROJECTNAME"),
                                  wxDefaultPosition,
                                  wxSize(400,25),
                                  0,
@@ -132,6 +132,12 @@ void PortalNewProjWin::OnPressOk( wxCommandEvent& ok ){
   // read all the values
   /// project name
   std::string PName = std::string(ProjNameCtrl->GetValue().mb_str());
+
+  if(!CoreGenBackend::IsValidName(PName)){
+    LogPane->AppendText(PName + " is not a valid project name.\n");
+    ProjNameText->SetForegroundColour(wxColour(255, 0, 0));
+    return;
+  }
 
   /// project type
   CGProjType PType = CGNULLProj;
