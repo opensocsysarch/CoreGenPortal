@@ -28,16 +28,17 @@ void CoreDrawInstFormat::paintEvent(wxPaintEvent& evt){
 
 void CoreDrawInstFormat::paintNow(){
   wxPaintDC *dc = new wxPaintDC(this);
-  wxCoord X;
-  wxCoord Y;
-  dc->GetLogicalOrigin(&X,&Y);
-  dc->DrawText(wxString(IF->GetName()),X,Y);
-#if 0
+  wxCoord Width;
+  wxCoord Height;
+  dc->GetSize(&Width, &Height);
+
   // TODO: draw all the rectangles
   dc->SetBrush(*wxBLUE_BRUSH); // blue filling
-  dc->SetPen( wxPen( wxColor(255,175,175), 10 ) ); // 10-pixels-thick pink outline
-  dc->DrawRectangle( 300, 100, 400, 200 );
-#endif
+  dc->SetPen( wxPen( wxColor(255,175,175), 3 ) ); // 10-pixels-thick pink outline
+
+  wxCoord StartX = Width/2-150;
+  dc->DrawRectangle( StartX, 30, 300, 20 );
+
 }
 
 CoreDrawInstFormat::~CoreDrawInstFormat(){
