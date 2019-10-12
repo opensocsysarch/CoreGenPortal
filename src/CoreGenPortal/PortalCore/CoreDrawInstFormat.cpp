@@ -35,7 +35,7 @@ void CoreDrawInstFormat::paintNow(){
   unsigned BitPixelWidth;
 
   dc->GetSize(&Width, &Height);
-  IF->SortFieldsByStartBit();
+  //IF->SortFieldsByStartBit();
 
   StartX = Width/2 - IF_BOX_PIXEL_WIDTH/2;
   InitialX = StartX;
@@ -46,6 +46,11 @@ void CoreDrawInstFormat::paintNow(){
   std::string CurrName;
   std::string NextName;
   unsigned DrawWidth;
+  unsigned CurrEndBit;
+  unsigned NextStartBit;
+  unsigned FieldWidth;
+  unsigned OverlapWidth;
+  bool PrevFieldOverlap = false;
 
   /*
   CurrName = IF->GetFieldName(0);
@@ -60,12 +65,41 @@ void CoreDrawInstFormat::paintNow(){
 
   
   for(unsigned i = 1; i < IF->GetNumFields(); i++){
+    //gather information needed to draw current field
     CurrName = IF->GetFieldName(i-1);
     NextName = IF->GetFieldName(i);
+    CurrEndBit = IF->GetEndBit(CurrName);
+    NextStartBit = IF->GetStartBit(NextName);
+    FieldWidth = IF->GetFieldWidth(CurrName);
+    dc->SetBrush( *wxTRANSPARENT_BRUSH );
 
-    if(IF->GetStartBit(NextName) > IF->GetEndBit(CurrName)){
-      DrawWidth = IF->GetFieldWidth(CurrName)*BitPixelWidth;
+    if(PrevFieldOverlap){
+      FieldWidth -= OverlapWidth;
+    }
+
+    if( NextStartBit > CurrEndBit){
+      //draw current field
+      DrawWidth = FieldWidth*BitPixelWidth;
       dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+
+      //prepare to draw next field
+      PrevFieldOverlap = false;
+      StartX += DrawWidth;
+    }
+    else{
+      //draw non-overlapping part of current field
+      OverlapWidth = CurrEndBit - NextStartBit + 1;
+      DrawWidth = (FieldWidth - OverlapWidth)*BitPixelWidth;
+      dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+
+      //draw overlapping part of current field
+      StartX += DrawWidth;
+      dc->SetBrush( *wxRED_BRUSH );
+      DrawWidth = OverlapWidth*BitPixelWidth;
+      dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+      
+      //prepare to draw next field
+      PrevFieldOverlap = true;
       StartX += DrawWidth;
     }
   }
