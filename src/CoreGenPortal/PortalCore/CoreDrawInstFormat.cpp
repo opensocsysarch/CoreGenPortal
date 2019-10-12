@@ -30,15 +30,49 @@ void CoreDrawInstFormat::paintNow(){
   wxPaintDC *dc = new wxPaintDC(this);
   wxCoord Width;
   wxCoord Height;
+  wxCoord StartX;
+  wxCoord InitialX;
+  unsigned BitPixelWidth;
+
   dc->GetSize(&Width, &Height);
+  IF->SortFieldsByStartBit();
+
+  StartX = Width/2 - IF_BOX_PIXEL_WIDTH/2;
+  InitialX = StartX;
+  BitPixelWidth = IF_BOX_PIXEL_WIDTH/IF->GetFormatWidth();
 
   // TODO: draw all the rectangles
-  dc->SetBrush(*wxBLUE_BRUSH); // blue filling
-  dc->SetPen( wxPen( wxColor(255,175,175), 3 ) ); // 10-pixels-thick pink outline
+  dc->SetPen( wxPen( *wxBLACK, 3 ) );
+  std::string CurrName;
+  std::string NextName;
+  unsigned DrawWidth;
 
-  wxCoord StartX = Width/2-150;
-  dc->DrawRectangle( StartX, 30, 300, 20 );
+  /*
+  CurrName = IF->GetFieldName(0);
+  DrawWidth = IF->GetFieldWidth(CurrName)*BitPixelWidth;
+  dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+  
+  NextName = IF->GetFieldName(0);
+  DrawWidth = IF->GetFieldWidth(NextName)*BitPixelWidth;
+  dc->DrawRectangle( StartX + 80, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+  */
 
+
+  
+  for(unsigned i = 1; i < IF->GetNumFields(); i++){
+    CurrName = IF->GetFieldName(i-1);
+    NextName = IF->GetFieldName(i);
+
+    if(IF->GetStartBit(NextName) > IF->GetEndBit(CurrName)){
+      DrawWidth = IF->GetFieldWidth(CurrName)*BitPixelWidth;
+      dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+      StartX += DrawWidth;
+    }
+  }
+  
+  DrawWidth = IF_BOX_PIXEL_WIDTH + InitialX - StartX;
+  dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+  
 }
 
 CoreDrawInstFormat::~CoreDrawInstFormat(){
