@@ -33,13 +33,14 @@ void CoreDrawInstFormat::paintNow(){
   wxCoord StartX;
   wxCoord InitialX;
   unsigned BitPixelWidth;
+  unsigned FormatWidth = IF->GetFormatWidth();
 
   dc->GetSize(&Width, &Height);
   //IF->SortFieldsByStartBit();
 
   StartX = Width/2 - IF_BOX_PIXEL_WIDTH/2;
   InitialX = StartX;
-  BitPixelWidth = IF_BOX_PIXEL_WIDTH/IF->GetFormatWidth();
+  BitPixelWidth = IF_BOX_PIXEL_WIDTH/FormatWidth;
 
   // TODO: draw all the rectangles
   dc->SetPen( wxPen( *wxBLACK, 3 ) );
@@ -53,6 +54,7 @@ void CoreDrawInstFormat::paintNow(){
   unsigned OverlapWidth;
   unsigned NextBitToDraw = 0;
   bool PrevFieldOverlap = false;
+  bool BrokeLoop = false;
 
   /*
   CurrName = IF->GetFieldName(0);
@@ -83,6 +85,11 @@ void CoreDrawInstFormat::paintNow(){
 
     //No overlap case
     if( CurrEndBit < NextStartBit ){
+      //break if field ends beyond format width
+      if(CurrEndBit > FormatWidth){
+        BrokeLoop = true;
+        break;
+      }
       //draw any unused space
       if(CurrStartBit != NextBitToDraw && !PrevFieldOverlap){
         dc->SetBrush(* wxYELLOW_BRUSH );
@@ -104,6 +111,11 @@ void CoreDrawInstFormat::paintNow(){
     }
     //Overlapping case
     else{
+      //break if field ends beyond format width
+      if(CurrEndBit > FormatWidth){
+        BrokeLoop = true;
+        break;
+      }
       //draw any unused space
       if(CurrStartBit != NextBitToDraw && !PrevFieldOverlap){
         dc->SetBrush(* wxYELLOW_BRUSH );
@@ -134,7 +146,11 @@ void CoreDrawInstFormat::paintNow(){
     NextBitToDraw += FieldWidth;
   }
   
-  CurrStartBit = IF->GetStartBit(NextName);
+  if(!BrokeLoop){
+    CurrStartBit = IF->GetStartBit(NextName);
+    CurrEndBit = IF->GetEndBit(NextName);
+  }
+    
 
   //draw any unused space
   if(CurrStartBit != NextBitToDraw && !PrevFieldOverlap){
@@ -149,6 +165,13 @@ void CoreDrawInstFormat::paintNow(){
   dc->SetBrush( *wxTRANSPARENT_BRUSH );
   DrawWidth = IF_BOX_PIXEL_WIDTH + InitialX - StartX;
   dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+
+  //draw endcap if field extends beyond format width
+  if(CurrEndBit > FormatWidth){
+    StartX += DrawWidth;
+    dc->SetBrush( *wxBLACK_BRUSH );
+    dc->DrawRectangle( StartX, IF_BOX_TOP, 10, IF_BOX_PIXEL_HEIGHT );
+  }
   
 }
 
