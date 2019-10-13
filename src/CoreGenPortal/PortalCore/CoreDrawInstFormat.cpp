@@ -46,10 +46,12 @@ void CoreDrawInstFormat::paintNow(){
   std::string CurrName;
   std::string NextName;
   unsigned DrawWidth;
+  unsigned CurrStartBit;
   unsigned CurrEndBit;
   unsigned NextStartBit;
   unsigned FieldWidth;
   unsigned OverlapWidth;
+  unsigned NextBitToDraw = 0;
   bool PrevFieldOverlap = false;
 
   /*
@@ -68,16 +70,30 @@ void CoreDrawInstFormat::paintNow(){
     //gather information needed to draw current field
     CurrName = IF->GetFieldName(i-1);
     NextName = IF->GetFieldName(i);
+    CurrStartBit = IF->GetStartBit(CurrName);
     CurrEndBit = IF->GetEndBit(CurrName);
     NextStartBit = IF->GetStartBit(NextName);
     FieldWidth = IF->GetFieldWidth(CurrName);
+
     dc->SetBrush( *wxTRANSPARENT_BRUSH );
 
     if(PrevFieldOverlap){
       FieldWidth -= OverlapWidth;
     }
 
-    if( NextStartBit > CurrEndBit){
+    //No overlap case
+    if( CurrEndBit < NextStartBit ){
+      //draw any unused space
+      if(CurrStartBit != NextBitToDraw && !PrevFieldOverlap){
+        dc->SetBrush(* wxYELLOW_BRUSH );
+        DrawWidth = (CurrStartBit - NextBitToDraw)*BitPixelWidth;
+        dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+
+        //prepare to draw field
+        StartX += DrawWidth;
+        NextBitToDraw = CurrStartBit;
+        dc->SetBrush( *wxTRANSPARENT_BRUSH );
+      }
       //draw current field
       DrawWidth = FieldWidth*BitPixelWidth;
       dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
@@ -86,7 +102,19 @@ void CoreDrawInstFormat::paintNow(){
       PrevFieldOverlap = false;
       StartX += DrawWidth;
     }
+    //Overlapping case
     else{
+      //draw any unused space
+      if(CurrStartBit != NextBitToDraw && !PrevFieldOverlap){
+        dc->SetBrush(* wxYELLOW_BRUSH );
+        DrawWidth = (CurrStartBit - NextBitToDraw)*BitPixelWidth;
+        dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+
+        //prepare to draw field
+        StartX += DrawWidth;
+        NextBitToDraw = CurrStartBit;
+        dc->SetBrush( *wxTRANSPARENT_BRUSH );
+      }
       //draw non-overlapping part of current field
       OverlapWidth = CurrEndBit - NextStartBit + 1;
       DrawWidth = (FieldWidth - OverlapWidth)*BitPixelWidth;
@@ -102,8 +130,23 @@ void CoreDrawInstFormat::paintNow(){
       PrevFieldOverlap = true;
       StartX += DrawWidth;
     }
+
+    NextBitToDraw += FieldWidth;
   }
   
+  CurrStartBit = IF->GetStartBit(NextName);
+
+  //draw any unused space
+  if(CurrStartBit != NextBitToDraw && !PrevFieldOverlap){
+    dc->SetBrush(* wxYELLOW_BRUSH );
+    DrawWidth = (CurrStartBit - NextBitToDraw)*BitPixelWidth;
+    dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
+
+    //prepare to draw field
+    StartX += DrawWidth;
+  }
+  
+  dc->SetBrush( *wxTRANSPARENT_BRUSH );
   DrawWidth = IF_BOX_PIXEL_WIDTH + InitialX - StartX;
   dc->DrawRectangle( StartX, IF_BOX_TOP, DrawWidth, IF_BOX_PIXEL_HEIGHT );
   
