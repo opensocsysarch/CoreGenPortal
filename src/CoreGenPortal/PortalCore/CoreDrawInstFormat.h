@@ -10,6 +10,9 @@
 
 #ifndef _COREDRAWINSTFORMAT_H_
 #define _COREDRAWINSTFORMAT_H_
+#define IF_BOX_PIXEL_WIDTH 320
+#define IF_BOX_PIXEL_HEIGHT 30
+#define IF_BOX_TOP 30
 
 //-- WX HEADERS
 #include <wx/artprov.h>

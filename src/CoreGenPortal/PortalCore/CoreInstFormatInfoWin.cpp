@@ -42,7 +42,7 @@ CoreInstFormatInfoWin::CoreInstFormatInfoWin( wxWindow* parent,
                                    InstF );
   IFDraw->SetAutoLayout(true);
   IFDraw->Layout();
-  InnerSizer->Add( IFDraw, 1, wxALIGN_CENTER|wxALL|wxEXPAND, 5 );
+  InnerSizer->Add( IFDraw, 4, wxALIGN_CENTER|wxALL|wxEXPAND, 5 );
 
   // add the static line
   FinalStaticLine = new wxStaticLine( this,
@@ -58,7 +58,7 @@ CoreInstFormatInfoWin::CoreInstFormatInfoWin( wxWindow* parent,
   m_socbuttonsizer->AddButton( m_userOK );
   m_socbuttonsizer->Realize();
 
-  InnerSizer->Add( m_socbuttonsizer, 1, wxEXPAND, 5 );
+  InnerSizer->Add( m_socbuttonsizer, 1, wxALL|wxEXPAND, 5 );
 
   // draw everything
   OuterSizer->Add(InnerSizer,1,wxEXPAND,5);

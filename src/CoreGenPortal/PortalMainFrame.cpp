@@ -2481,7 +2481,12 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
   while(!iss.eof()){
     CoreGenNode* N = CGProject->GetNodeByName(nextNodeName);
     if(N){
-      CommNode->InsertEndpoint(N);
+      if(!CommNode->InsertEndpoint(N)){
+        LogPane->AppendText(nextNodeName + " is not a valid node. It will not be added to the endpoints list.\n");
+        InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+        savedAll = false;
+        allValid = false;
+      }
     }
     else if(nextNodeName != ""){
       LogPane->AppendText(nextNodeName + " is not a valid node. It will not be added to the endpoints list.\n");
