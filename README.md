@@ -45,7 +45,7 @@ cd build
 ```
 1. Execute CMake to generate the makefiles
 ```
-cmake -DLLVM_DIR=/usr/lib/llvm-6.0/cmake ../
+cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake ../
 ```
 1. Execute the build
 ```
@@ -69,7 +69,7 @@ cd build
 ```
 1. Execute CMake to generate the makefiles
 ```
-cmake -DLLVM_DIR=/usr/lib/llvm-6.0/cmake ../
+cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake ../
 ```
 1. Execute the build
 ```
@@ -111,7 +111,7 @@ cd build
 ```
 1. Execute CMake to generate the makefiles
 ```
-cmake -DLLVM_DIR=/opt/rh/llvm-toolset-7/root/usr/lib64/cmake/llvm ../
+cmake -DLLVM_DIR=/opt/rh/llvm-toolset-7.0/root/usr/lib64/cmake/llvm ../
 ```
 1. Execute the build
 ```
@@ -137,7 +137,7 @@ cd build
 ```
 1. Execute CMake to generate the makefiles
 ```
-cmake -DLLVM_DIR=/usr/local/opt/llvm\@5/lib/cmake/llvm ../
+cmake -DLLVM_DIR=/usr/local/opt/llvm\@8/lib/cmake/llvm ../
 ```
 1. Execute the build
 ```
@@ -179,6 +179,7 @@ CoreGenPortal is licensed under an Apache-style license - see the [LICENSE](LICE
 ## Authors
 * *John Leidel* - *Chief Scientist* - [Tactical Computing Labs](http://www.tactcomplabs.com)
 * *Frank Conlon* - *Research Engineer* - [Tactical Computing Labs](http://www.tactcomplabs.com)
+* *David Donofrio* - *Chief Hardware Architect* - [Tactical Computing Labs](http://www.tactcomplabs.com)
 
 ## Acknowledgements
 * None at this time
