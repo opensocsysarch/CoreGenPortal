@@ -76,21 +76,20 @@ message(STATUS "COREGEN_INSTALL_PATH set to ${COREGEN_INSTALL_PATH}")
 #------------------------------------------------------------------------
 message( STATUS "CMAKE SYSTEM NAME IS ${CMAKE_SYSTEM_NAME}")
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-#if( ${CMAKE_SYSTEM_NAME} EQUAL "Linux" )
   find_file (DEBIAN_FOUND debian_version debconf.conf
       PATHS /etc
   )
   if( DEBIAN_FOUND )
     #-- ubuntu or debian system
     message(STATUS "BUILDING FOR DEBIAN/UBUNTU PLATFORM")
-    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua5.3 -ldl" )
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -ldl" )
   else()
     #-- centos system
     message(STATUS "BUILDING FOR CENTOS PLATFORM")
-    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua -ldl" )
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -ldl" )
   endif()
 else()
-  set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -lclingo -lgringo -lclasp -lpyclingo -lluaclingo -lpotassco -lreify -llua" )
+  set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp" )
 endif()
 message(STATUS "COREGEN_LINK_LIBS set to ${COREGEN_LINK_LIBS}")
 
@@ -121,7 +120,6 @@ if(BUILD_DOCUMENTATION)
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/man DESTINATION share/man)
 
   message(STATUS "Enabling developer documentation")
-#  add_subdirectory(docs)
 endif()
 
 #------------------------------------------------------------------------
@@ -184,6 +182,5 @@ endif()
 #------------------------------------------------------------------------
 # Add subdirectories
 add_subdirectory(src)
-#add_subdirectory(test)
 
 #-- EOF
