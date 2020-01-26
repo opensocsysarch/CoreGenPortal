@@ -12,7 +12,8 @@
 #define _COREDRAWINSTFORMAT_H_
 #define IF_BOX_PIXEL_WIDTH 320
 #define IF_BOX_PIXEL_HEIGHT 30
-#define IF_BOX_TOP 30
+#define IF_BOX_TOP 50
+#define IF_KEY_TOP 10
 
 //-- WX HEADERS
 #include <wx/artprov.h>
@@ -51,6 +52,7 @@ public:
 
   void paintEvent(wxPaintEvent& evt);
   void paintNow();
+  void drawKey(wxPaintDC* dc, wxCoord Width);
 
   DECLARE_EVENT_TABLE();
 
