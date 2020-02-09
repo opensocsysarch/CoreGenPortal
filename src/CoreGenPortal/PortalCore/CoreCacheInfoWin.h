@@ -61,6 +61,7 @@ protected:
   wxBoxSizer *CacheNameSizer;     ///< cache name sizer
   wxBoxSizer *CacheSetsSizer;     ///< cache sets sizer
   wxBoxSizer *CacheWaysSizer;     ///< cache ways sizer
+  wxBoxSizer *LineSizeSizer;     ///< line size sizer
   wxBoxSizer *ParentCacheSizer;   ///< parent cache sizer
   wxBoxSizer *ChildCacheSizer;    ///< child cache sizer
   wxBoxSizer *SpacerPanelSizer;   ///< spacer panel for spacing at bottom
@@ -71,12 +72,14 @@ protected:
   wxStaticText *CacheNameText;    ///< static text for cache name
   wxStaticText *SetsText;         ///< static text for cache sets
   wxStaticText *WaysText;         ///< static text for cache ways
+  wxStaticText *LineSizeText;    ///< static text for line size
   wxStaticText *ParentCacheText;  ///< static text for parent cache
   wxStaticText *ChildCacheText;   ///< static text for child cache
 
   wxTextCtrl *CacheNameCtrl;      ///< cache name
   wxTextCtrl *SetsCtrl;           ///< cache sets
   wxTextCtrl *WaysCtrl;           ///< cache ways
+  wxTextCtrl *LineSizeCtrl;       ///< Line Size
   wxTextCtrl *ParentCacheCtrl;    ///< parent cache
   wxTextCtrl *ChildCacheCtrl;     ///< child cache
 

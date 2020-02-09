@@ -58,15 +58,21 @@ protected:
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
   wxBoxSizer *RegClassNameSizer;  ///< regclass name sizer
+  wxBoxSizer *ReadPortsSizer;     ///< read ports sizer
+  wxBoxSizer *WritePortsSizer;    ///< write ports sizer
   wxBoxSizer *RegNameSizer;       ///< reg name sizer
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
 
   wxStaticText *RegClassNameText; ///< static text for SoC name
+  wxStaticText *ReadPortsText;    ///< static text for read ports
+  wxStaticText *WritePortsText;   ///< static text for write ports
   wxStaticText *RegNameText;      ///< static text for inst format
 
   wxTextCtrl *RegClassNameCtrl;   ///< instruction name
+  wxTextCtrl *ReadPortsCtrl;      ///< number of read ports
+  wxTextCtrl *WritePortsCtrl;     ///< number of write ports
   wxTextCtrl *RegNameCtrl;        ///< instruction format name
 
   // buttons

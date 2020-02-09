@@ -2367,7 +2367,7 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
     savedAll = false;
   }
   
-  //set sets
+  //set ways
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
@@ -2377,6 +2377,19 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Cache ways will not be changed\n");
     InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set ways
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(10);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    CacheNode->SetLineSize(std::stoi(BoxContents));
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Line Size will not be changed\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
 
@@ -2841,6 +2854,23 @@ bool PortalMainFrame::SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode){
     savedAll = false;
   }
 
+  //set order
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CGMemOrder Order;
+  if(BoxContents == "Weak") Order = CGMemOrder::CGWeak;
+  if(BoxContents == "TSO") Order = CGMemOrder::CGTSO;
+  if(BoxContents == "Strong") Order = CGMemOrder::CGStrong;
+  if((int)Order < 3){
+    MCtrlNode->SetMemOrder(Order);
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " must be Weak, TSO, or Strong. Ordering will not be changed\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
   return savedAll;
 }
 
@@ -3141,6 +3171,32 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
   else{
     LogPane->AppendText(BoxContents + " is not a valid Register Class name. Keeping old Register Class name\n");
     InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set read ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    RegClassNode->SetReadPorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Read ports will not be changed\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set write ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(7);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    RegClassNode->SetWritePorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Write ports will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
   

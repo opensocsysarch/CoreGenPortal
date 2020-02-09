@@ -21,7 +21,7 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenCache *Cache)
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,350), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,360), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
 
   this->CacheNode = Cache;
 
@@ -109,6 +109,29 @@ CoreCacheInfoWin::CoreCacheInfoWin( wxWindow* parent,
                              wxT("Ways") );
   CacheWaysSizer->Add( WaysCtrl, 0, wxALL, 0 );
   InnerSizer->Add( CacheWaysSizer, 0, wxALIGN_CENTER|wxALL, 5 );
+
+  //-- line size
+  LineSizeSizer = new wxBoxSizer( wxHORIZONTAL );
+  LineSizeText = new wxStaticText( Wnd,
+                                   9,
+                                   wxT("Line Size"),
+                                   wxDefaultPosition,
+                                   wxSize(160,-1),
+                                   0 );
+  LineSizeText->Wrap(-1);
+  LineSizeSizer->Add( LineSizeText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+
+  LineSizeCtrl = new wxTextCtrl( Wnd,
+                             10,
+                             Cache ? wxString::Format(wxT("%i"),Cache->GetLineSize()) : "",
+                             wxDefaultPosition,
+                             wxSize(320,25),
+                             0,
+                             wxDefaultValidator,
+                             wxT("Ways") );
+  LineSizeSizer->Add( LineSizeCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( LineSizeSizer, 0, wxALIGN_CENTER|wxALL, 5 );
+
 
   //-- child cache
   ChildCacheSizer = new wxBoxSizer( wxHORIZONTAL );

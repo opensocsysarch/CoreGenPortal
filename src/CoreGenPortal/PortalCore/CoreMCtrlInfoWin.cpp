@@ -86,7 +86,39 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
                                   wxDefaultValidator,
                                   wxT("InputPorts") );
   InputPortSizer->Add( InputPortCtrl, 0, wxALL, 0 );
-  InnerSizer->Add( InputPortSizer, 0, wxALIGN_CENTER|wxALL, 0);
+  InnerSizer->Add( InputPortSizer, 0, wxALIGN_CENTER|wxALL, 5);
+ 
+  //-- ordering
+  OrderSizer = new wxBoxSizer( wxHORIZONTAL );
+  OrderText = new wxStaticText( Wnd,
+                                   4,
+                                   wxT("Order"),
+                                   wxDefaultPosition,
+                                   wxSize(160,-1),
+                                   0 );
+  OrderText->Wrap(-1);
+  OrderSizer->Add( OrderText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+
+  wxString Order = "";
+  if(MCtrl){
+    switch(MCtrl->GetMemOrder()){
+      case 0: Order = "Weak";
+      break;
+      case 1: Order = "TSO";
+      break;
+      case 2: Order = "Strong";
+    }
+  }
+  OrderCtrl = new wxTextCtrl( Wnd,
+                                  5,
+                                  Order,
+                                  wxDefaultPosition,
+                                  wxSize(320,25),
+                                  0,
+                                  wxDefaultValidator,
+                                  wxT("Orders") );
+  OrderSizer->Add( OrderCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( OrderSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
   // add the static line
   FinalStaticLine = new wxStaticLine( Wnd,
