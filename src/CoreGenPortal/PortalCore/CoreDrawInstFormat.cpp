@@ -267,6 +267,29 @@ void CoreDrawInstFormat::handleLeftClick(wxMouseEvent& mevt){
     }
     else{
       DisplayBoundaries = false;
+      int bit = pixelToBit(Loc, StartX, BitPixelWidth);
+      if(bit > -1){
+        if(boundedFields.size() == 1){
+          if(setStartOrEndBit == "start"){
+            IF->SetStartBit(boundedFields[0], bit);
+          }
+          if(setStartOrEndBit == "end"){
+            IF->SetEndBit(boundedFields[0], bit);
+          }
+        }
+        else{
+          if(currButton == 1){
+            IF->SetStartBit(boundedFields[0], bit);
+            IF->SetEndBit(boundedFields[1], bit-1);
+          }
+          if(currButton == 2){
+            IF->SetStartBit(boundedFields[0], bit);
+          }
+          if(currButton == 3){
+            IF->SetEndBit(boundedFields[1], bit-1);
+          }
+        }
+      }
       this->boundedFields.clear();
       this->paintNow();
     }
@@ -288,15 +311,21 @@ void CoreDrawInstFormat::handleLeftClick(wxMouseEvent& mevt){
 }
 
 bool CoreDrawInstFormat::clickedBoundary(wxPoint Loc, wxCoord StartX, unsigned BitPixelWidth){
-  unsigned clickedBit = pixelToBit(Loc.x, StartX, BitPixelWidth);
+  unsigned clickedBit = pixelToBit(Loc, StartX, BitPixelWidth);
   boundedFields.clear();
   bool clickedBoundary = false;
   for(unsigned i = 0; i < IF->GetNumFields(); i++){
     std::string fieldName = IF->GetFieldName(i);
     unsigned startBit = IF->GetStartBit(fieldName);
     unsigned endBit = IF->GetEndBit(fieldName);
-    if((startBit == clickedBit || endBit + 1 == clickedBit) && (Loc.y > IF_BOX_TOP && Loc.y < IF_BOX_TOP + IF_BOX_PIXEL_HEIGHT)){
+    if(startBit == clickedBit && (Loc.y > IF_BOX_TOP && Loc.y < IF_BOX_TOP + IF_BOX_PIXEL_HEIGHT)){
       clickedBoundary = true;
+      setStartOrEndBit = "start";
+      boundedFields.insert(boundedFields.begin(), fieldName);
+    }
+    if( endBit + 1 == clickedBit && (Loc.y > IF_BOX_TOP && Loc.y < IF_BOX_TOP + IF_BOX_PIXEL_HEIGHT)){
+      clickedBoundary = true;
+      setStartOrEndBit == "end";
       boundedFields.push_back(fieldName);
     }
   }
@@ -307,6 +336,7 @@ bool CoreDrawInstFormat::clickedBoundary(wxPoint Loc, wxCoord StartX, unsigned B
 }
 
 void CoreDrawInstFormat::drawSelectButtons(wxCoord StartX, int selectedBox){
+  currButton = selectedBox;
   drawSelectButton("Both", StartX, selectedBox == 1 ? wxBLUE : wxBLACK);
   drawSelectButton(boundedFields[0], StartX + 110, selectedBox == 2 ? wxBLUE: wxBLACK);
   drawSelectButton(boundedFields[1], StartX + 220, selectedBox == 3 ? wxBLUE : wxBLACK);
@@ -321,10 +351,11 @@ void CoreDrawInstFormat::drawSelectButton(std::string Label, wxCoord StartX, con
   dc->DrawText(Label, StartX + 50 + w/2, buttonTop + IF_BOX_PIXEL_HEIGHT/2 - h/2 - 2);
 }
 
-unsigned CoreDrawInstFormat::pixelToBit(wxCoord x, wxCoord StartX, unsigned BitPixelWidth){
+unsigned CoreDrawInstFormat::pixelToBit(wxPoint Loc, wxCoord StartX, unsigned BitPixelWidth){
+  if(Loc.y < IF_BOX_TOP || Loc.y > IF_BOX_TOP + IF_BOX_PIXEL_HEIGHT) return -1;
   for(unsigned i = 0; i <= IF->GetFormatWidth(); i++){
     int lineCenter = i*BitPixelWidth + StartX;
-    if(x < lineCenter+2 && x > lineCenter-2) return i;
+    if(Loc.x < lineCenter+2 && Loc.x > lineCenter-2) return i;
   }
   return -1;
 }

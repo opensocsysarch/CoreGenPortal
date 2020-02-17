@@ -55,7 +55,7 @@ public:
   void drawKey(wxCoord Width);
   void handleLeftClick(wxMouseEvent& mevt);
   bool clickedBoundary(wxPoint clickPoint, wxCoord StartX, unsigned BitPixelWidth);
-  unsigned pixelToBit(wxCoord x, wxCoord StartX, unsigned BitPixelWidth);
+  unsigned pixelToBit(wxPoint Loc, wxCoord StartX, unsigned BitPixelWidth);
   void drawSelectButtons(wxCoord StartX, int selectedBox);
   void drawSelectButton(std::string Label, wxCoord StartX, const wxColour *Colour);
   int getSelectedButton(wxPoint ClickPoint, wxCoord StartX);
@@ -65,6 +65,8 @@ public:
 protected:
 private:
   bool DisplayBoundaries;
+  int currButton;
+  std::string setStartOrEndBit;
   std::vector<std::string> boundedFields;
   wxPaintDC* dc;
   CoreGenInstFormat *IF;    //< handler for the instruction format
