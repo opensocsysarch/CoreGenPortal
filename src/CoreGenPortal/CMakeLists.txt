@@ -68,7 +68,7 @@ IF(wxWidgets_FOUND)
   link_directories (${COREGEN_INSTALL_PATH}/lib64)
   add_executable( CoreGenPortal ${CGPortalSrcs}
                                 $<TARGET_OBJECTS:PortalCoreObjs> )
-  TARGET_LINK_LIBRARIES( CoreGenPortal SCComp ${llvm_libs} CoreGenSigMap ${COREGEN_LINK_LIBS} ${wxWidgets_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( CoreGenPortal SCComp ${llvm_libs} ${COREGEN_LINK_LIBS} ${wxWidgets_LIBRARIES} )
   install(TARGETS CoreGenPortal DESTINATION bin)
 ELSE(wxWidgets_FOUND)
   MESSAGE("wxWidgets not found!")

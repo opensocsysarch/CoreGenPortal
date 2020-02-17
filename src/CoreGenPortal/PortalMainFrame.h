@@ -93,6 +93,9 @@ private:
   CoreUserConfig *UserConfig;
   CoreVerifConfig *VerifConfig;
 
+  // selected runtime components
+  std::string LLVMComp;
+
   // top level manager
   wxAuiManager Mgr;
 

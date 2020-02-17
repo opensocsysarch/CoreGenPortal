@@ -2028,14 +2028,14 @@ void PortalMainFrame::OnBuildLLVMCodegen(wxCommandEvent &event){
     LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
     return ;
   }
-
   // execute the codegen
-  if( !CGProject->ExecuteLLVMCodegen() ){
+  if( !CGProject->ExecuteLLVMCodegen(LLVMComp) ){
     LogPane->AppendText( wxString( CGProject->GetErrStr() ) + wxT("\n") );
     LogPane->AppendText( "Failed to execute LLVM codegen!\n" );
   }else{
     LogPane->AppendText( "Successfully executed LLVM codegen\n" );
   }
+
   ProjDir->ReCreateTree();
 }
 

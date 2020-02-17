@@ -82,14 +82,14 @@ if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   if( DEBIAN_FOUND )
     #-- ubuntu or debian system
     message(STATUS "BUILDING FOR DEBIAN/UBUNTU PLATFORM")
-    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -ldl" )
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lCoreGenSigMap -lCoreGenArchive -lyaml-cpp -lcurl -ldl" )
   else()
     #-- centos system
     message(STATUS "BUILDING FOR CENTOS PLATFORM")
-    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp -ldl" )
+    set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lCoreGenSigMap -lCoreGenArchive -lyaml-cpp -lcurl -ldl" )
   endif()
 else()
-  set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lyaml-cpp" )
+  set(COREGEN_LINK_LIBS "-lSCComp -lCoreGenBackend -lCoreGenCodegen -lCoreGenPluginImpl -lCoreGenSigMap -lCoreGenArchive -lcurl -lyaml-cpp" )
 endif()
 message(STATUS "COREGEN_LINK_LIBS set to ${COREGEN_LINK_LIBS}")
 

@@ -300,7 +300,7 @@ void CoreDrawInstFormat::handleLeftClick(wxMouseEvent& mevt){
     
     //draw bit boundaries
     dc->SetPen( wxPen(*wxCYAN, 4) );
-    
+
     for(int i = StartX; i <= StartX + IF_BOX_PIXEL_WIDTH; i += BitPixelWidth){
       if(Loc.x < i+2 && Loc.x > i-2 && Loc.y > IF_BOX_TOP && Loc.y < IF_BOX_TOP + IF_BOX_PIXEL_HEIGHT) 
         dc->SetPen( wxPen(*wxBLUE, 4));
@@ -325,7 +325,7 @@ bool CoreDrawInstFormat::clickedBoundary(wxPoint Loc, wxCoord StartX, unsigned B
     }
     if( endBit + 1 == clickedBit && (Loc.y > IF_BOX_TOP && Loc.y < IF_BOX_TOP + IF_BOX_PIXEL_HEIGHT)){
       clickedBoundary = true;
-      setStartOrEndBit == "end";
+      setStartOrEndBit = "end";
       boundedFields.push_back(fieldName);
     }
   }
