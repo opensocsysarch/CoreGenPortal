@@ -118,6 +118,42 @@ cmake -DLLVM_DIR=/opt/rh/llvm-toolset-7.0/root/usr/lib64/cmake/llvm ../
 make
 ```
 
+### Centos8
+Centos8 has a modern toolchain, much more so than Centos7.  However, the build requires 
+packages from the EPEL repository.  Utilize the following steps on the CentOS 8 systems.
+
+1. Install the EPEL repository (required to pull the wxGTK3 RPMs).
+```
+wget https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/e/epel-release-8-8.el8.noarch.rpm
+sudo rpm -Uvh epel-release-8-8.el8.noarch.rpm
+```
+1. Install the system dependencies:
+```
+sudo yum -y install wxGTK3 wxGTK3-devel
+```
+1. [Optional] For those wishing to build CentOS7 RPMS, you also need the following packages.
+```
+sudo yum install rpm-build rpmdevtools
+```
+1. Clone the CoreGenPortal repository
+```
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
+```
+1. Setup your build tree
+```
+cd CoreGenPortal
+mkdir build
+cd build
+```
+1. Execute CMake to generate the makefiles
+```
+cmake -DLLVM_DIR=/usr/lib64/cmake/llvm ../
+```
+1. Execute the build
+```
+make
+```
+
 ### Darwin (OSX)
 
 1. Install the homebrew package: https://brew.sh/
