@@ -392,6 +392,11 @@ void PortalMainFrame::SetupModuleBox(){
                                               -1,
                                               NULL ) );
   TreeItems.push_back( ModuleBox->AppendItem( ParentModule,
+                                              wxT("Datapath"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ParentModule,
                                               wxT("Ext"),
                                               -1,
                                               -1,
@@ -505,6 +510,9 @@ wxString PortalMainFrame::FindNodeStr( CoreGenNode *Parent ){
   case CGCore:
     return wxT("- Core: ") + wxString(Parent->GetName());
     break;
+  case CGDPath:
+    return wxT(" - Datapath: ") + wxString(Parent->GetName());
+    break;
   case CGInstF:
     return wxT("- InstFormatName: ") + wxString(Parent->GetName());
     break;
@@ -579,6 +587,12 @@ void PortalMainFrame::LoadModuleBox(bool editing){
                                                 -1,
                                                 NULL ),Top->GetChild(i)) );
       break;
+    case CGDPath:
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_DPATH],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                -1,
+                                                -1,
+                                                NULL ),Top->GetChild(i)) );
     case CGInstF:
       NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_INSTFORMAT],
                                                 wxString(Top->GetChild(i)->GetName()),
@@ -708,6 +722,11 @@ void PortalMainFrame::LoadExtNodes( wxTreeItemId Parent,
                                               NULL ) );
   wxExtItems.push_back( ModuleBox->AppendItem( Parent,
                                               wxT("Core"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Datapath"),
                                               -1,
                                               -1,
                                               NULL ) );
@@ -875,6 +894,15 @@ void PortalMainFrame::LoadExtNodes( wxTreeItemId Parent,
                                   wxTreeListCtrl::NO_IMAGE,
                                   NULL), Ext, Child ) );
       break;
+    case CGDPath:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_DPATH],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
     default:
       LogPane->AppendText("Unable to load Ext child node into module tree\n");
       break;
@@ -896,6 +924,11 @@ void PortalMainFrame::LoadPluginNodes( wxTreeItemId Parent,
                                               NULL ) );
   wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
                                               wxT("Core"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Datapath"),
                                               -1,
                                               -1,
                                               NULL ) );
@@ -975,6 +1008,19 @@ void PortalMainFrame::LoadPluginNodes( wxTreeItemId Parent,
     PluginItems.push_back( std::make_tuple(
                                 ModuleBox->AppendItem(
                                   wxPluginItems[TREE_PLUGIN_NODE_CORE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- data paths
+  std::vector<CoreGenDataPath *> DPathVect = Plugin->GetDataPathVect();
+  for( unsigned i=0; i<DPathVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(DPathVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_DPATH],
                                   wxString(Child->GetName()),
                                   wxTreeListCtrl::NO_IMAGE,
                                   wxTreeListCtrl::NO_IMAGE,
@@ -1344,21 +1390,21 @@ CGNodeType PortalMainFrame::TreeIdToCGType(wxTreeItemId ID){
     case 0: return CGCache;
     case 1: return CGComm;
     case 2: return CGCore;
-    case 3: return CGExt;
-    case 4: return CGISA;
-    case 5: return CGInst;
-    case 6: return CGInstF;
-    case 7: return CGMCtrl;
-    case 8: return CGPlugin;
-    case 9: return CGPInst;
-    case 10: return CGReg;
-    case 11: return CGRegC;
-    case 12: return CGSoc;
-    case 13: return CGSpad;
-    case 14: return CGVTP;
+    case 3: return CGDPath;
+    case 4: return CGExt;
+    case 5: return CGISA;
+    case 6: return CGInst;
+    case 7: return CGInstF;
+    case 8: return CGMCtrl;
+    case 9: return CGPlugin;
+    case 10: return CGPInst;
+    case 11: return CGReg;
+    case 12: return CGRegC;
+    case 13: return CGSoc;
+    case 14: return CGSpad;
+    case 15: return CGVTP;
     default: return CGTop;
   }
-  
 }
 
 // PortalMainFrame::OnRightClickNode
