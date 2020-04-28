@@ -2308,6 +2308,10 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       if(createNewNode) node = CGProject->InsertCore("NewCore", nullptr);
       savedAll = SaveCore(InfoWin, (CoreGenCore*)node);
       break;
+    case CGDPath:
+      if(createNewNode) node = CGProject->InsertDPath("NewDataPath", "");
+      savedAll = SaveDataPath(InfoWin, (CoreGenDataPath*)node);
+      break;
     case CGExt:
       if(createNewNode) node = CGProject->InsertExt("NewExt");
       savedAll = SaveExt(InfoWin, (CoreGenExt*)node);
@@ -2561,6 +2565,42 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
   return savedAll;
 }
 
+bool PortalMainFrame::SaveDataPath(wxDialog* InfoWin, CoreGenDataPath* DPathNode){
+  std::istringstream iss;
+  std::string nextNodeName;
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  bool allValid = true;
+
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    DPathNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid DataPath name.  Keeping the old DataPath name.\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    DPathNode->SetStyle(BoxContents);
+    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid DataPath style.  Keeping the old DataPath style.\n");
+    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  if(allValid) InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
+
+  return savedAll;
+}
+
 bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   CoreGenNode *newNode;
   std::istringstream iss;
@@ -2577,7 +2617,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
     InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
-    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    LogPane->AppendText(BoxContents + " is not a valid core name. Keeping old core name\n");
     InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }

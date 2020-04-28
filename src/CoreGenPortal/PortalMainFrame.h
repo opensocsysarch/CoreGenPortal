@@ -186,10 +186,11 @@ private:
   void OnCopyText(wxCommandEvent &event );
   void OnPasteText(wxCommandEvent &event );
 
-  //functions to save/edit node data
+  // functions to save/edit node data
   bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
   bool SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode);
   bool SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode);
+  bool SaveDataPath(wxDialog* InfoWin, CoreGenDataPath* DPathNode);
   bool SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode);
   bool SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode);
   bool SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode);
