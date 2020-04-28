@@ -511,7 +511,7 @@ wxString PortalMainFrame::FindNodeStr( CoreGenNode *Parent ){
     return wxT("- Core: ") + wxString(Parent->GetName());
     break;
   case CGDPath:
-    return wxT(" - Datapath: ") + wxString(Parent->GetName());
+    return wxT("- Datapath: ") + wxString(Parent->GetName());
     break;
   case CGInstF:
     return wxT("- InstFormatName: ") + wxString(Parent->GetName());
@@ -2613,7 +2613,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
   BoxContents = InfoBox->GetValue().ToStdString();
   newNode = CGProject->GetCacheNodeByName(BoxContents);
-  if(BoxContents == "" || newNode){ 
+  if(BoxContents == "" || newNode){
     CoreNode->InsertCache((CoreGenCache*)newNode);
     InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
   }
@@ -2622,14 +2622,14 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
     InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
-      
+
   //set Register Classes
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
   BoxContents = InfoBox->GetValue().ToStdString();
   bool allValid = true;
   if (BoxContents[BoxContents.size()-1] != '\n')
-    BoxContents += "\n";  
-  iss.str(BoxContents);  
+    BoxContents += "\n";
+  iss.str(BoxContents);
   while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
   std::getline(iss, nextNodeName);
   while(!iss.eof()){
