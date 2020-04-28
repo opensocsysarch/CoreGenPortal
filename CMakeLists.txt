@@ -60,7 +60,7 @@ add_definitions(${LLVM_DEFINITIONS})
 #------------------------------------------------------------------------
 # Add package paths
 if(NOT COREGEN_INSTALL_PATH)
-  set(COREGEN_INSTALL_PATH "/opt/coregen")
+  message(FATAL_ERROR "COREGEN_INSTALL_PATH is required to build CoreGenPortal")
 endif()
 
 if(NOT PORTAL_INCLUDE_PATH)
