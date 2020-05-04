@@ -392,6 +392,11 @@ void PortalMainFrame::SetupModuleBox(){
                                               -1,
                                               NULL ) );
   TreeItems.push_back( ModuleBox->AppendItem( ParentModule,
+                                              wxT("Datapath"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  TreeItems.push_back( ModuleBox->AppendItem( ParentModule,
                                               wxT("Ext"),
                                               -1,
                                               -1,
@@ -505,6 +510,9 @@ wxString PortalMainFrame::FindNodeStr( CoreGenNode *Parent ){
   case CGCore:
     return wxT("- Core: ") + wxString(Parent->GetName());
     break;
+  case CGDPath:
+    return wxT("- Datapath: ") + wxString(Parent->GetName());
+    break;
   case CGInstF:
     return wxT("- InstFormatName: ") + wxString(Parent->GetName());
     break;
@@ -579,6 +587,12 @@ void PortalMainFrame::LoadModuleBox(bool editing){
                                                 -1,
                                                 NULL ),Top->GetChild(i)) );
       break;
+    case CGDPath:
+      NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_DPATH],
+                                                wxString(Top->GetChild(i)->GetName()),
+                                                -1,
+                                                -1,
+                                                NULL ),Top->GetChild(i)) );
     case CGInstF:
       NodeItems.push_back( std::make_pair(ModuleBox->AppendItem( TreeItems[TREE_NODE_INSTFORMAT],
                                                 wxString(Top->GetChild(i)->GetName()),
@@ -708,6 +722,11 @@ void PortalMainFrame::LoadExtNodes( wxTreeItemId Parent,
                                               NULL ) );
   wxExtItems.push_back( ModuleBox->AppendItem( Parent,
                                               wxT("Core"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxExtItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Datapath"),
                                               -1,
                                               -1,
                                               NULL ) );
@@ -875,6 +894,15 @@ void PortalMainFrame::LoadExtNodes( wxTreeItemId Parent,
                                   wxTreeListCtrl::NO_IMAGE,
                                   NULL), Ext, Child ) );
       break;
+    case CGDPath:
+      ExtItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxExtItems[TREE_EXT_NODE_DPATH],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Ext, Child ) );
+      break;
     default:
       LogPane->AppendText("Unable to load Ext child node into module tree\n");
       break;
@@ -896,6 +924,11 @@ void PortalMainFrame::LoadPluginNodes( wxTreeItemId Parent,
                                               NULL ) );
   wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
                                               wxT("Core"),
+                                              -1,
+                                              -1,
+                                              NULL ) );
+  wxPluginItems.push_back( ModuleBox->AppendItem( Parent,
+                                              wxT("Datapath"),
                                               -1,
                                               -1,
                                               NULL ) );
@@ -975,6 +1008,19 @@ void PortalMainFrame::LoadPluginNodes( wxTreeItemId Parent,
     PluginItems.push_back( std::make_tuple(
                                 ModuleBox->AppendItem(
                                   wxPluginItems[TREE_PLUGIN_NODE_CORE],
+                                  wxString(Child->GetName()),
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  wxTreeListCtrl::NO_IMAGE,
+                                  NULL), Plugin, Child ) );
+  }
+
+  //-- data paths
+  std::vector<CoreGenDataPath *> DPathVect = Plugin->GetDataPathVect();
+  for( unsigned i=0; i<DPathVect.size(); i++ ){
+    CoreGenNode *Child = static_cast<CoreGenNode *>(DPathVect[i]);
+    PluginItems.push_back( std::make_tuple(
+                                ModuleBox->AppendItem(
+                                  wxPluginItems[TREE_PLUGIN_NODE_DPATH],
                                   wxString(Child->GetName()),
                                   wxTreeListCtrl::NO_IMAGE,
                                   wxTreeListCtrl::NO_IMAGE,
@@ -1344,21 +1390,21 @@ CGNodeType PortalMainFrame::TreeIdToCGType(wxTreeItemId ID){
     case 0: return CGCache;
     case 1: return CGComm;
     case 2: return CGCore;
-    case 3: return CGExt;
-    case 4: return CGISA;
-    case 5: return CGInst;
-    case 6: return CGInstF;
-    case 7: return CGMCtrl;
-    case 8: return CGPlugin;
-    case 9: return CGPInst;
-    case 10: return CGReg;
-    case 11: return CGRegC;
-    case 12: return CGSoc;
-    case 13: return CGSpad;
-    case 14: return CGVTP;
+    case 3: return CGDPath;
+    case 4: return CGExt;
+    case 5: return CGISA;
+    case 6: return CGInst;
+    case 7: return CGInstF;
+    case 8: return CGMCtrl;
+    case 9: return CGPlugin;
+    case 10: return CGPInst;
+    case 11: return CGReg;
+    case 12: return CGRegC;
+    case 13: return CGSoc;
+    case 14: return CGSpad;
+    case 15: return CGVTP;
     default: return CGTop;
   }
-  
 }
 
 // PortalMainFrame::OnRightClickNode
@@ -2028,14 +2074,14 @@ void PortalMainFrame::OnBuildLLVMCodegen(wxCommandEvent &event){
     LogPane->AppendText( "Error constructing DAG of hardware nodes\n" );
     return ;
   }
-
   // execute the codegen
-  if( !CGProject->ExecuteLLVMCodegen() ){
+  if( !CGProject->ExecuteLLVMCodegen(LLVMComp) ){
     LogPane->AppendText( wxString( CGProject->GetErrStr() ) + wxT("\n") );
     LogPane->AppendText( "Failed to execute LLVM codegen!\n" );
   }else{
     LogPane->AppendText( "Successfully executed LLVM codegen\n" );
   }
+
   ProjDir->ReCreateTree();
 }
 
@@ -2262,6 +2308,10 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
       if(createNewNode) node = CGProject->InsertCore("NewCore", nullptr);
       savedAll = SaveCore(InfoWin, (CoreGenCore*)node);
       break;
+    case CGDPath:
+      if(createNewNode) node = CGProject->InsertDPath("NewDataPath", "");
+      savedAll = SaveDataPath(InfoWin, (CoreGenDataPath*)node);
+      break;
     case CGExt:
       if(createNewNode) node = CGProject->InsertExt("NewExt");
       savedAll = SaveExt(InfoWin, (CoreGenExt*)node);
@@ -2367,7 +2417,7 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
     savedAll = false;
   }
   
-  //set sets
+  //set ways
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(2);
   BoxContents = InfoBox->GetValue().ToStdString();
   if(IsInteger(BoxContents)){
@@ -2377,6 +2427,19 @@ bool PortalMainFrame::SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode){
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Cache ways will not be changed\n");
     InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set ways
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(10);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    CacheNode->SetLineSize(std::stoi(BoxContents));
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Line Size will not be changed\n");
+    InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
 
@@ -2502,6 +2565,42 @@ bool PortalMainFrame::SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode){
   return savedAll;
 }
 
+bool PortalMainFrame::SaveDataPath(wxDialog* InfoWin, CoreGenDataPath* DPathNode){
+  std::istringstream iss;
+  std::string nextNodeName;
+  wxTextCtrl *InfoBox;
+  std::string BoxContents;
+  bool savedAll = true;
+  bool allValid = true;
+
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    DPathNode->SetName(BoxContents);
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid DataPath name.  Keeping the old DataPath name.\n");
+    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(1);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(CGProject->IsValidName(BoxContents)){
+    DPathNode->SetStyle(BoxContents);
+    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not a valid DataPath style.  Keeping the old DataPath style.\n");
+    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  if(allValid) InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
+
+  return savedAll;
+}
+
 bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   CoreGenNode *newNode;
   std::istringstream iss;
@@ -2518,7 +2617,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
     InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
   }
   else{
-    LogPane->AppendText(BoxContents + " is not a valid cache name. Keeping old cache name\n");
+    LogPane->AppendText(BoxContents + " is not a valid core name. Keeping old core name\n");
     InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
@@ -2554,7 +2653,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(3);
   BoxContents = InfoBox->GetValue().ToStdString();
   newNode = CGProject->GetCacheNodeByName(BoxContents);
-  if(BoxContents == "" || newNode){ 
+  if(BoxContents == "" || newNode){
     CoreNode->InsertCache((CoreGenCache*)newNode);
     InfoWin->FindWindow(9)->SetForegroundColour(wxColour(0, 0, 0));
   }
@@ -2563,14 +2662,14 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
     InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
-      
+
   //set Register Classes
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(4);
   BoxContents = InfoBox->GetValue().ToStdString();
   bool allValid = true;
   if (BoxContents[BoxContents.size()-1] != '\n')
-    BoxContents += "\n";  
-  iss.str(BoxContents);  
+    BoxContents += "\n";
+  iss.str(BoxContents);
   while( CoreNode->GetNumRegClass() > 0) CoreNode->DeleteRegClass((unsigned)0);
   std::getline(iss, nextNodeName);
   while(!iss.eof()){
@@ -2838,6 +2937,23 @@ bool PortalMainFrame::SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode){
   else{
     LogPane->AppendText(BoxContents + " is not an integer. Input ports will not be changed\n");
     InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set order
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  CGMemOrder Order;
+  if(BoxContents == "Weak") Order = CGMemOrder::CGWeak;
+  if(BoxContents == "TSO") Order = CGMemOrder::CGTSO;
+  if(BoxContents == "Strong") Order = CGMemOrder::CGStrong;
+  if((int)Order < 3){
+    MCtrlNode->SetMemOrder(Order);
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " must be Weak, TSO, or Strong. Ordering will not be changed\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
 
@@ -3141,6 +3257,32 @@ bool PortalMainFrame::SaveRegClass(wxDialog* InfoWin, CoreGenRegClass* RegClassN
   else{
     LogPane->AppendText(BoxContents + " is not a valid Register Class name. Keeping old Register Class name\n");
     InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set read ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(5);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    RegClassNode->SetReadPorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Read ports will not be changed\n");
+    InfoWin->FindWindow(4)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+
+  //set write ports
+  InfoBox = (wxTextCtrl*)InfoWin->FindWindow(7);
+  BoxContents = InfoBox->GetValue().ToStdString();
+  if(IsInteger(BoxContents)){
+    RegClassNode->SetWritePorts(std::stoi(BoxContents));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }
+  else{
+    LogPane->AppendText(BoxContents + " is not an integer. Write ports will not be changed\n");
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
   

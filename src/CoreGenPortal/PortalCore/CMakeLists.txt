@@ -15,6 +15,7 @@ CoreVerifConfig.cpp
 CoreInfoWin.cpp
 CoreSocInfoWin.cpp
 CoreCoreInfoWin.cpp
+CoreDataPathInfoWin.cpp
 CoreInstFormatInfoWin.cpp
 CoreDrawInstFormat.cpp
 CoreInstInfoWin.cpp

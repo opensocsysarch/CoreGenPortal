@@ -59,15 +59,18 @@ protected:
   wxBoxSizer *InnerSizer;         ///< inner sizer
   wxBoxSizer *MCtrlNameSizer;     ///< mctrl name sizer
   wxBoxSizer *InputPortSizer;     ///< input port sizer
+  wxBoxSizer *OrderSizer;         ///< ordering sizer
 
   // static lines
   wxStaticLine* FinalStaticLine;  ///< final static line
 
   wxStaticText *MCtrlNameText;    ///< static text for memory controller name
   wxStaticText *InputPortText;    ///< static text for input ports
+  wxStaticText *OrderText;        ///< static text for ordering
 
   wxTextCtrl *MCtrlCtrl;          ///< memory controller name
   wxTextCtrl *InputPortCtrl;      ///< input ports for memory controller
+  wxTextCtrl *OrderCtrl;
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer

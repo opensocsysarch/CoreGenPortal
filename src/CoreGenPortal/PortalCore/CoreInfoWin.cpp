@@ -28,6 +28,12 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
                                                 static_cast<CoreGenCore *>(Node) );
     Win->ShowModal();
     delete Win;
+  }else if( Type == CGDPath ){
+    CoreDataPathInfoWin *Win = new CoreDataPathInfoWin( parent, id,
+                                                Node ? Node->GetName() : "New Datapath",
+                                                static_cast<CoreGenDataPath *>(Node) );
+    Win->ShowModal();
+    delete Win;
   }else if( Type == CGInstF ){
     CoreInstFormatInfoWin *Win = new CoreInstFormatInfoWin(parent, id,
                                                            Node ? Node->GetName() : "New Instruction Format",

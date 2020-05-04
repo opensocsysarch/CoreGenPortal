@@ -93,6 +93,9 @@ private:
   CoreUserConfig *UserConfig;
   CoreVerifConfig *VerifConfig;
 
+  // selected runtime components
+  std::string LLVMComp;
+
   // top level manager
   wxAuiManager Mgr;
 
@@ -183,10 +186,11 @@ private:
   void OnCopyText(wxCommandEvent &event );
   void OnPasteText(wxCommandEvent &event );
 
-  //functions to save/edit node data
+  // functions to save/edit node data
   bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
   bool SaveComm(wxDialog* InfoWin, CoreGenComm* CommNode);
   bool SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode);
+  bool SaveDataPath(wxDialog* InfoWin, CoreGenDataPath* DPathNode);
   bool SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode);
   bool SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode);
   bool SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode);
@@ -234,50 +238,53 @@ enum{
   TREE_NODE_CACHE       = 0,
   TREE_NODE_COMM        = 1,
   TREE_NODE_CORE        = 2,
-  TREE_NODE_EXT         = 3,
-  TREE_NODE_ISA         = 4,
-  TREE_NODE_INST        = 5,
-  TREE_NODE_INSTFORMAT  = 6,
-  TREE_NODE_MCTRL       = 7,
-  TREE_NODE_PLUGIN      = 8,
-  TREE_NODE_PSEUDOINST  = 9,
-  TREE_NODE_REG         = 10,
-  TREE_NODE_REGCLASS    = 11,
-  TREE_NODE_SOC         = 12,
-  TREE_NODE_SPAD        = 13,
-  TREE_NODE_VTP         = 14
+  TREE_NODE_DPATH       = 3,
+  TREE_NODE_EXT         = 4,
+  TREE_NODE_ISA         = 5,
+  TREE_NODE_INST        = 6,
+  TREE_NODE_INSTFORMAT  = 7,
+  TREE_NODE_MCTRL       = 8,
+  TREE_NODE_PLUGIN      = 9,
+  TREE_NODE_PSEUDOINST  = 10,
+  TREE_NODE_REG         = 11,
+  TREE_NODE_REGCLASS    = 12,
+  TREE_NODE_SOC         = 13,
+  TREE_NODE_SPAD        = 14,
+  TREE_NODE_VTP         = 15
 };
 
 enum{
   TREE_EXT_NODE_CACHE       = 0,
   TREE_EXT_NODE_COMM        = 1,
   TREE_EXT_NODE_CORE        = 2,
-  TREE_EXT_NODE_EXT         = 3,
-  TREE_EXT_NODE_ISA         = 4,
-  TREE_EXT_NODE_INST        = 5,
-  TREE_EXT_NODE_PINST       = 6,
-  TREE_EXT_NODE_INSTFORMAT  = 7,
-  TREE_EXT_NODE_MCTRL       = 8,
-  TREE_EXT_NODE_REG         = 9,
-  TREE_EXT_NODE_REGCLASS    = 10,
-  TREE_EXT_NODE_SPAD        = 11
+  TREE_EXT_NODE_DPATH       = 3,
+  TREE_EXT_NODE_EXT         = 4,
+  TREE_EXT_NODE_ISA         = 5,
+  TREE_EXT_NODE_INST        = 6,
+  TREE_EXT_NODE_PINST       = 7,
+  TREE_EXT_NODE_INSTFORMAT  = 8,
+  TREE_EXT_NODE_MCTRL       = 9,
+  TREE_EXT_NODE_REG         = 10,
+  TREE_EXT_NODE_REGCLASS    = 11,
+  TREE_EXT_NODE_SPAD        = 12
 };
 
 enum{
   TREE_PLUGIN_NODE_CACHE      = 0,
   TREE_PLUGIN_NODE_CORE       = 1,
-  TREE_PLUGIN_NODE_INST       = 2,
-  TREE_PLUGIN_NODE_PINST      = 3,
-  TREE_PLUGIN_NODE_INSTFORMAT = 4,
-  TREE_PLUGIN_NODE_REG        = 5,
-  TREE_PLUGIN_NODE_REGCLASS   = 6,
-  TREE_PLUGIN_NODE_SOC        = 7,
-  TREE_PLUGIN_NODE_ISA        = 8,
-  TREE_PLUGIN_NODE_EXT        = 9,
-  TREE_PLUGIN_NODE_COMM       = 10,
-  TREE_PLUGIN_NODE_SPAD       = 11,
-  TREE_PLUGIN_NODE_MCTRL      = 12,
-  TREE_PLUGIN_NODE_VTP        = 13
+  TREE_PLUGIN_NODE_DPATH      = 2,
+  TREE_PLUGIN_NODE_INST       = 3,
+  TREE_PLUGIN_NODE_PINST      = 4,
+  TREE_PLUGIN_NODE_INSTFORMAT = 5,
+  TREE_PLUGIN_NODE_REG        = 6,
+  TREE_PLUGIN_NODE_REGCLASS   = 7,
+  TREE_PLUGIN_NODE_SOC        = 8,
+  TREE_PLUGIN_NODE_ISA        = 9,
+  TREE_PLUGIN_NODE_EXT        = 10,
+  TREE_PLUGIN_NODE_COMM       = 11,
+  TREE_PLUGIN_NODE_SPAD       = 12,
+  TREE_PLUGIN_NODE_MCTRL      = 13,
+  TREE_PLUGIN_NODE_VTP        = 14
 
 };
 

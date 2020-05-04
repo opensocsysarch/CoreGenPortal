@@ -37,6 +37,7 @@
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalCore/CoreSocInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreCoreInfoWin.h"
+#include "CoreGenPortal/PortalCore/CoreDataPathInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreInstFormatInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreInstInfoWin.h"
 #include "CoreGenPortal/PortalCore/CorePInstInfoWin.h"

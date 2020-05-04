@@ -1,6 +1,6 @@
 ProjectInfo:
   - ProjectName: TEST81
-    ProjectRoot: ./
+    ProjectRoot: /home/fconlon/CoreGenProj/CoreGenPortal/sampletestcases
     ProjectType: unknown
     ChiselMajorVersion: 3
     ChiselMinorVersion: 0
@@ -1959,6 +1959,8 @@ RegClasses:
       - TEST81.69.reg
       - TEST81.70.reg
       - TEST81.71.reg
+    ReadPorts: 8
+    WritePorts: 4
   - RegisterClassName: TEST81.csrregclass
     Registers:
       - TEST81.0.csr
@@ -2033,6 +2035,8 @@ RegClasses:
       - TEST81.69.csr
       - TEST81.70.csr
       - TEST81.71.csr
+    ReadPorts: 2
+    WritePorts: 1
 ISAs:
   - ISAName: TEST81.isa
 InstFormats:
@@ -2042,27 +2046,27 @@ InstFormats:
     Fields:
       - FieldName: opcode
         FieldType: CGInstCode
-        FieldWidth: 8
+        FieldWidth: 7
         StartBit: 1
         EndBit: 7
         MandatoryField: true
       - FieldName: RB
         FieldType: CGInstReg
-        FieldWidth: 8
+        FieldWidth: 9
         StartBit: 7
         EndBit: 15
         MandatoryField: false
         RegClass: TEST81.regclass
       - FieldName: RA
         FieldType: CGInstReg
-        FieldWidth: 8
+        FieldWidth: 7
         StartBit: 17
         EndBit: 23
         MandatoryField: false
         RegClass: TEST81.regclass
       - FieldName: RT
         FieldType: CGInstReg
-        FieldWidth: 8
+        FieldWidth: 9
         StartBit: 23
         EndBit: 31
         MandatoryField: false
@@ -2074,7 +2078,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 1
     Impl: RT = RA + RB
     Syntax: TEST81.inst0 %RT, %RA, %RB
@@ -2083,7 +2087,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 2
     Impl: RT = RA + RB
     Syntax: TEST81.inst1 %RT, %RA, %RB
@@ -2092,7 +2096,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 3
     Impl: RT = RA + RB
     Syntax: TEST81.inst2 %RT, %RA, %RB
@@ -2101,7 +2105,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 4
     Impl: RT = RA + RB
     Syntax: TEST81.inst3 %RT, %RA, %RB
@@ -2110,7 +2114,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 5
     Impl: RT = RA + RB
     Syntax: TEST81.inst4 %RT, %RA, %RB
@@ -2119,7 +2123,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 6
     Impl: RT = RA + RB
     Syntax: TEST81.inst5 %RT, %RA, %RB
@@ -2128,7 +2132,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 7
     Impl: RT = RA + RB
     Syntax: TEST81.inst6 %RT, %RA, %RB
@@ -2137,7 +2141,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 8
     Impl: RT = RA + RB
     Syntax: TEST81.inst7 %RT, %RA, %RB
@@ -2146,7 +2150,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 9
     Impl: RT = RA + RB
     Syntax: TEST81.inst8 %RT, %RA, %RB
@@ -2155,7 +2159,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 10
     Impl: RT = RA + RB
     Syntax: TEST81.inst9 %RT, %RA, %RB
@@ -2164,7 +2168,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 11
     Impl: RT = RA + RB
     Syntax: TEST81.inst10 %RT, %RA, %RB
@@ -2173,7 +2177,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 12
     Impl: RT = RA + RB
     Syntax: TEST81.inst11 %RT, %RA, %RB
@@ -2182,7 +2186,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 13
     Impl: RT = RA + RB
     Syntax: TEST81.inst12 %RT, %RA, %RB
@@ -2191,7 +2195,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 14
     Impl: RT = RA + RB
     Syntax: TEST81.inst13 %RT, %RA, %RB
@@ -2200,7 +2204,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 15
     Impl: RT = RA + RB
     Syntax: TEST81.inst14 %RT, %RA, %RB
@@ -2209,7 +2213,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 16
     Impl: RT = RA + RB
     Syntax: TEST81.inst15 %RT, %RA, %RB
@@ -2218,7 +2222,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 17
     Impl: RT = RA + RB
     Syntax: TEST81.inst16 %RT, %RA, %RB
@@ -2227,7 +2231,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 18
     Impl: RT = RA + RB
     Syntax: TEST81.inst17 %RT, %RA, %RB
@@ -2236,7 +2240,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 19
     Impl: RT = RA + RB
     Syntax: TEST81.inst18 %RT, %RA, %RB
@@ -2245,7 +2249,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 20
     Impl: RT = RA + RB
     Syntax: TEST81.inst19 %RT, %RA, %RB
@@ -2254,7 +2258,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 21
     Impl: RT = RA + RB
     Syntax: TEST81.inst20 %RT, %RA, %RB
@@ -2263,7 +2267,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 22
     Impl: RT = RA + RB
     Syntax: TEST81.inst21 %RT, %RA, %RB
@@ -2272,7 +2276,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 23
     Impl: RT = RA + RB
     Syntax: TEST81.inst22 %RT, %RA, %RB
@@ -2281,7 +2285,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 24
     Impl: RT = RA + RB
     Syntax: TEST81.inst23 %RT, %RA, %RB
@@ -2290,7 +2294,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 25
     Impl: RT = RA + RB
     Syntax: TEST81.inst24 %RT, %RA, %RB
@@ -2299,7 +2303,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 26
     Impl: RT = RA + RB
     Syntax: TEST81.inst25 %RT, %RA, %RB
@@ -2308,7 +2312,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 27
     Impl: RT = RA + RB
     Syntax: TEST81.inst26 %RT, %RA, %RB
@@ -2317,7 +2321,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 28
     Impl: RT = RA + RB
     Syntax: TEST81.inst27 %RT, %RA, %RB
@@ -2326,7 +2330,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 29
     Impl: RT = RA + RB
     Syntax: TEST81.inst28 %RT, %RA, %RB
@@ -2335,7 +2339,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 30
     Impl: RT = RA + RB
     Syntax: TEST81.inst29 %RT, %RA, %RB
@@ -2344,7 +2348,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 31
     Impl: RT = RA + RB
     Syntax: TEST81.inst30 %RT, %RA, %RB
@@ -2353,7 +2357,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 32
     Impl: RT = RA + RB
     Syntax: TEST81.inst31 %RT, %RA, %RB
@@ -2362,7 +2366,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 33
     Impl: RT = RA + RB
     Syntax: TEST81.inst32 %RT, %RA, %RB
@@ -2371,7 +2375,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 34
     Impl: RT = RA + RB
     Syntax: TEST81.inst33 %RT, %RA, %RB
@@ -2380,7 +2384,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 35
     Impl: RT = RA + RB
     Syntax: TEST81.inst34 %RT, %RA, %RB
@@ -2389,7 +2393,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 36
     Impl: RT = RA + RB
     Syntax: TEST81.inst35 %RT, %RA, %RB
@@ -2398,7 +2402,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 37
     Impl: RT = RA + RB
     Syntax: TEST81.inst36 %RT, %RA, %RB
@@ -2407,7 +2411,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 38
     Impl: RT = RA + RB
     Syntax: TEST81.inst37 %RT, %RA, %RB
@@ -2416,7 +2420,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 39
     Impl: RT = RA + RB
     Syntax: TEST81.inst38 %RT, %RA, %RB
@@ -2425,7 +2429,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 40
     Impl: RT = RA + RB
     Syntax: TEST81.inst39 %RT, %RA, %RB
@@ -2434,7 +2438,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 41
     Impl: RT = RA + RB
     Syntax: TEST81.inst40 %RT, %RA, %RB
@@ -2443,7 +2447,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 42
     Impl: RT = RA + RB
     Syntax: TEST81.inst41 %RT, %RA, %RB
@@ -2452,7 +2456,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 43
     Impl: RT = RA + RB
     Syntax: TEST81.inst42 %RT, %RA, %RB
@@ -2461,7 +2465,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 44
     Impl: RT = RA + RB
     Syntax: TEST81.inst43 %RT, %RA, %RB
@@ -2470,7 +2474,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 45
     Impl: RT = RA + RB
     Syntax: TEST81.inst44 %RT, %RA, %RB
@@ -2479,7 +2483,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 46
     Impl: RT = RA + RB
     Syntax: TEST81.inst45 %RT, %RA, %RB
@@ -2488,7 +2492,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 47
     Impl: RT = RA + RB
     Syntax: TEST81.inst46 %RT, %RA, %RB
@@ -2497,7 +2501,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 48
     Impl: RT = RA + RB
     Syntax: TEST81.inst47 %RT, %RA, %RB
@@ -2506,7 +2510,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 49
     Impl: RT = RA + RB
     Syntax: TEST81.inst48 %RT, %RA, %RB
@@ -2515,7 +2519,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 50
     Impl: RT = RA + RB
     Syntax: TEST81.inst49 %RT, %RA, %RB
@@ -2524,7 +2528,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 51
     Impl: RT = RA + RB
     Syntax: TEST81.inst50 %RT, %RA, %RB
@@ -2533,7 +2537,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 52
     Impl: RT = RA + RB
     Syntax: TEST81.inst51 %RT, %RA, %RB
@@ -2542,7 +2546,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 53
     Impl: RT = RA + RB
     Syntax: TEST81.inst52 %RT, %RA, %RB
@@ -2551,7 +2555,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 54
     Impl: RT = RA + RB
     Syntax: TEST81.inst53 %RT, %RA, %RB
@@ -2560,7 +2564,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 55
     Impl: RT = RA + RB
     Syntax: TEST81.inst54 %RT, %RA, %RB
@@ -2569,7 +2573,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 56
     Impl: RT = RA + RB
     Syntax: TEST81.inst55 %RT, %RA, %RB
@@ -2578,7 +2582,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 57
     Impl: RT = RA + RB
     Syntax: TEST81.inst56 %RT, %RA, %RB
@@ -2587,7 +2591,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 58
     Impl: RT = RA + RB
     Syntax: TEST81.inst57 %RT, %RA, %RB
@@ -2596,7 +2600,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 59
     Impl: RT = RA + RB
     Syntax: TEST81.inst58 %RT, %RA, %RB
@@ -2605,7 +2609,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 60
     Impl: RT = RA + RB
     Syntax: TEST81.inst59 %RT, %RA, %RB
@@ -2614,7 +2618,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 61
     Impl: RT = RA + RB
     Syntax: TEST81.inst60 %RT, %RA, %RB
@@ -2623,7 +2627,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 62
     Impl: RT = RA + RB
     Syntax: TEST81.inst61 %RT, %RA, %RB
@@ -2632,7 +2636,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 63
     Impl: RT = RA + RB
     Syntax: TEST81.inst62 %RT, %RA, %RB
@@ -2641,7 +2645,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 64
     Impl: RT = RA + RB
     Syntax: TEST81.inst63 %RT, %RA, %RB
@@ -2650,7 +2654,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 65
     Impl: RT = RA + RB
     Syntax: TEST81.inst64 %RT, %RA, %RB
@@ -2659,7 +2663,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 66
     Impl: RT = RA + RB
     Syntax: TEST81.inst65 %RT, %RA, %RB
@@ -2668,7 +2672,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 67
     Impl: RT = RA + RB
     Syntax: TEST81.inst66 %RT, %RA, %RB
@@ -2677,7 +2681,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 68
     Impl: RT = RA + RB
     Syntax: TEST81.inst67 %RT, %RA, %RB
@@ -2686,7 +2690,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 69
     Impl: RT = RA + RB
     Syntax: TEST81.inst68 %RT, %RA, %RB
@@ -2695,7 +2699,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 70
     Impl: RT = RA + RB
     Syntax: TEST81.inst69 %RT, %RA, %RB
@@ -2704,7 +2708,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 71
     Impl: RT = RA + RB
     Syntax: TEST81.inst70 %RT, %RA, %RB
@@ -2713,7 +2717,7 @@ Insts:
     InstFormat: TEST81.if
     Encodings:
       - EncodingField: opcode
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 72
     Impl: RT = RA + RB
     Syntax: TEST81.inst71 %RT, %RA, %RB
@@ -2723,7 +2727,7 @@ PseudoInsts:
     Inst: TEST81.inst0
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 0
     Syntax: TEST81.pinst0 %RB
   - PseudoInst: TEST81.pinst1
@@ -2731,7 +2735,7 @@ PseudoInsts:
     Inst: TEST81.inst1
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 1
     Syntax: TEST81.pinst1 %RB
   - PseudoInst: TEST81.pinst2
@@ -2739,7 +2743,7 @@ PseudoInsts:
     Inst: TEST81.inst2
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 2
     Syntax: TEST81.pinst2 %RB
   - PseudoInst: TEST81.pinst3
@@ -2747,7 +2751,7 @@ PseudoInsts:
     Inst: TEST81.inst3
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 3
     Syntax: TEST81.pinst3 %RB
   - PseudoInst: TEST81.pinst4
@@ -2755,7 +2759,7 @@ PseudoInsts:
     Inst: TEST81.inst4
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 4
     Syntax: TEST81.pinst4 %RB
   - PseudoInst: TEST81.pinst5
@@ -2763,7 +2767,7 @@ PseudoInsts:
     Inst: TEST81.inst5
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 5
     Syntax: TEST81.pinst5 %RB
   - PseudoInst: TEST81.pinst6
@@ -2771,7 +2775,7 @@ PseudoInsts:
     Inst: TEST81.inst6
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 6
     Syntax: TEST81.pinst6 %RB
   - PseudoInst: TEST81.pinst7
@@ -2779,7 +2783,7 @@ PseudoInsts:
     Inst: TEST81.inst7
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 7
     Syntax: TEST81.pinst7 %RB
   - PseudoInst: TEST81.pinst8
@@ -2787,7 +2791,7 @@ PseudoInsts:
     Inst: TEST81.inst8
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 8
     Syntax: TEST81.pinst8 %RB
   - PseudoInst: TEST81.pinst9
@@ -2795,7 +2799,7 @@ PseudoInsts:
     Inst: TEST81.inst9
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 9
     Syntax: TEST81.pinst9 %RB
   - PseudoInst: TEST81.pinst10
@@ -2803,7 +2807,7 @@ PseudoInsts:
     Inst: TEST81.inst10
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 10
     Syntax: TEST81.pinst10 %RB
   - PseudoInst: TEST81.pinst11
@@ -2811,7 +2815,7 @@ PseudoInsts:
     Inst: TEST81.inst11
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 11
     Syntax: TEST81.pinst11 %RB
   - PseudoInst: TEST81.pinst12
@@ -2819,7 +2823,7 @@ PseudoInsts:
     Inst: TEST81.inst12
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 12
     Syntax: TEST81.pinst12 %RB
   - PseudoInst: TEST81.pinst13
@@ -2827,7 +2831,7 @@ PseudoInsts:
     Inst: TEST81.inst13
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 13
     Syntax: TEST81.pinst13 %RB
   - PseudoInst: TEST81.pinst14
@@ -2835,7 +2839,7 @@ PseudoInsts:
     Inst: TEST81.inst14
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 14
     Syntax: TEST81.pinst14 %RB
   - PseudoInst: TEST81.pinst15
@@ -2843,7 +2847,7 @@ PseudoInsts:
     Inst: TEST81.inst15
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 15
     Syntax: TEST81.pinst15 %RB
   - PseudoInst: TEST81.pinst16
@@ -2851,7 +2855,7 @@ PseudoInsts:
     Inst: TEST81.inst16
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 16
     Syntax: TEST81.pinst16 %RB
   - PseudoInst: TEST81.pinst17
@@ -2859,7 +2863,7 @@ PseudoInsts:
     Inst: TEST81.inst17
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 17
     Syntax: TEST81.pinst17 %RB
   - PseudoInst: TEST81.pinst18
@@ -2867,7 +2871,7 @@ PseudoInsts:
     Inst: TEST81.inst18
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 18
     Syntax: TEST81.pinst18 %RB
   - PseudoInst: TEST81.pinst19
@@ -2875,7 +2879,7 @@ PseudoInsts:
     Inst: TEST81.inst19
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 19
     Syntax: TEST81.pinst19 %RB
   - PseudoInst: TEST81.pinst20
@@ -2883,7 +2887,7 @@ PseudoInsts:
     Inst: TEST81.inst20
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 20
     Syntax: TEST81.pinst20 %RB
   - PseudoInst: TEST81.pinst21
@@ -2891,7 +2895,7 @@ PseudoInsts:
     Inst: TEST81.inst21
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 21
     Syntax: TEST81.pinst21 %RB
   - PseudoInst: TEST81.pinst22
@@ -2899,7 +2903,7 @@ PseudoInsts:
     Inst: TEST81.inst22
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 22
     Syntax: TEST81.pinst22 %RB
   - PseudoInst: TEST81.pinst23
@@ -2907,7 +2911,7 @@ PseudoInsts:
     Inst: TEST81.inst23
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 23
     Syntax: TEST81.pinst23 %RB
   - PseudoInst: TEST81.pinst24
@@ -2915,7 +2919,7 @@ PseudoInsts:
     Inst: TEST81.inst24
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 24
     Syntax: TEST81.pinst24 %RB
   - PseudoInst: TEST81.pinst25
@@ -2923,7 +2927,7 @@ PseudoInsts:
     Inst: TEST81.inst25
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 25
     Syntax: TEST81.pinst25 %RB
   - PseudoInst: TEST81.pinst26
@@ -2931,7 +2935,7 @@ PseudoInsts:
     Inst: TEST81.inst26
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 26
     Syntax: TEST81.pinst26 %RB
   - PseudoInst: TEST81.pinst27
@@ -2939,7 +2943,7 @@ PseudoInsts:
     Inst: TEST81.inst27
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 27
     Syntax: TEST81.pinst27 %RB
   - PseudoInst: TEST81.pinst28
@@ -2947,7 +2951,7 @@ PseudoInsts:
     Inst: TEST81.inst28
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 28
     Syntax: TEST81.pinst28 %RB
   - PseudoInst: TEST81.pinst29
@@ -2955,7 +2959,7 @@ PseudoInsts:
     Inst: TEST81.inst29
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 29
     Syntax: TEST81.pinst29 %RB
   - PseudoInst: TEST81.pinst30
@@ -2963,7 +2967,7 @@ PseudoInsts:
     Inst: TEST81.inst30
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 30
     Syntax: TEST81.pinst30 %RB
   - PseudoInst: TEST81.pinst31
@@ -2971,7 +2975,7 @@ PseudoInsts:
     Inst: TEST81.inst31
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 31
     Syntax: TEST81.pinst31 %RB
   - PseudoInst: TEST81.pinst32
@@ -2979,7 +2983,7 @@ PseudoInsts:
     Inst: TEST81.inst32
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 32
     Syntax: TEST81.pinst32 %RB
   - PseudoInst: TEST81.pinst33
@@ -2987,7 +2991,7 @@ PseudoInsts:
     Inst: TEST81.inst33
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 33
     Syntax: TEST81.pinst33 %RB
   - PseudoInst: TEST81.pinst34
@@ -2995,7 +2999,7 @@ PseudoInsts:
     Inst: TEST81.inst34
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 34
     Syntax: TEST81.pinst34 %RB
   - PseudoInst: TEST81.pinst35
@@ -3003,7 +3007,7 @@ PseudoInsts:
     Inst: TEST81.inst35
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 35
     Syntax: TEST81.pinst35 %RB
   - PseudoInst: TEST81.pinst36
@@ -3011,7 +3015,7 @@ PseudoInsts:
     Inst: TEST81.inst36
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 36
     Syntax: TEST81.pinst36 %RB
   - PseudoInst: TEST81.pinst37
@@ -3019,7 +3023,7 @@ PseudoInsts:
     Inst: TEST81.inst37
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 37
     Syntax: TEST81.pinst37 %RB
   - PseudoInst: TEST81.pinst38
@@ -3027,7 +3031,7 @@ PseudoInsts:
     Inst: TEST81.inst38
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 38
     Syntax: TEST81.pinst38 %RB
   - PseudoInst: TEST81.pinst39
@@ -3035,7 +3039,7 @@ PseudoInsts:
     Inst: TEST81.inst39
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 39
     Syntax: TEST81.pinst39 %RB
   - PseudoInst: TEST81.pinst40
@@ -3043,7 +3047,7 @@ PseudoInsts:
     Inst: TEST81.inst40
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 40
     Syntax: TEST81.pinst40 %RB
   - PseudoInst: TEST81.pinst41
@@ -3051,7 +3055,7 @@ PseudoInsts:
     Inst: TEST81.inst41
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 41
     Syntax: TEST81.pinst41 %RB
   - PseudoInst: TEST81.pinst42
@@ -3059,7 +3063,7 @@ PseudoInsts:
     Inst: TEST81.inst42
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 42
     Syntax: TEST81.pinst42 %RB
   - PseudoInst: TEST81.pinst43
@@ -3067,7 +3071,7 @@ PseudoInsts:
     Inst: TEST81.inst43
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 43
     Syntax: TEST81.pinst43 %RB
   - PseudoInst: TEST81.pinst44
@@ -3075,7 +3079,7 @@ PseudoInsts:
     Inst: TEST81.inst44
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 44
     Syntax: TEST81.pinst44 %RB
   - PseudoInst: TEST81.pinst45
@@ -3083,7 +3087,7 @@ PseudoInsts:
     Inst: TEST81.inst45
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 45
     Syntax: TEST81.pinst45 %RB
   - PseudoInst: TEST81.pinst46
@@ -3091,7 +3095,7 @@ PseudoInsts:
     Inst: TEST81.inst46
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 46
     Syntax: TEST81.pinst46 %RB
   - PseudoInst: TEST81.pinst47
@@ -3099,7 +3103,7 @@ PseudoInsts:
     Inst: TEST81.inst47
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 47
     Syntax: TEST81.pinst47 %RB
   - PseudoInst: TEST81.pinst48
@@ -3107,7 +3111,7 @@ PseudoInsts:
     Inst: TEST81.inst48
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 48
     Syntax: TEST81.pinst48 %RB
   - PseudoInst: TEST81.pinst49
@@ -3115,7 +3119,7 @@ PseudoInsts:
     Inst: TEST81.inst49
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 49
     Syntax: TEST81.pinst49 %RB
   - PseudoInst: TEST81.pinst50
@@ -3123,7 +3127,7 @@ PseudoInsts:
     Inst: TEST81.inst50
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 50
     Syntax: TEST81.pinst50 %RB
   - PseudoInst: TEST81.pinst51
@@ -3131,7 +3135,7 @@ PseudoInsts:
     Inst: TEST81.inst51
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 51
     Syntax: TEST81.pinst51 %RB
   - PseudoInst: TEST81.pinst52
@@ -3139,7 +3143,7 @@ PseudoInsts:
     Inst: TEST81.inst52
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 52
     Syntax: TEST81.pinst52 %RB
   - PseudoInst: TEST81.pinst53
@@ -3147,7 +3151,7 @@ PseudoInsts:
     Inst: TEST81.inst53
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 53
     Syntax: TEST81.pinst53 %RB
   - PseudoInst: TEST81.pinst54
@@ -3155,7 +3159,7 @@ PseudoInsts:
     Inst: TEST81.inst54
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 54
     Syntax: TEST81.pinst54 %RB
   - PseudoInst: TEST81.pinst55
@@ -3163,7 +3167,7 @@ PseudoInsts:
     Inst: TEST81.inst55
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 55
     Syntax: TEST81.pinst55 %RB
   - PseudoInst: TEST81.pinst56
@@ -3171,7 +3175,7 @@ PseudoInsts:
     Inst: TEST81.inst56
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 56
     Syntax: TEST81.pinst56 %RB
   - PseudoInst: TEST81.pinst57
@@ -3179,7 +3183,7 @@ PseudoInsts:
     Inst: TEST81.inst57
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 57
     Syntax: TEST81.pinst57 %RB
   - PseudoInst: TEST81.pinst58
@@ -3187,7 +3191,7 @@ PseudoInsts:
     Inst: TEST81.inst58
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 58
     Syntax: TEST81.pinst58 %RB
   - PseudoInst: TEST81.pinst59
@@ -3195,7 +3199,7 @@ PseudoInsts:
     Inst: TEST81.inst59
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 59
     Syntax: TEST81.pinst59 %RB
   - PseudoInst: TEST81.pinst60
@@ -3203,7 +3207,7 @@ PseudoInsts:
     Inst: TEST81.inst60
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 60
     Syntax: TEST81.pinst60 %RB
   - PseudoInst: TEST81.pinst61
@@ -3211,7 +3215,7 @@ PseudoInsts:
     Inst: TEST81.inst61
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 61
     Syntax: TEST81.pinst61 %RB
   - PseudoInst: TEST81.pinst62
@@ -3219,7 +3223,7 @@ PseudoInsts:
     Inst: TEST81.inst62
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 62
     Syntax: TEST81.pinst62 %RB
   - PseudoInst: TEST81.pinst63
@@ -3227,7 +3231,7 @@ PseudoInsts:
     Inst: TEST81.inst63
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 63
     Syntax: TEST81.pinst63 %RB
   - PseudoInst: TEST81.pinst64
@@ -3235,7 +3239,7 @@ PseudoInsts:
     Inst: TEST81.inst64
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 64
     Syntax: TEST81.pinst64 %RB
   - PseudoInst: TEST81.pinst65
@@ -3243,7 +3247,7 @@ PseudoInsts:
     Inst: TEST81.inst65
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 65
     Syntax: TEST81.pinst65 %RB
   - PseudoInst: TEST81.pinst66
@@ -3251,7 +3255,7 @@ PseudoInsts:
     Inst: TEST81.inst66
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 66
     Syntax: TEST81.pinst66 %RB
   - PseudoInst: TEST81.pinst67
@@ -3259,7 +3263,7 @@ PseudoInsts:
     Inst: TEST81.inst67
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 67
     Syntax: TEST81.pinst67 %RB
   - PseudoInst: TEST81.pinst68
@@ -3267,7 +3271,7 @@ PseudoInsts:
     Inst: TEST81.inst68
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 68
     Syntax: TEST81.pinst68 %RB
   - PseudoInst: TEST81.pinst69
@@ -3275,7 +3279,7 @@ PseudoInsts:
     Inst: TEST81.inst69
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 69
     Syntax: TEST81.pinst69 %RB
   - PseudoInst: TEST81.pinst70
@@ -3283,7 +3287,7 @@ PseudoInsts:
     Inst: TEST81.inst70
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 70
     Syntax: TEST81.pinst70 %RB
   - PseudoInst: TEST81.pinst71
@@ -3291,28 +3295,33 @@ PseudoInsts:
     Inst: TEST81.inst71
     Encodings:
       - EncodingField: RA
-        EncodingWidth: 8
+        EncodingWidth: 7
         EncodingValue: 71
     Syntax: TEST81.pinst71 %RB
 Caches:
   - Cache: TEST81.L2.cache
     Sets: 2
     Ways: 8
+    LineSize: 64
   - Cache: TEST81.core0.L1.cache
     Sets: 1
     Ways: 1
+    LineSize: 64
     SubLevel: TEST81.L2.cache
   - Cache: TEST81.core1.L1.cache
     Sets: 1
     Ways: 1
+    LineSize: 64
     SubLevel: TEST81.L2.cache
   - Cache: TEST81.core2.L1.cache
     Sets: 1
     Ways: 1
+    LineSize: 64
     SubLevel: TEST81.L2.cache
   - Cache: TEST81.core3.L1.cache
     Sets: 1
     Ways: 1
+    LineSize: 64
     SubLevel: TEST81.L2.cache
 Comms:
   - Comm: TEST81.comm
@@ -3357,12 +3366,16 @@ Scratchpads:
 MemoryControllers:
   - MemoryController: TEST81.0.mctrl
     Ports: 2
+    MemoryOrder: Weak
   - MemoryController: TEST81.1.mctrl
     Ports: 2
+    MemoryOrder: Weak
   - MemoryController: TEST81.2.mctrl
     Ports: 2
+    MemoryOrder: Weak
   - MemoryController: TEST81.3.mctrl
     Ports: 2
+    MemoryOrder: Weak
 VTPControllers:
   - VTP: TEST81.vtp
 Extensions:
@@ -3385,6 +3398,8 @@ Extensions:
       - RegisterClassName: TEST81.ext0.regclass
         Registers:
           - TEST81.ext0.reg
+        ReadPorts: 2
+        WritePorts: 1
     ISAs:
       - ISAName: TEST81.ext0.isa
     RTL: when( RA === 0x05){RT = RA << RB}
@@ -3408,6 +3423,8 @@ Extensions:
       - RegisterClassName: TEST81.ext1.regclass
         Registers:
           - TEST81.ext1.reg
+        ReadPorts: 2
+        WritePorts: 1
     ISAs:
       - ISAName: TEST81.ext1.isa
     RTL: when( RA === 0x05){RT = RA << RB}
@@ -3431,6 +3448,8 @@ Extensions:
       - RegisterClassName: TEST81.ext2.regclass
         Registers:
           - TEST81.ext2.reg
+        ReadPorts: 2
+        WritePorts: 1
     ISAs:
       - ISAName: TEST81.ext2.isa
     RTL: when( RA === 0x05){RT = RA << RB}
@@ -3454,6 +3473,8 @@ Extensions:
       - RegisterClassName: TEST81.ext3.regclass
         Registers:
           - TEST81.ext3.reg
+        ReadPorts: 2
+        WritePorts: 1
     ISAs:
       - ISAName: TEST81.ext3.isa
     RTL: when( RA === 0x05){RT = RA << RB}

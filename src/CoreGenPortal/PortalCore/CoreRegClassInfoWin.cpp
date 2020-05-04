@@ -21,7 +21,7 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenRegClass *RegClass )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,250), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,320), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
 
   RegClassNode = RegClass;
 
@@ -65,6 +65,50 @@ CoreRegClassInfoWin::CoreRegClassInfoWin( wxWindow* parent,
                                  wxT("Reg Class Name") );
   RegClassNameSizer->Add( RegClassNameCtrl, 0, wxALL, 0 );
   InnerSizer->Add( RegClassNameSizer, 0, wxALIGN_CENTER|wxALL, 5 );
+
+  // -- Write ports
+  ReadPortsSizer = new wxBoxSizer( wxHORIZONTAL );
+  ReadPortsText = new wxStaticText( Wnd,
+                                   4,
+                                   wxT("Read Ports"),
+                                   wxDefaultPosition,
+                                   wxSize(160, -1),
+                                   0 );
+  ReadPortsText->Wrap(-1);
+  ReadPortsSizer->Add( ReadPortsText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+
+  ReadPortsCtrl = new wxTextCtrl( Wnd,
+                                 5,
+                                 RegClass ? wxString(std::to_string(RegClass->GetReadPorts())) : "",
+                                 wxDefaultPosition,
+                                 wxSize(320,25),
+                                 0,
+                                 wxDefaultValidator,
+                                 wxT("Read Ports") );
+  ReadPortsSizer->Add( ReadPortsCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( ReadPortsSizer, 0, wxALIGN_CENTER|wxALL, 5 );
+
+  // -- write ports
+  WritePortsSizer = new wxBoxSizer( wxHORIZONTAL );
+  WritePortsText = new wxStaticText( Wnd,
+                                   6,
+                                   wxT("Write Ports"),
+                                   wxDefaultPosition,
+                                   wxSize(160, -1),
+                                   0 );
+  WritePortsText->Wrap(-1);
+  WritePortsSizer->Add( WritePortsText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+
+  WritePortsCtrl = new wxTextCtrl( Wnd,
+                                 7,
+                                 RegClass ? wxString(std::to_string(RegClass->GetWritePorts())) : "",
+                                 wxDefaultPosition,
+                                 wxSize(320,25),
+                                 0,
+                                 wxDefaultValidator,
+                                 wxT("Write Ports") );
+  WritePortsSizer->Add( WritePortsCtrl, 0, wxALL, 0 );
+  InnerSizer->Add( WritePortsSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   //-- registers
   RegNameSizer = new wxBoxSizer( wxHORIZONTAL );

@@ -1,5 +1,5 @@
 //
-// _COREREGCLASSINFOWIN_H_
+// _COREDATAPATHINFOWIN_H_
 //
 // Copyright (C) 2017-2020 Tactical Computing Laboratories, LLC
 // All Rights Reserved
@@ -8,8 +8,8 @@
 // See LICENSE in the top level directory for licensing details
 //
 
-#ifndef _COREREGCLASSINFOWIN_H_
-#define _COREREGCLASSINFOWIN_H_
+#ifndef _COREDATAPATHINFOWIN_H_
+#define _COREDATAPATHINFOWIN_H_
 
 //-- WX HEADERS
 #include <wx/artprov.h>
@@ -34,46 +34,40 @@
 #include <wx/checkbox.h>
 #include <wx/msgdlg.h>
 #include <wx/textctrl.h>
-#include <wx/scrolwin.h>
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
 #include "CoreGenPortal/PortalMainFrame.h"
 
-class CoreRegClassInfoWin : public wxDialog {
+class CoreDataPathInfoWin : public wxDialog {
 public:
-  CoreRegClassInfoWin( wxWindow* parent,
-                 wxWindowID id = wxID_ANY,
-                 const wxString& title = wxT("RegClass Node"),
-                 CoreGenRegClass *Node = nullptr);
-  ~CoreRegClassInfoWin();
+  CoreDataPathInfoWin( wxWindow* parent,
+                       wxWindowID id = wxID_ANY,
+                       const wxString& title = wxT("DataPath Node"),
+                       CoreGenDataPath *Node = nullptr);
+  ~CoreDataPathInfoWin();
 
 protected:
-  CoreGenRegClass *RegClassNode;  ///< RegClassNode
+  CoreGenDataPath *CoreGenDPath;  ///< Node
+
   // window handlers
-  wxScrolledWindow *Wnd;         ///< scrolling window handler
+  wxScrolledWindow *Wnd;          ///< scrolling window handler
+
+  // static lines
+  wxStaticLine *FinalStaticLine;  ///< final static line
 
   // box sizers
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
-  wxBoxSizer *RegClassNameSizer;  ///< regclass name sizer
-  wxBoxSizer *ReadPortsSizer;     ///< read ports sizer
-  wxBoxSizer *WritePortsSizer;    ///< write ports sizer
-  wxBoxSizer *RegNameSizer;       ///< reg name sizer
+  wxBoxSizer *DPathNameSizer;     ///< data path name sizer
+  wxBoxSizer *StyleNameSizer;     ///< style name sizer
 
-  // static lines
-  wxStaticLine* FinalStaticLine;  ///< final static line
+  wxStaticText *DPathNameText;    ///< static text for data path name
+  wxStaticText *StyleNameText;    ///< static text for style name
 
-  wxStaticText *RegClassNameText; ///< static text for SoC name
-  wxStaticText *ReadPortsText;    ///< static text for read ports
-  wxStaticText *WritePortsText;   ///< static text for write ports
-  wxStaticText *RegNameText;      ///< static text for inst format
-
-  wxTextCtrl *RegClassNameCtrl;   ///< instruction name
-  wxTextCtrl *ReadPortsCtrl;      ///< number of read ports
-  wxTextCtrl *WritePortsCtrl;     ///< number of write ports
-  wxTextCtrl *RegNameCtrl;        ///< instruction format name
+  wxTextCtrl *DPathNameCtrl;      ///< name of the data path
+  wxTextCtrl *StyleNameCtrl;      ///< name of the style
 
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
