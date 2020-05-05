@@ -66,7 +66,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                                wxT("Core Name") );
   CoreNameSizer->Add( CoreNameCtrl, 0, wxALL, 0 );
   InnerSizer->Add( CoreNameSizer, 0, wxALIGN_CENTER|wxALL, 5);
- 
+
   //-- thread unit name
   ThreadUnitSizer = new wxBoxSizer( wxHORIZONTAL );
   ThreadUnitText = new wxStaticText(Wnd,
@@ -89,7 +89,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                                wxT("Thread Units") );
   ThreadUnitSizer->Add( ThreadUnitCtrl, 0, wxALL, 0 );
   InnerSizer->Add( ThreadUnitSizer, 0, wxALIGN_CENTER|wxALL, 5);
- 
+
   //-- isa name
   ISANameSizer = new wxBoxSizer( wxHORIZONTAL );
   ISANameText= new wxStaticText(Wnd,
@@ -112,7 +112,7 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
                            wxT("ISA") );
   ISANameSizer->Add( ISACtrl, 0, wxALL, 0 );
   InnerSizer->Add( ISANameSizer, 0, wxALIGN_CENTER|wxALL, 5);
- 
+
   //-- cache name
   CacheNameSizer = new wxBoxSizer( wxHORIZONTAL );
   CacheNameText = new wxStaticText(Wnd,
