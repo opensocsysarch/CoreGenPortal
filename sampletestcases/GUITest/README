@@ -1,0 +1,50 @@
+******************************************************************
+* Sample Python Script for testing System Architect CoreGenPortal
+******************************************************************
+
+* Currently tested in MacOS 10.14 (Mojave) Ubuntu 18.04 (Gnome) and Ubuntu Headless 
+  with a CoreGenPortal window size of 1024x768 (MUST be 1024x768)
+
+* Goal: Auto-implementation of steps in CoreGenPortal Tutotial - create new project, 
+  add a cache, save project, quit coregenportal. By default all projects are saved 
+  to ~/OpenSysArch/<test_name>
+
+Darwin Install / run:
+---------------------
+Install CoreGen, CoreGenPortal - assumes CoreGenPortal is in opt/coregen/bin/CoreGenPortal
+pip3 install pyautogui Xlib pyvirtualdisplay pyscreenshot
+
+To run:
+
+python3 ./test_tutorial.py
+
+Remember to click on CoreGenPortal to bring it to the foreground after it launches.
+Also, this is a GUI test... please do not touch the keyboard or mouse or bad things happen
+
+
+Ubuntu 18.04
+------------
+sudo apt-get install xvfb scrot
+pip3 install pyautogui Xlib pyvirtualdisplay pyscreenshot
+
+Running with GUI on screen - remember to click on CoreGenPortal to bring it to the foreground after it launches.
+python3 ./test_tutorial.py
+
+Running on Ubuntu with no X-Display (also works if you have a display attached)
+xvfb-run -s "-screen 0 1024x768x16" python3 ./test_tutortial.py
+
+Note that if you choose to run headless on an Ubuntu box where you have a display 
+open it will work, you just won't see anything 
+
+TODO:
+ - Bring in argparse to manage options for (among other things):
+   - Default screen size
+   - Path to CoreGenPortal
+   - Path to screenshots
+   - Test names / parameters
+   - Path to where you save projects
+
+ - Better exception handling for things like a screen size != 1024x768
+ - Regular screenshot capture
+ - Screenshots from headless gui window manger for verification
+
