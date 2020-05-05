@@ -2571,17 +2571,15 @@ bool PortalMainFrame::SaveDataPath(wxDialog* InfoWin, CoreGenDataPath* DPathNode
   wxTextCtrl *InfoBox;
   std::string BoxContents;
   bool savedAll = true;
-  bool allValid = true;
 
   InfoBox = (wxTextCtrl*)InfoWin->FindWindow(0);
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     DPathNode->SetName(BoxContents);
-    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(0, 0, 0));
-  }
-  else{
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(0, 0, 0));
+  }else{
     LogPane->AppendText(BoxContents + " is not a valid DataPath name.  Keeping the old DataPath name.\n");
-    InfoWin->FindWindow(2)->SetForegroundColour(wxColour(255, 0, 0));
+    InfoWin->FindWindow(6)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
 
@@ -2589,14 +2587,12 @@ bool PortalMainFrame::SaveDataPath(wxDialog* InfoWin, CoreGenDataPath* DPathNode
   BoxContents = InfoBox->GetValue().ToStdString();
   if(CGProject->IsValidName(BoxContents)){
     DPathNode->SetStyle(BoxContents);
-    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
-  }
-  else{
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(0, 0, 0));
+  }else{
     LogPane->AppendText(BoxContents + " is not a valid DataPath style.  Keeping the old DataPath style.\n");
-    InfoWin->FindWindow(3)->SetForegroundColour(wxColour(255, 0, 0));
+    InfoWin->FindWindow(7)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
   }
-  if(allValid) InfoWin->FindWindow(3)->SetForegroundColour(wxColour(0, 0, 0));
 
   return savedAll;
 }
