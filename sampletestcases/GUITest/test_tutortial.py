@@ -67,7 +67,7 @@ pyautogui.PAUSE = 1     #Pause one second between all GUI commands - this lets d
 
 #launch CoreGenPortal
 print("launching CoreGen... I'll wait 15 sec")
-coreGenP = subprocess.Popen([os.getenv("COREGENPORTAL_BIN","/opt/coregen/bin/CoreGenPortal")])
+coreGenP = subprocess.Popen([os.getenv("COREGENPORTAL_BIN","/opt/coregen/bin/CoreGenPortal"),"--maximize"])
 time.sleep(15)
 assert(coreGenP.poll() == None), "Error launching CoreGenPortal"
 
