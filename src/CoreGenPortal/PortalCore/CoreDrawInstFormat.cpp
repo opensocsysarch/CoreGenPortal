@@ -239,7 +239,7 @@ void CoreDrawInstFormat::drawKey(wxCoord Width){
   dc->SetBrush(* wxYELLOW_BRUSH );
   dc->DrawRectangle(UnusedBoxX, IF_KEY_TOP, 10, 10);
   dc->DrawText(UnusedLabel, UnusedLabelX, IF_KEY_TOP + 5 - uLabelHeight/2);
-  
+
   //draw overlap key
   dc->SetBrush(* wxRED_BRUSH );
   dc->DrawRectangle(OverlapBoxX, IF_KEY_TOP, 10, 10);
