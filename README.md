@@ -188,6 +188,7 @@ make
 * -DCMAKE\_INSTALL\_PREFIX=/path/to/install : Forces alternate install locations
 * -DCOREGEN\_INSTALL\_PATH=/path/to/coregen/install : The default is /opt/coregen
 * -DLLVM\_DIR=/path/to/llvm/cmake/scripts : Sets the path for the LLVM cmake scripts.  This must be set for the build to be successful.  This is generally difficult to derive automatically.
+* -DBUILD\_ALL\_TESTING=ON : Enables the top-level GUI test harness
 
 ### Documentation Options
 * -DBUILD\_DOCUMENTATION=ON  : Enables Doxygenized documentaition.  ``make doc`` will build the documentation (requires Doxygen to be installed)
@@ -205,6 +206,7 @@ make
 ## Contributing
 
 ## Testing
+* -DBUILD\_PORTAL\_GUI\_TESTS=ON : Enables the Python3 GUI test harness
 
 ## License
 CoreGenPortal is licensed under an Apache-style license - see the [LICENSE](LICENSE) file for details
