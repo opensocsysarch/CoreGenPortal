@@ -22,15 +22,55 @@
 
 
 class CoreGenPortal: public wxApp{
+private:
+  // private data
+  bool isHelp;
+  bool isMaximize;
+
+  // private functions
+  void ParseArgs();
+  void PrintHelp();
 public:
   virtual bool OnInit();
 };
 
 IMPLEMENT_APP(CoreGenPortal);
 
+void CoreGenPortal::PrintHelp(){
+  std::cout << "----------------------------------------------------------" << std::endl;
+  std::cout << " CoreGenPortal Help" << std::endl;
+  std::cout << "----------------------------------------------------------" << std::endl;
+  std::cout << " --help          : Print this help menu" << std::endl;
+  std::cout << " --maximize      : Maximize the window at startup" << std::endl;
+  std::cout << "----------------------------------------------------------" << std::endl;
+}
+
+void CoreGenPortal::ParseArgs(){
+  isMaximize = false;
+
+  unsigned NumArgs = argc;
+
+  for( unsigned i=1; i<NumArgs; i++ ){
+    if( argv.GetArguments().Item(i) == "--maximize" ){
+      isMaximize = true;
+    }else if( argv.GetArguments().Item(i) == "--help" ){
+      isHelp = true;
+    }
+  }
+}
+
 // PortalMain::OnInit
 // Initialize the main frame
 bool CoreGenPortal::OnInit(){
+
+  // parse the command line args
+  ParseArgs();
+
+  // print the help menu
+  if( isHelp ){
+    PrintHelp();
+    exit(0);
+  }
 
   // Initial setup
   SetAppName(PORTAL_APP_NAME);
@@ -55,7 +95,12 @@ bool CoreGenPortal::OnInit(){
   PortalMainFrame *MainFrame = new PortalMainFrame( "CoreGenPortal",
                                                     wxPoint(50,50),
                                                     wxSize(1024,768));
+  // maximize the window
+  if( isMaximize )
+    MainFrame->Maximize();
+
   MainFrame->Show( true );
+
   return true;
 }
 

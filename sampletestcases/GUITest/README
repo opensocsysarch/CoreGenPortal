@@ -11,7 +11,8 @@
 
 Darwin Install / run:
 ---------------------
-Install CoreGen, CoreGenPortal - assumes CoreGenPortal is in opt/coregen/bin/CoreGenPortal
+Install CoreGen, CoreGenPortal.  Set the environment variable "COREGENPORTAL_BIN" to point 
+to the CoreGenPortal binary.
 pip3 install pyautogui Xlib pyvirtualdisplay pyscreenshot
 
 To run:
