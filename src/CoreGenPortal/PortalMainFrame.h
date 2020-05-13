@@ -45,6 +45,7 @@
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
 #include "CoreGenPortal/PortalVerifPrefWin.h"
+#include "CoreGenPortal/PortalSCPrefWin.h"
 #include "CoreGenPortal/PortalUserPrefWin.h"
 #include "CoreGenPortal/PortalNewProjWin.h"
 #include "CoreGenPortal/PortalCore/CoreErrorDiag.h"
@@ -54,6 +55,7 @@
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
 #include "CoreGenPortal/PortalCore/CoreInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreVerifWin.h"
+#include "CoreGenPortal/PortalCore/SCCompConfig.h"
 #include "CoreGenPortal/PortalCore/CoreStatsWin.h"
 #include "CoreGenPortal/PortalCore/CoreSpecDocWin.h"
 #include "CoreGenPortal/PortalCore/CorePluginBrowser.h"
@@ -92,6 +94,7 @@ private:
   // data handlers
   CoreUserConfig *UserConfig;
   CoreVerifConfig *VerifConfig;
+  SCCompConfig *SCConfig;
 
   // selected runtime components
   std::string LLVMComp;
@@ -164,6 +167,7 @@ private:
   // menu handlers
   void OnQuit(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
+  void OnSCPref(wxCommandEvent& event);
   void OnVerifPref(wxCommandEvent& event);
   void OnUserPref(wxCommandEvent& event);
   void OnProjNew(wxCommandEvent& event);

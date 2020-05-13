@@ -35,6 +35,7 @@ CoreVerifWin.cpp
 CoreStatsWin.cpp
 CoreSpecDocWin.cpp
 CorePluginBrowser.cpp
+SCCompConfig.cpp
 )
 
 #-- target deps

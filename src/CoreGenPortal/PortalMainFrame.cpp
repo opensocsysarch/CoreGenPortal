@@ -17,7 +17,7 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
                                   const wxPoint& pos,
                                   const wxSize& size )
   : wxFrame( NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE ),
-    CGProject(nullptr), UserConfig(nullptr),VerifConfig(nullptr),
+    CGProject(nullptr), UserConfig(nullptr),VerifConfig(nullptr),SCConfig(nullptr),
     MenuBar(NULL), FileMenu(NULL), EditMenu(NULL), PrefMenu(NULL), ProjectMenu(NULL),
     BuildMenu(NULL), PluginMenu(NULL), HelpMenu(NULL), ToolBar(NULL),
     LogPane(NULL), ModulesNotebook(NULL), ModuleBox(NULL), PluginBox(NULL),
@@ -48,6 +48,13 @@ PortalMainFrame::PortalMainFrame( const wxString& title,
     LogPane->AppendText("Initialized the verification pass preferences\n");
   else
     LogPane->AppendText("Error initializing the verification pass preferences\n");
+
+  // initialize the stonecutter compiler configuration
+  SCConfig = new SCCompConfig();
+  if( SCConfig->isValid() )
+    LogPane->AppendText("Initialized the StoneCutter compiler preferences\n");
+  else
+    LogPane->AppendText("Error initializaing the StoneCutter compiler preferences\n");
 
   // set the default path in the project window
   ProjDir->SetPath(UserConfig->wxGetProjectDir());
@@ -166,6 +173,8 @@ void PortalMainFrame::CreateMenuBar(){
   //-- preferences menu
   Connect(ID_PREF_VERIF, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnVerifPref));
+  Connect(ID_PREF_STONECUTTER, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnSCPref));
   Connect(ID_PREF_USER, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnUserPref));
 
@@ -1702,6 +1711,22 @@ void PortalMainFrame::OnVerifPref(wxCommandEvent &event){
     LogPane->AppendText("Committed verification preferences\n");
   }
   VP->Destroy();
+}
+
+// PortalMainFram::OnSCPref
+void PortalMainFrame::OnSCPref(wxCommandEvent &event){
+  LogPane->AppendText("Loading StoneCutter compiler preferences...\n");
+  PortalSCPrefWin *SP = new PortalSCPrefWin(this,
+                                            wxID_ANY,
+                                            wxT("StoneCutter Preferences"),
+                                            wxDefaultPosition,
+                                            wxSize(500,500),
+                                            wxDEFAULT_DIALOG_STYLE|wxVSCROLL,
+                                            SCConfig);
+  if( SP->ShowModal() == wxID_OK ){
+    LogPane->AppendText("Committed StoneCutter compiler preferences\n");
+  }
+  SP->Destroy();
 }
 
 // PortalMainFrame::OnUserPref

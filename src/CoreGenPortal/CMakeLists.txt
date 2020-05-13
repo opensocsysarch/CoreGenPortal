@@ -22,6 +22,8 @@ PortalUserPrefWin.cpp
 PortalUserPrefWin.h
 PortalNewProjWin.cpp
 PortalNewProjWin.h
+PortalSCPrefWin.cpp
+PortalSCPrefWin.h
 )
 
 set(llvm_codegens
