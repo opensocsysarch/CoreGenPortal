@@ -2556,6 +2556,12 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     SetupModuleBox();
 
     OpenProject(IRFileName, true);
+    CoreGenNode *TmpNode = CGProject->GetNodeByName(NodeName);
+    wxTreeItemId SavedId = GetItemFromNode(TmpNode);
+
+    if( SavedId.IsOk() )
+      ModuleBox->SetFocusedItem(SavedId);
+
     LogPane->AppendText("Updated " + NodeName + ".\n");
   }
   else{
