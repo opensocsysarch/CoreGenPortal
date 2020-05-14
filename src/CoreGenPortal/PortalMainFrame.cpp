@@ -72,6 +72,9 @@ PortalMainFrame::~PortalMainFrame(){
   if( VerifConfig )
     delete VerifConfig;
 
+  if( SCConfig )
+    delete SCConfig;
+
   Mgr.UnInit();
 }
 
@@ -161,6 +164,8 @@ void PortalMainFrame::CreateMenuBar(){
 
   // connect all the handlers
   //-- file menu
+  Connect(wxID_PRINT, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnPrint));
   Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnQuit));
 
@@ -1283,6 +1288,60 @@ void PortalMainFrame::CloseProject(bool editing){
 
   // log the close project
   if(!editing) LogPane->AppendText("Closed project\n");
+}
+
+// PortalMainFrame::AddNewlines
+wxString PortalMainFrame::AddNewlines(wxStyledTextCtrl *CW){
+  wxString Str;
+
+  // we insert <pre> tags in the header and footer of text
+  // this is a fun little trick to get the raw text to print
+  // with newline characters attached using the wxHtmlEasyPrinting
+  // class
+
+  Str += "<pre>";
+  for( unsigned i=0; i<CW->GetNumberOfLines(); i++ ){
+    Str += (CW->GetLineText(i) + "\n");
+  }
+  Str += "</pre>";
+  return Str;
+}
+
+// PortalMainFrame::OnPrint
+// handles the print request
+void PortalMainFrame::OnPrint(wxCommandEvent& event){
+  if( EditorNotebook->GetPageCount() == 0 ){
+    LogPane->AppendText("No editor panes to print\n" );
+    return ;
+  }
+  wxStyledTextCtrl *CW = (wxStyledTextCtrl *)(EditorNotebook->GetCurrentPage());
+  if( !CW ){
+    LogPane->AppendText("No editor pane selected\n");
+    return ;
+  }
+
+  wxString PFileName = wxT("");
+
+  // determine what the file name is
+  if( CW == IRPane ){
+    // we're using the IR File
+    PFileName = IRFileName;
+  }else{
+    // its an SCPane
+    for( unsigned i=0; i<SCPanes.size(); i++ ){
+      if( SCPanes[i].first == CW ){
+        PFileName = SCPanes[i].second;
+      }
+    }
+  }
+
+  wxHtmlEasyPrinting *HP = new wxHtmlEasyPrinting(_("Source Code Printer"),this);
+  HP->SetHeader(PFileName + wxT("(@PAGENUM@/@PAGESCNT@)<hr>"),
+                wxPAGE_ALL);
+  HP->PrintText(AddNewlines(CW),wxEmptyString);
+  delete HP;
+
+  return ;
 }
 
 // PortalMainFrame::OnQuit

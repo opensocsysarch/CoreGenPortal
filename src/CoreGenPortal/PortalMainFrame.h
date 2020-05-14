@@ -41,6 +41,9 @@
 #include <wx/treectrl.h>
 #include <wx/textctrl.h>
 #include <wx/clipbrd.h>
+#include <wx/print.h>
+#include <wx/html/htmlwin.h>
+#include <wx/html/htmprint.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -102,6 +105,9 @@ private:
   // top level manager
   wxAuiManager Mgr;
 
+  // printer handler
+  wxPrintDialogData PrintData;
+
   // menu bar items
   wxMenuBar *MenuBar;
   wxMenu *FileMenu;
@@ -159,12 +165,14 @@ private:
   void OpenYamlFile(wxString NP, wxFileName NPF);
   void OpenSCFile(wxString NP, wxFileName NPF);
   void OpenProject(wxString NP, bool editing = false);
+  wxString AddNewlines(wxStyledTextCtrl *CW);
 
   CGNodeType TreeIdToCGType(wxTreeItemId ID);
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
 
   // menu handlers
+  void OnPrint(wxCommandEvent& event);
   void OnQuit(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
   void OnSCPref(wxCommandEvent& event);
