@@ -1987,6 +1987,60 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
   ProjDir->ReCreateTree();
 }
 
+// PortalMainFrame::InitSCOpts
+bool PortalMainFrame::InitSCOpts(SCOpts *Opts){
+  // set all the standard options
+  if( SCConfig->IsParseEnabled() ){
+    Opts->UnsetCG();
+  }else{
+    Opts->SetCG();
+  }
+  if( SCConfig->IsKeepEnabled() ){
+    Opts->SetKeep();
+  }else{
+    Opts->UnsetKeep();
+  }
+
+  // set the optimization options
+  if( SCConfig->GetOptLevel() == 0 ){
+    // optimize = false
+    Opts->UnsetOptimize();
+    // pipeline = false
+    Opts->UnsetPipeline();
+  }
+  if( SCConfig->GetOptLevel() == 1 ){
+    // optimize = true
+    Opts->SetOptimize();
+    // scenable = true, but disable all passes
+    Opts->UnsetSCPasses();
+    // pipeline = false
+    Opts->UnsetPipeline();
+  }
+  if( SCConfig->GetOptLevel() == 2 ){
+    // optimize = true
+    Opts->SetOptimize();
+    // scenable = true
+    Opts->DisableManualSCPasses();
+    // pipeline = false
+    Opts->UnsetPipeline();
+  }
+  if( SCConfig->GetOptLevel() == 3 ){
+    // optimize = true
+    Opts->SetOptimize();
+    // scenable = true
+    Opts->DisableManualSCPasses();
+    // pipeline = true
+    Opts->SetPipeline();
+  }
+
+  // set the individual pass options
+  // TODO
+
+  // TODO: Add pipeliner options
+
+  return true;
+}
+
 // PortalMainFrame::OnBuildStoneCutter
 void PortalMainFrame::OnBuildStoneCutter(wxCommandEvent &event){
   if( !CGProject ){
@@ -2031,6 +2085,11 @@ void PortalMainFrame::OnBuildStoneCutter(wxCommandEvent &event){
 
       // create a new SCOpts context
       SCOpts *SCO = new SCOpts( Msgs );
+      if( !InitSCOpts(SCO) ){
+        LogPane->AppendText( "Failed to initialize StoneCutter options\n" );
+        delete SCO;
+        return ;
+      }
 
       // set all the options
       std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
@@ -2048,6 +2107,10 @@ void PortalMainFrame::OnBuildStoneCutter(wxCommandEvent &event){
       SCObjects.push_back(std::make_tuple(SCFile,SCO,SCE));
     }else{
       SCOpts *SCO = std::get<1>(SCObjects[Idx]);
+      if( !InitSCOpts(SCO) ){
+        LogPane->AppendText( "Failed to initialize StoneCutter options\n" );
+        return ;
+      }
       std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
                                   "/RTL/chisel/src/main/scala/" +
                                   std::string(RawName.mb_str()) + ".chisel";

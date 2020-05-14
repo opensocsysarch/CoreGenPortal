@@ -207,6 +207,7 @@ private:
   bool SaveVTP(wxDialog* InfoWin, CoreGenVTP* VTPNode);
   bool IsInteger(std::string TestString);
   bool HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache);
+  bool InitSCOpts(SCOpts *Opts);
 };
 
 enum

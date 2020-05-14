@@ -91,4 +91,32 @@ bool SCCompConfig::IsSCPassEnabled(unsigned P){
   return SCPasses[P].second;
 }
 
+bool SCCompConfig::EnableLLVMPass(unsigned P){
+  if( P > (LLVMPasses.size()-1) )
+    return false;
+  LLVMPasses[P].second = true;
+  return true;
+}
+
+bool SCCompConfig::DisableLLVMPass(unsigned P){
+  if( P > (LLVMPasses.size()-1) )
+    return false;
+  LLVMPasses[P].second = false;
+  return true;
+}
+
+bool SCCompConfig::EnableSCPass(unsigned P){
+  if( P > (SCPasses.size()-1) )
+    return false;
+  SCPasses[P].second = true;
+  return true;
+}
+
+bool SCCompConfig::DisableSCPass(unsigned P){
+  if( P > (SCPasses.size()-1) )
+    return false;
+  SCPasses[P].second = false;
+  return true;
+}
+
 // EOF

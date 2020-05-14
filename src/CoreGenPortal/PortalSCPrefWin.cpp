@@ -130,7 +130,7 @@ PortalSCPrefWin::PortalSCPrefWin( wxWindow *parent,
                        wxDefaultPosition,
                        wxDefaultSize,
                        0 );
-  if( Config->GetOptLevel() == 1 ){
+  if( Config->GetOptLevel() == 3 ){
     CB->SetValue(true);
     PipelineBox->SetValue(true);
   }
@@ -212,6 +212,88 @@ PortalSCPrefWin::PortalSCPrefWin( wxWindow *parent,
 void PortalSCPrefWin::OnPressOk( wxCommandEvent& ok ){
   // user pressed 'ok', walk through all the options and update
   // the configuration
+
+  // parser
+  if( ParseBox->GetValue() )
+    Config->EnableParse();
+  else
+    Config->DisableParse();
+
+  // keep files
+  if( KeepBox->GetValue() )
+    Config->EnableKeep();
+  else
+    Config->DisableKeep();
+
+  // pipeline
+  if( PipelineBox->GetValue() )
+    Config->EnablePipeliner();
+  else
+    Config->DisablePipeliner();
+
+  // optimization options
+  if( OptOptions[0]->GetValue() ){
+    Config->SetO0();
+    for( unsigned i=0; i<LLVMOptions.size(); i++ ){
+      Config->DisableLLVMPass(i);
+      LLVMOptions[i]->SetValue(false);
+    }
+    for( unsigned i=0; i<SCOptions.size(); i++ ){
+      Config->DisableSCPass(i);
+      SCOptions[i]->SetValue(false);
+    }
+  }
+  if( OptOptions[1]->GetValue() ){
+    Config->SetO1();
+    for( unsigned i=0; i<LLVMOptions.size(); i++ ){
+      Config->EnableLLVMPass(i);
+      LLVMOptions[i]->SetValue(true);
+    }
+    for( unsigned i=0; i<SCOptions.size(); i++ ){
+      Config->DisableSCPass(i);
+      SCOptions[i]->SetValue(false);
+    }
+  }
+  if( OptOptions[2]->GetValue() ){
+    Config->SetO2();
+    for( unsigned i=0; i<LLVMOptions.size(); i++ ){
+      Config->EnableLLVMPass(i);
+      LLVMOptions[i]->SetValue(true);
+    }
+    for( unsigned i=0; i<SCOptions.size(); i++ ){
+      Config->EnableSCPass(i);
+      SCOptions[i]->SetValue(true);
+    }
+  }
+  if( OptOptions[3]->GetValue() ){
+    Config->SetO3();
+    Config->EnablePipeliner();
+    for( unsigned i=0; i<LLVMOptions.size(); i++ ){
+      Config->EnableLLVMPass(i);
+      LLVMOptions[i]->SetValue(true);
+    }
+    for( unsigned i=0; i<SCOptions.size(); i++ ){
+      Config->EnableSCPass(i);
+      SCOptions[i]->SetValue(true);
+    }
+  }
+
+  // LLVM options
+  for( unsigned i=0; i<LLVMOptions.size(); i++ ){
+    if( LLVMOptions[i]->GetValue() )
+      Config->EnableLLVMPass(i);
+    else
+      Config->DisableLLVMPass(i);
+  }
+
+  // SC options
+  for( unsigned i=0; i<SCOptions.size(); i++ ){
+    if( SCOptions[i]->GetValue() )
+      Config->EnableSCPass(i);
+    else
+      Config->DisableSCPass(i);
+  }
+
   this->EndModal( wxID_OK );
 }
 

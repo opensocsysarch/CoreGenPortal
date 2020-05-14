@@ -93,6 +93,18 @@ public:
   /// Retrieve the name of the SC Pass
   wxString GetSCPassName(unsigned P);
 
+  /// Enable the target LLVM pass
+  bool EnableLLVMPass(unsigned P);
+
+  /// Disable the target LLVM pass
+  bool DisableLLVMPass(unsigned P);
+
+  /// Enable the target SC pass
+  bool EnableSCPass(unsigned P);
+
+  /// Disable the target SC pass
+  bool DisableSCPass(unsigned P);
+
   /// Retrieve whether the target sc pass is enabled
   bool IsSCPassEnabled(unsigned P);
 
@@ -112,7 +124,7 @@ public:
   void DisableKeep() { IsKeep = false; }
 
   /// Disable only the parser (full code generation enabled)
-  void DisableParse() { IsParse = true; }
+  void DisableParse() { IsParse = false; }
 
   /// Retrieve the optimization level
   int GetOptLevel() { return OptLevel; }
