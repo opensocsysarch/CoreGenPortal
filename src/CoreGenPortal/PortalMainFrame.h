@@ -170,6 +170,7 @@ private:
   CGNodeType TreeIdToCGType(wxTreeItemId ID);
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
+  wxTreeItemId GetItemFromNode(CoreGenNode *Node);
 
   // menu handlers
   void OnPrint(wxCommandEvent& event);

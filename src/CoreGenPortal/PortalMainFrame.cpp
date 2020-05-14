@@ -1493,6 +1493,37 @@ void PortalMainFrame::OnRightClickNode(wxTreeEvent &event){
   PopupMenu(&mnu);
 }
 
+// PortalMainFrame:GetItemFromNode
+wxTreeItemId PortalMainFrame::GetItemFromNode(CoreGenNode *Node){
+  wxTreeItemId Id;
+
+  // walk all the main nodes
+  for( unsigned i=0; i<NodeItems.size(); i++ ){
+    if( NodeItems[i].second == Node )
+      return NodeItems[i].first;
+  }
+
+  // walk the encoding nodes
+  for( unsigned i=0; i<EncItems.size(); i++ ){
+    if( EncItems[i].second == Node )
+      return EncItems[i].first;
+  }
+
+  // walk the ext nodes
+  for( unsigned i=0; i<ExtItems.size(); i++ ){
+    if( std::get<2>(ExtItems[i]) == Node )
+      return std::get<0>(ExtItems[i]);
+  }
+
+  // walk the plugin nodes
+  for( unsigned i=0; i<PluginItems.size(); i++ ){
+    if( std::get<2>(PluginItems[i]) )
+      return std::get<0>(PluginItems[i]);
+  }
+
+  return Id;
+}
+
 // PortalMainFrame::GetNodeFromItem
 CoreGenNode *PortalMainFrame::GetNodeFromItem( wxTreeItemId SelId ){
   if( !SelId.IsOk() ){
@@ -2518,10 +2549,12 @@ bool PortalMainFrame::OnSave(wxDialog *InfoWin,
     std::remove(FName.c_str());
     std::rename(tempName.c_str(), FName.c_str());
     std::remove(tempName.c_str());
+
     ModuleBox->DeleteAllItems();
     TreeItems.clear();
     NodeItems.clear();
     SetupModuleBox();
+
     OpenProject(IRFileName, true);
     LogPane->AppendText("Updated " + NodeName + ".\n");
   }

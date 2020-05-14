@@ -25,7 +25,7 @@ const wxString PORTAL_APP_NAME    = wxT("CoreGenPortal");
 const wxString PORTAL_VENDOR_NAME = wxT("Tactical Computing Laboratories, LLC");
 
 //-- Copyright Information
-const wxString PORTAL_COPYRIGHT = "Copyright 2017-2019 Tactical Computing Laboratories, LLC";
+const wxString PORTAL_COPYRIGHT = "Copyright 2017-2020 Tactical Computing Laboratories, LLC";
 
 #endif
 
