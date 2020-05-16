@@ -44,6 +44,9 @@
 #include <wx/print.h>
 #include <wx/html/htmlwin.h>
 #include <wx/html/htmprint.h>
+#include <wx/webview.h>
+#include <wx/webviewarchivehandler.h>
+#include <wx/webviewfshandler.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -198,6 +201,7 @@ private:
   void OnPopupNode(wxCommandEvent &event);
   void OnCopyText(wxCommandEvent &event );
   void OnPasteText(wxCommandEvent &event );
+  void OnVizIR(wxCommandEvent &event );
 
   // functions to save/edit node data
   bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
@@ -227,6 +231,7 @@ enum
   ID_PROJSUMMARY        = 12,
   ID_PROJSPECDOC        = 13,
   ID_PROJFILESAVE       = 14,
+  ID_PROJVIZIR          = 15,
   ID_BUILD_VERIFY       = 20,
   ID_BUILD_CODEGEN      = 21,
   ID_BUILD_SIGMAP       = 22,

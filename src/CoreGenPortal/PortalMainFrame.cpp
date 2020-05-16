@@ -132,6 +132,8 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->Append( ID_PROJSCOPEN, wxT("&Open StoneCutter"));
   ProjectMenu->Append( ID_PROJSUMMARY, wxT("&Project Summary"));
   ProjectMenu->Append( ID_PROJSPECDOC, wxT("&Build Specification Doc"));
+  ProjectMenu->AppendSeparator();
+  ProjectMenu->Append( ID_PROJVIZIR, wxT("&Visualize IR"));
 
   //-- Build Menu
   BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
@@ -198,6 +200,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjSpecDoc));
   Connect( ID_PROJFILESAVE, wxEVT_COMMAND_MENU_SELECTED,
            wxCommandEventHandler(PortalMainFrame::OnProjSaveFile));
+  Connect( ID_PROJVIZIR, wxEVT_COMMAND_MENU_SELECTED,
+           wxCommandEventHandler(PortalMainFrame::OnVizIR));
 
   //-- build menu
   Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
@@ -2365,6 +2369,17 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event){
     NP->Destroy();
   }
 }
+
+// PortalMainFrame::OnVizIR
+void PortalMainFrame::OnVizIR(wxCommandEvent& WXUNUSED(event)){
+  if( !CGProject ){
+    LogPane->AppendText( "No project open\n" );
+    return ;
+  }
+
+  // insert web view functionality here
+}
+
 
 // PortalMainFrame::OnProjClose
 void PortalMainFrame::OnProjClose(wxCommandEvent& WXUNUSED(event)){
