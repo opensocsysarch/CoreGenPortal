@@ -37,15 +37,28 @@ xvfb-run -s "-screen 0 1024x768x16" python3 ./test_tutortial.py
 Note that if you choose to run headless on an Ubuntu box where you have a display 
 open it will work, you just won't see anything 
 
+---------------------
+Command line options
+---------------------
+** Required args: **
+  -r RESOLUTION, --resolution RESOLUTION
+                        Resolution of screen in "X x Y" pixels where you are
+                        launching CoreGenPortal "Auto" will direct the script
+                        to attempt to determine your screen resolution. Multi-
+                        monitor environments may have issues
+** Optional args: **
+  -h, --help            show this help message and exit
+  -l, --headless        Run headless using Xvfb, Ubuntu ONLY
+  -p PORTAL_PATH, --portal_path PORTAL_PATH
+                        Path to CoreGenPortal binary - overrides env var COREGENPORTAL_BIN
+
+
 TODO:
  - Bring in argparse to manage options for (among other things):
-   - Default screen size
-   - Path to CoreGenPortal
    - Path to screenshots
    - Test names / parameters
    - Path to where you save projects
 
- - Better exception handling for things like a screen size != 1024x768
  - Regular screenshot capture
  - Screenshots from headless gui window manger for verification
 
