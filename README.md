@@ -76,6 +76,30 @@ cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/i
 make
 ```
 
+#### Ubuntu 20.04
+1. Install the system dependencies
+```
+sudo apt-get install libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
+```
+1. Clone the CoreGenPortal repository
+```
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
+```
+1. Setup your build tree
+```
+cd CoreGenPortal
+mkdir build
+cd build
+```
+1. Execute CMake to generate the makefiles
+```
+cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
+```
+1. Execute the build
+```
+make
+```
+
 ### Centos7
 
 Centos7 (CentOS 7.4, 1704) has somewhat of an older toolchain.  As a result,

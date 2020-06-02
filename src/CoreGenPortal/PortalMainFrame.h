@@ -44,9 +44,6 @@
 #include <wx/print.h>
 #include <wx/html/htmlwin.h>
 #include <wx/html/htmprint.h>
-#include <wx/webview.h>
-#include <wx/webviewarchivehandler.h>
-#include <wx/webviewfshandler.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
@@ -65,6 +62,7 @@
 #include "CoreGenPortal/PortalCore/CoreStatsWin.h"
 #include "CoreGenPortal/PortalCore/CoreSpecDocWin.h"
 #include "CoreGenPortal/PortalCore/CorePluginBrowser.h"
+#include "CoreGenPortal/PortalCore/IRVizWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"

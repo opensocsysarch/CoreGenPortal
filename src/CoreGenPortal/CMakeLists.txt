@@ -60,7 +60,7 @@ llvm_map_components_to_libnames(llvm_libs
 )
 
 #-- target deps
-find_package(wxWidgets COMPONENTS net adv aui core gl html propgrid qa ribbon richtext stc xrc base REQUIRED)
+find_package(wxWidgets COMPONENTS net adv aui core gl html propgrid qa ribbon richtext stc xrc base webview REQUIRED)
 IF(wxWidgets_FOUND)
   INCLUDE("${wxWidgets_USE_FILE}")
   include_directories ( . )
