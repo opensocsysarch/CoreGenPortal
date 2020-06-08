@@ -215,7 +215,7 @@ make
 * -DBUILD\_ALL\_TESTING=ON : Enables the top-level GUI test harness
 
 ### Documentation Options
-* -DBUILD\_DOCUMENTATION=ON  : Enables Doxygenized documentaition.  ``make doc`` will build the documentation (requires Doxygen to be installed)
+* -DBUILD\_DOCUMENTATION=ON  : Enables Doxygenized documentation.  ``make doc`` will build the documentation (requires Doxygen to be installed)
 
 ### Developer Build Options
 * -DYAML\_PATH=/path/to/alternate/yaml-cpp : Set an alternate yaml-cpp library path
