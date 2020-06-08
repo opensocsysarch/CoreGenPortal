@@ -67,6 +67,38 @@ CoreCoreInfoWin::CoreCoreInfoWin( wxWindow* parent,
   CoreNameSizer->Add( CoreNameCtrl, 0, wxALL, 0 );
   InnerSizer->Add( CoreNameSizer, 0, wxALIGN_CENTER|wxALL, 5);
 
+  //-- SMT name
+  SMTMethodSizer = new wxBoxSizer( wxHORIZONTAL );
+  SMTMethodText = new wxStaticText(Wnd,
+                                 89,
+                                 wxT("SMT Method"),
+                                 wxDefaultPosition,
+                                 wxSize(160, -1),
+                                 0 );
+  SMTMethodText->Wrap(-1);
+  SMTMethodSizer->Add( SMTMethodText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0 );
+
+  //-- SMT Options
+  SMTOptionsArray.Add(wxT("Unknown"));
+  SMTOptionsArray.Add(wxT("PCycle"));
+  SMTOptionsArray.Add(wxT("Pressure"));
+  SMTOptionsArray.Add(wxT("Programmatic"));
+  
+  //-- SMT name dropdown
+  SMTMethodName = new wxComboBox(
+                               Wnd,
+                               10,
+                               Core ? wxString::Format(wxT("%s"),Core->CGSchedToStr(Core->GetSched())) : "Unknown",
+                               wxDefaultPosition,
+                               wxSize(320, 25),
+                               wxArrayString(SMTOptionsArray),
+                               0,
+                               wxDefaultValidator,
+                               wxT("SMT Method") );
+  SMTMethodSizer->Add( SMTMethodName, 0, wxALL, 0 );
+  InnerSizer->Add( SMTMethodSizer, 0, wxALIGN_CENTER|wxALL, 5);
+
+  
   //-- thread unit name
   ThreadUnitSizer = new wxBoxSizer( wxHORIZONTAL );
   ThreadUnitText = new wxStaticText(Wnd,

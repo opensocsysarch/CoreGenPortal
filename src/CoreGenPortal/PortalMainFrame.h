@@ -47,6 +47,7 @@
 #include <wx/webview.h>
 #include <wx/webviewarchivehandler.h>
 #include <wx/webviewfshandler.h>
+#include <wx/combobox.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
