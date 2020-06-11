@@ -40,7 +40,7 @@ IRVizWin.cpp
 )
 
 #-- target deps
-find_package(wxWidgets COMPONENTS net adv aui core gl html propgrid qa ribbon richtext stc xrc base webview webkit REQUIRED)
+find_package(wxWidgets COMPONENTS net adv aui core gl html propgrid qa ribbon richtext stc xrc base REQUIRED)
 IF(wxWidgets_FOUND)
   INCLUDE("${wxWidgets_USE_FILE}")
   include_directories ( . )
@@ -48,6 +48,7 @@ IF(wxWidgets_FOUND)
   include_directories (${wxWidgets_INCLUDE_DIRS})
   include_directories (${COREGEN_INSTALL_PATH}/include)
   include_directories (${PORTAL_INCLUDE_PATH})
+  include_directories (${GRAPHVIZ_INCLUDE_PATH})
   add_library(PortalCoreObjs OBJECT ${CGPortalCoreSrcs})
 ELSE(wxWidgets_FOUND)
   MESSAGE("wxWidgets not found!")

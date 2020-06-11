@@ -55,6 +55,14 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
+# Find Graphviz packages
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GRAPHVIZ REQUIRED libgvc)
+set(GRAPHVIZ_LINK_OPTS "${GRAPHVIZ_LIBRARIES}")
+set(GRAPHVIZ_INCLUDE_PATH "${GRAPHVIZ_INCLUDE_DIRS}")
+message(STATUS "GRAPHVIZ_LINK_OPTS set to ${GRAPHVIZ_LINK_OPTS}")
+message(STATUS "GRAPHVIZ_INCLUDE_PATH set to ${GRAPHVIZ_INCLUDE_PATH}")
+
 #------------------------------------------------------------------------
 #-- COREGEN PATHS
 #------------------------------------------------------------------------

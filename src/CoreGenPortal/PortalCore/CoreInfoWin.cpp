@@ -35,11 +35,19 @@ CoreInfoWin::CoreInfoWin( wxWindow *parent,
     Win->ShowModal();
     delete Win;
   }else if( Type == CGInstF ){
+
+    // Create a new instruction format image
+    PortalViz *Viz = new PortalViz();
+    std::string Img;  // This string will contain the path to the image
+
+    Viz->GenerateInstFormatImg(static_cast<CoreGenInstFormat *>(Node),Img);
+
     CoreInstFormatInfoWin *Win = new CoreInstFormatInfoWin(parent, id,
                                                            Node ? Node->GetName() : "New Instruction Format",
                                                            static_cast<CoreGenInstFormat *>(Node));
     Win->ShowModal();
     delete Win;
+    delete Viz; // deletes the image and the dot file
   }else if( Type == CGInst ){
     CoreInstInfoWin *Win = new CoreInstInfoWin( parent, id,
                                                 Node ? Node->GetName() : "New Instruction",

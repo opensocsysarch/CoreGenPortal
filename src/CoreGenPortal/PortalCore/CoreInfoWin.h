@@ -53,6 +53,8 @@
 #include "CoreGenPortal/PortalCore/CoreVTPInfoWin.h"
 #include "CoreGenPortal/PortalCore/CorePluginInfoWin.h"
 
+#include "CoreGenPortal/PortalViz/PortalViz.h"
+
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 

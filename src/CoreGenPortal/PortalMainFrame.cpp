@@ -2372,12 +2372,10 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event){
 
 // PortalMainFrame::OnVizIR
 void PortalMainFrame::OnVizIR(wxCommandEvent& WXUNUSED(event)){
-#if 0
   if( !CGProject ){
     LogPane->AppendText( "No project open\n" );
     return ;
   }
-#endif
 
   // insert web view functionality here
   IRVizWin *VW = new IRVizWin( this,
@@ -2385,7 +2383,8 @@ void PortalMainFrame::OnVizIR(wxCommandEvent& WXUNUSED(event)){
                                wxT("IR Visualization"),
                                wxDefaultPosition,
                                wxSize(1024,768),
-                               wxDEFAULT_DIALOG_STYLE|wxVSCROLL);
+                               wxDEFAULT_DIALOG_STYLE|wxVSCROLL|wxHSCROLL,
+                               CGProject);
   VW->ShowModal();
   VW->Destroy();
 }
