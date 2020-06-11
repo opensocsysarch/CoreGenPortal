@@ -100,6 +100,30 @@ cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/i
 make
 ```
 
+#### Ubuntu 20.04
+1. Install the system dependencies
+```
+sudo apt-get install libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
+```
+1. Clone the CoreGenPortal repository
+```
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
+```
+1. Setup your build tree
+```
+cd CoreGenPortal
+mkdir build
+cd build
+```
+1. Execute CMake to generate the makefiles
+```
+cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
+```
+1. Execute the build
+```
+make
+```
+
 ### Centos7
 
 Centos7 (CentOS 7.4, 1704) has somewhat of an older toolchain.  As a result,
@@ -215,7 +239,7 @@ make
 * -DBUILD\_ALL\_TESTING=ON : Enables the top-level GUI test harness
 
 ### Documentation Options
-* -DBUILD\_DOCUMENTATION=ON  : Enables Doxygenized documentaition.  ``make doc`` will build the documentation (requires Doxygen to be installed)
+* -DBUILD\_DOCUMENTATION=ON  : Enables Doxygenized documentation.  ``make doc`` will build the documentation (requires Doxygen to be installed)
 
 ### Developer Build Options
 * -DYAML\_PATH=/path/to/alternate/yaml-cpp : Set an alternate yaml-cpp library path
@@ -241,6 +265,7 @@ CoreGenPortal is licensed under an Apache-style license - see the [LICENSE](LICE
 ## Authors
 * *John Leidel* - *Chief Scientist* - [Tactical Computing Labs](http://www.tactcomplabs.com)
 * *David Donofrio* - *Chief Hardware Architect* - [Tactical Computing Labs](http://www.tactcomplabs.com)
+* *Ryan Kabrick* - *Research Engineer* - [Tactical Computing Labs](http://www.tactcomplabs.com)
 
 ## Acknowledgements
 * None at this time

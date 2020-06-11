@@ -44,6 +44,7 @@
 #include <wx/print.h>
 #include <wx/html/htmlwin.h>
 #include <wx/html/htmprint.h>
+#include <wx/combobox.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"

@@ -2812,6 +2812,7 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
   std::istringstream iss;
   std::string nextNodeName;
   wxTextCtrl *InfoBox;
+  wxComboBox *ComboBox;
   std::string BoxContents;
   bool savedAll = true;
 
@@ -2867,6 +2868,21 @@ bool PortalMainFrame::SaveCore(wxDialog* InfoWin, CoreGenCore* CoreNode){
     LogPane->AppendText("Could not find specified Cache. Keeping old Cache.\n");
     InfoWin->FindWindow(9)->SetForegroundColour(wxColour(255, 0, 0));
     savedAll = false;
+  }
+  
+  //set SMT Method
+  ComboBox = (wxComboBox*)InfoWin->FindWindow(10);
+  BoxContents = ComboBox->GetStringSelection().ToStdString();
+  
+  if(BoxContents != "Unknown" && CoreNode->GetNumThreadUnits() == 1){
+    LogPane->AppendText("Invalid SMT Choice for Thread Number.\n");
+    InfoWin->FindWindow(89)->SetForegroundColour(wxColour(255, 0, 0));
+    savedAll = false;
+  }
+  else {
+    CGSched Sched = CoreNode->StrToCGSched(BoxContents);
+    CoreNode->SetSched(Sched);
+    InfoWin->FindWindow(10)->SetForegroundColour(wxColour(0, 0, 0));  
   }
 
   //set Register Classes

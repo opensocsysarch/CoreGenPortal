@@ -33,7 +33,8 @@
 #include <wx/dialog.h>
 #include <wx/checkbox.h>
 #include <wx/msgdlg.h>
-#include <wx/textctrl.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
@@ -60,6 +61,7 @@ protected:
   wxBoxSizer *OuterSizer;         ///< outer sizer
   wxBoxSizer *InnerSizer;         ///< inner sizer
   wxBoxSizer *CoreNameSizer;      ///< core name sizer
+  wxBoxSizer *SMTMethodSizer;     ///< smt name sizer
   wxBoxSizer *ThreadUnitSizer;    ///< thread unit sizer
   wxBoxSizer *ISANameSizer;       ///< isa name sizer
   wxBoxSizer *CacheNameSizer;     ///< cache name sizer
@@ -67,6 +69,7 @@ protected:
   wxBoxSizer *ExtNameSizer;       ///< extension name sizer
 
   wxStaticText *CoreNameText;     ///< static text for SoC name
+  wxStaticText *SMTMethodText;    ///< static text for SMTNameText
   wxStaticText *ThreadUnitText;   ///< static text for thread units name
   wxStaticText *ISANameText;      ///< static text for isa name
   wxStaticText *CacheNameText;    ///< static text for cache name
@@ -74,12 +77,15 @@ protected:
   wxStaticText *ExtNameText;      ///< static text for extension name
 
   wxTextCtrl *CoreNameCtrl;       ///< name of the SoC
+  wxTextCtrl *SMTMethodCtrl;      ///< name of SMT method
   wxTextCtrl *ThreadUnitCtrl;     ///< number of thread units
   wxTextCtrl *ISACtrl;            ///< name of the ISA
   wxTextCtrl *CacheCtrl;          ///< name of the primary cache layer
   wxTextCtrl *RegClassCtrl;       ///< name of the register classes
   wxTextCtrl *ExtCtrl;            ///< name of the extensions
 
+  wxArrayString SMTOptionsArray;
+  wxComboBox *SMTMethodName;    ///< name of SMT Method
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
   wxButton *m_userOK;                         ///< ok button
