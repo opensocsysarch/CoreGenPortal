@@ -64,12 +64,14 @@
 #include "CoreGenPortal/PortalCore/CoreSpecDocWin.h"
 #include "CoreGenPortal/PortalCore/CorePluginBrowser.h"
 #include "CoreGenPortal/PortalCore/IRVizWin.h"
+#include "CoreGenPortal/PortalCore/PipeVizWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
 //-- STONECUTTER HEADERS
 #include "CoreGen/StoneCutter/StoneCutter.h"
+#include "CoreGen/CoreGenSigMap/CoreGenSigMap.h"
 
 //-- STANDARD HEADERS
 #include <stdlib.h>
@@ -201,6 +203,7 @@ private:
   void OnCopyText(wxCommandEvent &event );
   void OnPasteText(wxCommandEvent &event );
   void OnVizIR(wxCommandEvent &event );
+  void OnVizPipeline(wxCommandEvent &event );
 
   // functions to save/edit node data
   bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
@@ -231,6 +234,7 @@ enum
   ID_PROJSPECDOC        = 13,
   ID_PROJFILESAVE       = 14,
   ID_PROJVIZIR          = 15,
+  ID_PROJVIZPIPE        = 16,
   ID_BUILD_VERIFY       = 20,
   ID_BUILD_CODEGEN      = 21,
   ID_BUILD_SIGMAP       = 22,

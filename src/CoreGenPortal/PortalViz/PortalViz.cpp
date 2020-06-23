@@ -119,4 +119,201 @@ bool PortalViz::GenerateDesignImg(CoreGenBackend *CG,
   return true;
 }
 
+std::vector<std::string> PortalViz::GetRowNodes(std::string inst,
+                                                std::string stage){
+  std::vector<std::string> NodeVect;
+
+  for( const auto &i : NodeToSig ){
+    if( (std::get<1>(i) == inst) &&
+        (std::get<2>(i)->GetPipeName() == stage) ){
+      NodeVect.push_back(std::get<0>(i));
+    }
+  }
+
+  return NodeVect;
+}
+
+std::vector<std::string> PortalViz::GetLevelNodes(std::string stage){
+  std::vector<std::string> NodeVect;
+  for( const auto &i : NodeToSig ){
+    if( std::get<2>(i)->GetPipeName() == stage) {
+      NodeVect.push_back(std::get<0>(i));
+    }
+  }
+  return NodeVect;
+}
+
+bool PortalViz::GeneratePipeline(CoreGenSigMap *SM,
+                                 std::string &Img){
+
+  // Stage 1: Ensure that the signal map is valid
+  if( !SM )
+    return false;
+
+  // Stage 2: Determine how to format our matrix
+  std::ofstream dofs;
+  dofs.open(DOTFile.c_str(), std::ofstream::out | std::ofstream::app);
+  if( !dofs.is_open() )
+    return false;
+
+  std::vector<std::string> Pipelines = SM->GetPipelines();
+
+  // -- write out all the top-level node info
+  dofs << "digraph matrix {" << std::endl;
+  dofs << "node [shape=box]" << std::endl;
+
+  // write out the "Stages" block
+  dofs << "Mt[ label = \"Stages\", width = 1.5, style = filled, fillcolor = firebrick1, group = 1 ];" << std::endl;
+
+  // write out the Pipeline blcoks
+  for( unsigned i=0; i<Pipelines.size(); i++ ){
+    dofs << "P" << std::to_string(i) << " [label = \"" << Pipelines[i]
+         << "\" width = 1.5 style = filled, fillcolor = lightskyblue, group = "
+         << std::to_string(i+2) << " ];" << std::endl;
+  }
+
+  // write out all the instructions
+  std::vector<std::string> InstVect = SM->GetInstVect();
+  unsigned base = Pipelines.size() + 2;
+  for( unsigned i=0; i<InstVect.size(); i++ ){
+    dofs << "N" << std::to_string(i)
+         << "[label = \"" << InstVect[i]
+         << "\" width = 1.5 style = filled, fillcolor = grey, group = "
+         << std::to_string(base+i) << " ];"
+         << std::endl;
+  }
+
+  // write out the node rankings for the column headers
+  dofs << "{ rank = same; Mt; ";
+  for( unsigned i=0; i<Pipelines.size(); i++ ){
+    dofs << "P" << std::to_string(i) << "; ";
+  }
+  for( unsigned i=0; i<InstVect.size(); i++ ){
+    dofs << "N" << std::to_string(i) << "; ";
+  }
+  dofs << "}" << std::endl;
+
+  // link all the initial nodes
+  std::string Last = "Mt";
+  for( unsigned i=0; i<Pipelines.size(); i++ ){
+    dofs << Last << "->P" << std::to_string(i) << ";" << std::endl;
+    Last = "P" + std::to_string(i);
+  }
+  for( unsigned i=0; i<InstVect.size(); i++ ){
+    dofs << Last << "->N" << std::to_string(i) << ";" << std::endl;
+    Last = "N" + std::to_string(i);
+  }
+
+  // write out all the stage blocks
+  base = 2;
+  unsigned row = 0;
+  for( unsigned i=0; i<Pipelines.size(); i++ ){
+    for( unsigned j=0; j<SM->GetNumPipeStages(Pipelines[i]); j++ ){
+      std::string Name = "P" + std::to_string(i) + "_" + std::to_string(j);
+      dofs << Name
+           << "[label = \"" << SM->GetPipelineStage(Pipelines[i],j)
+           << "\" width = 1.5 style = filled, fillcolor = green, group = "
+           << std::to_string(base) << " ];" << std::endl;
+
+      // save off the row placement
+      PipeStageRow.push_back({Pipelines[i],
+                             SM->GetPipelineStage(Pipelines[i],j),
+                             Name,
+                             row});
+      row++;
+    }
+
+    // setup the stage node linkage
+    Last = "P" + std::to_string(i);
+    for( unsigned j=0; j<SM->GetNumPipeStages(Pipelines[i]); j++ ){
+      dofs << Last << "->P" << std::to_string(i)
+           << "_" << std::to_string(j) << ";" << std::endl;
+      Last = "P" +  std::to_string(i) + "_" + std::to_string(j);
+    }
+    base++;
+  }
+
+  // draw the stage boxes for each instruction
+  base = Pipelines.size() + 2;
+  std::string Name;
+  for( unsigned i=0; i<InstVect.size(); i++ ){
+    std::vector<SCSig *> SV = SM->GetSigVect(InstVect[i]);
+    for( unsigned j=0; j<SV.size(); j++ ){
+      Name = "N" + std::to_string(i) + "_" + std::to_string(j);
+      dofs << Name
+           << "[label = \"" << SV[j]->GetName()
+           << "\" width = 1.5 style = filled, fillcolor = white, group = "
+           << std::to_string(base+i) << " ];"
+           << std::endl;
+      NodeToSig.push_back({Name,InstVect[i],SV[j]});
+    }
+  }
+
+  // link the stages together
+  std::vector<std::string> Prev;
+  std::vector<std::string> Cur;
+  for( unsigned i=0; i<InstVect.size(); i++ ){
+    Prev.clear();
+    Cur.clear();
+    Prev.push_back("N" + std::to_string(i));
+    for( const auto &j : PipeStageRow ){
+      // retrieve all the nodes that belong to this instruction + pipe stage
+      Cur = GetRowNodes(InstVect[i],std::get<1>(j));
+      bool swap = false;
+
+      // map the Prev nodes to Cur nodes
+      for( unsigned a=0; a<Prev.size(); a++ ){
+        for( unsigned b=0; b<Cur.size(); b++ ){
+          dofs << Prev[a] << "->" << Cur[b] << ";" << std::endl;
+          swap = true;
+        }
+      }
+      if( swap ){
+        Prev.clear();
+        Prev = Cur;
+        Cur.clear();
+      }
+    }
+  }
+
+  // organize all the stages into rows
+  for( const auto &i : PipeStageRow ){
+  //  if( (std::get<0>(i) == pipeline) &&
+    std::vector<std::string> RowVect;
+    std::vector<std::string> TmpRowVect;
+    RowVect.push_back(std::get<2>(i));  // push back the stage name
+    TmpRowVect = GetLevelNodes(std::get<2>(i));
+
+    RowVect.insert(RowVect.begin(),TmpRowVect.begin(),TmpRowVect.end());
+
+    dofs << "{ rank = same; ";
+    for( auto i : RowVect ){
+      dofs << i << ";";
+    }
+    dofs << "}" << std::endl;
+  }
+
+  dofs << "}" << std::endl;
+
+  dofs.close();
+
+  // Stage 3: Run graphviz against the dot input file
+  GVC_t *gvc;
+  Agraph_t *g;
+  FILE *fp;
+  gvc = gvContext();
+  fp = fopen(DOTFile.c_str(), "r");
+  g = agread(fp, 0);
+  gvLayout(gvc, g, "dot");
+  gvRender(gvc, g, "png", fopen(PNGFile.c_str(), "w"));
+  gvFreeLayout(gvc, g);
+  agclose(g);
+  gvFreeContext(gvc);
+
+  // Stage 4: Return the image
+  Img = PNGFile;
+
+  return true;
+}
+
 // EOF

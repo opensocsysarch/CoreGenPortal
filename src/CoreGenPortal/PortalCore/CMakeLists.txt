@@ -37,6 +37,7 @@ CoreSpecDocWin.cpp
 CorePluginBrowser.cpp
 SCCompConfig.cpp
 IRVizWin.cpp
+PipeVizWin.cpp
 )
 
 #-- target deps

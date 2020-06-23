@@ -134,6 +134,7 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->Append( ID_PROJSPECDOC, wxT("&Build Specification Doc"));
   ProjectMenu->AppendSeparator();
   ProjectMenu->Append( ID_PROJVIZIR, wxT("&Visualize IR"));
+  ProjectMenu->Append( ID_PROJVIZPIPE, wxT("&Visualize Pipeline"));
 
   //-- Build Menu
   BuildMenu->Append( ID_BUILD_VERIFY,       wxT("&Verify Design"));
@@ -202,6 +203,8 @@ void PortalMainFrame::CreateMenuBar(){
            wxCommandEventHandler(PortalMainFrame::OnProjSaveFile));
   Connect( ID_PROJVIZIR, wxEVT_COMMAND_MENU_SELECTED,
            wxCommandEventHandler(PortalMainFrame::OnVizIR));
+  Connect( ID_PROJVIZPIPE, wxEVT_COMMAND_MENU_SELECTED,
+           wxCommandEventHandler(PortalMainFrame::OnVizPipeline));
 
   //-- build menu
   Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
@@ -2027,6 +2030,11 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
 
       // create a new SCOpts context
       SCOpts *SCO = new SCOpts( Msgs );
+      if( !InitSCOpts(SCO) ){
+        LogPane->AppendText( "Failed to initialize StoneCutter options for signal map\n" );
+        delete SCO;
+        return ;
+      }
 
       // set all the options
       std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
@@ -2044,6 +2052,12 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
       SCObjects.push_back(std::make_tuple(SCFile,SCO,SCE));
     }else{
       SCOpts *SCO = std::get<1>(SCObjects[Idx]);
+      if( !InitSCOpts(SCO) ){
+        LogPane->AppendText( "Failed to initialize StoneCutter options for signal map\n" );
+        delete SCO;
+        return ;
+      }
+
       std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
                                   "/RTL/stonecutter/" +
                                   std::string(RawName.mb_str()) + ".yaml";
@@ -2057,13 +2071,12 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
     SCFile = wxFindNextFile();
   }
 
+  // setup the text redirector
+  std::streambuf *oldBuf = std::cout.rdbuf();
+  std::ostringstream newBuf;
+  std::cout.rdbuf( newBuf.rdbuf() );
   // execute each of the signal map generators
   for( unsigned i=0; i<SCObjects.size(); i++ ){
-    // setup the text redirector
-    std::streambuf *oldBuf = std::cout.rdbuf();
-    std::ostringstream newBuf;
-    std::cout.rdbuf( newBuf.rdbuf() );
-
     SCExec *SCE = std::get<2>(SCObjects[i]);
     bool Success = SCE->Exec();
     LogPane->AppendText( wxString(newBuf.str())+wxT("\n") );
@@ -2074,10 +2087,10 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
       LogPane->AppendText( "Successfully built signal map from " +
                            std::get<0>(SCObjects[i]) + wxT("\n") );
     }
-
-    // restore the old cout buffer
-    std::cout.rdbuf( oldBuf );
   }
+
+  // restore the old cout buffer
+  std::cout.rdbuf( oldBuf );
   ProjDir->ReCreateTree();
 }
 
@@ -2370,6 +2383,52 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event){
   }
 }
 
+// PortalMainFrame::OnVizPipeline
+void PortalMainFrame::OnVizPipeline(wxCommandEvent& WXUNUSED(event)){
+  if( !CGProject ){
+    LogPane->AppendText( "No project open\n" );
+    return ;
+  }
+
+  // retrieve the selected signal map
+  std::string SM = std::string(ProjDir->GetFilePath().mb_str());
+  if( SM.length() == 0 ){
+    LogPane->AppendText( "No signal map selected\n" );
+  }
+
+  // attempt to read it
+  CoreGenSigMap *SigMap = new CoreGenSigMap();
+  if( !SigMap->ReadSigMap( SM ) ){
+    LogPane->AppendText( "Could not read signal map " + wxString(SM) + "\n");
+    LogPane->AppendText( wxString(SigMap->GetErrStr()) + "\n" );
+    delete SigMap;
+    return ;
+  }
+
+  // generate a new image from the pipeline
+  std::string ImgPath;
+  PortalViz *Viz = new PortalViz();
+  if( !Viz->GeneratePipeline(SigMap,ImgPath) ){
+    LogPane->AppendText( "Could not generate pipeline visualization\n" );
+    delete Viz;
+    delete SigMap;
+    return ;
+  }
+
+  // visualization the pipeline
+  PipeVizWin *PV = new PipeVizWin( this,
+                                   wxID_ANY,
+                                   wxT("Pipeline Visualization"),
+                                   wxDefaultPosition,
+                                   wxSize(1024,768),
+                                   wxDEFAULT_DIALOG_STYLE|wxVSCROLL|wxHSCROLL,
+                                   wxString(ImgPath) );
+  PV->ShowModal();
+  PV->Destroy();
+  delete Viz;
+  delete SigMap;
+}
+
 // PortalMainFrame::OnVizIR
 void PortalMainFrame::OnVizIR(wxCommandEvent& WXUNUSED(event)){
   if( !CGProject ){
@@ -2377,7 +2436,7 @@ void PortalMainFrame::OnVizIR(wxCommandEvent& WXUNUSED(event)){
     return ;
   }
 
-  // insert web view functionality here
+  // visualize the design IR
   IRVizWin *VW = new IRVizWin( this,
                                wxID_ANY,
                                wxT("IR Visualization"),

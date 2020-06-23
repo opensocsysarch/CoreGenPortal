@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string>
+#include <tuple>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -34,6 +35,7 @@
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
+#include "CoreGen/CoreGenSigMap/CoreGenSigMap.h"
 
 class PortalViz {
 private:
@@ -41,11 +43,26 @@ private:
   std::string PNGFile;    ///< Temporary PNG output file name
   std::string DOTFile;    ///< Temporary DOT output file name
 
+  std::vector<std::tuple<std::string,
+                         std::string,
+                         std::string,
+                         unsigned>> PipeStageRow; ///< Pipeline:Stage:Name:Row mapping
+
+  std::vector<std::tuple<std::string,
+                         std::string,
+                         SCSig *>> NodeToSig; ///< NodeName:Instruction:Signal mapping
+
   /// creates a temporary file name
   void CreateTmpFile();
 
   /// deletes the target temporary file
   bool DeleteTmpFile(std::string& name);
+
+  /// retrieve the nodes from the instruction:stage combination
+  std::vector<std::string> GetRowNodes(std::string inst, std::string stage);
+
+  /// retrieve all the signals from all instructions that fall into the target stage
+  std::vector<std::string> GetLevelNodes(std::string stage);
 
 public:
   /// Default constructor
@@ -61,6 +78,10 @@ public:
   /// Generate an image based upon the design dependence graph
   bool GenerateDesignImg(CoreGenBackend *CG,
                          std::string &Img);
+
+  /// Generate an image based upon the target pipeline
+  bool GeneratePipeline(CoreGenSigMap *SM,
+                        std::string &Img);
 };
 
 #endif
