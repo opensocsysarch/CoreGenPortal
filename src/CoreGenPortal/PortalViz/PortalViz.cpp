@@ -216,10 +216,10 @@ bool PortalViz::GeneratePipeline(CoreGenSigMap *SM,
            << std::to_string(base) << " ];" << std::endl;
 
       // save off the row placement
-      PipeStageRow.push_back({Pipelines[i],
-                             SM->GetPipelineStage(Pipelines[i],j),
-                             Name,
-                             row});
+      PipeStageRow.push_back(std::make_tuple(Pipelines[i],
+                                             SM->GetPipelineStage(Pipelines[i],j),
+                                             Name,
+                                             row));
       row++;
     }
 
@@ -245,7 +245,9 @@ bool PortalViz::GeneratePipeline(CoreGenSigMap *SM,
            << "\" width = 1.5 style = filled, fillcolor = white, group = "
            << std::to_string(base+i) << " ];"
            << std::endl;
-      NodeToSig.push_back({Name,InstVect[i],SV[j]});
+      NodeToSig.push_back(std::make_tuple(Name,
+                                          InstVect[i],
+                                          SV[j]));
     }
   }
 
