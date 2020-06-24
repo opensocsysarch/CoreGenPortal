@@ -2027,7 +2027,6 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
     wxFileName::SplitPath( SCFile, &RawPath, &RawName, &RawExt );
 
     if( !isFound ){
-
       // create a new SCOpts context
       SCOpts *SCO = new SCOpts( Msgs );
       if( !InitSCOpts(SCO) ){
@@ -2052,6 +2051,7 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
       SCObjects.push_back(std::make_tuple(SCFile,SCO,SCE));
     }else{
       SCOpts *SCO = std::get<1>(SCObjects[Idx]);
+
       if( !InitSCOpts(SCO) ){
         LogPane->AppendText( "Failed to initialize StoneCutter options for signal map\n" );
         delete SCO;
@@ -2065,6 +2065,7 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
       SCO->SetInputFile(std::string(SCFile.mb_str()));
       SCO->SetSignalMap( OutFile );
       SCO->UnsetChisel();
+      SCO->ReRunPass();
     }
 
     // find the next file
@@ -2139,6 +2140,9 @@ bool PortalMainFrame::InitSCOpts(SCOpts *Opts){
     // pipeline = true
     Opts->SetPipeline();
   }
+
+  // enable verbosity
+  Opts->SetVerbose();
 
   // set the individual pass options
   // TODO
