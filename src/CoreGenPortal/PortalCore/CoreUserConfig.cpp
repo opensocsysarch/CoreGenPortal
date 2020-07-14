@@ -11,7 +11,7 @@
 #include "CoreGenPortal/PortalCore/CoreUserConfig.h"
 
 CoreUserConfig::CoreUserConfig()
-  : isValidConfig(false) {
+  : isValidConfig(false), SavePipeViz(false) {
   wxString OverrideConfig = getenv(PORTAL_ENV_USER_CONFIG.c_str());
   if( OverrideConfig.length() > 0 ){
     ConfFile = OverrideConfig;
@@ -66,6 +66,12 @@ bool CoreUserConfig::WriteConfig(){
   file.AddLine( wxT("PROJECT_DIR = ") + ProjectDir );
   file.AddLine( wxT("ARCHIVE_DIR = ") + ArchiveDir );
 
+  if( SavePipeViz ){
+    file.AddLine( wxT("SAVE_PIPE_VIZ = true") );
+  }else {
+    file.AddLine( wxT("SAVE_PIPE_VIZ = false") );
+  }
+
   file.Write();
   file.Close();
 
@@ -106,6 +112,13 @@ bool CoreUserConfig::ReadConfigFile(){
       ProjectDir = str.Mid( pos+14, wxString::npos );
     }else if( (pos = str.Find( wxT("ARCHIVE_DIR = ") )) != wxNOT_FOUND ){
       ArchiveDir = str.Mid( pos+14, wxString::npos );
+    }else if( (pos = str.Find( wxT("SAVE_PIPE_VIZ = ") )) != wxNOT_FOUND ){
+      wxString Tmp = str.Mid( pos+16, wxString::npos );
+      if( Tmp == wxT("true") ){
+        SavePipeViz = true;
+      }else{
+        SavePipeViz = false;
+      }
     }
     str = tfile.GetNextLine();
   }while( !tfile.Eof() );
@@ -121,6 +134,11 @@ bool CoreUserConfig::ReadConfigFile(){
   }
 
   isValidConfig = true;
+  return true;
+}
+
+bool CoreUserConfig::SetSavePipeViz( bool viz ){
+  SavePipeViz = viz;
   return true;
 }
 

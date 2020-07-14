@@ -38,8 +38,21 @@ PipeVizWin::PipeVizWin(wxWindow *parent,
                    const wxPoint& pos,
                    const wxSize& size,
                    long style,
-                   wxString ImgPath )
+                   wxString ImgPath,
+                   wxString ProjPath,
+                   bool SaveViz )
   : wxDialog( parent, id, title, pos, size, style ), ImgPath(ImgPath) {
+
+  // determine if we need to save it
+  if( SaveViz ){
+    std::string SrcPath = std::string(ImgPath.mb_str());
+    std::string DestPath = std::string(ProjPath.mb_str()) + "/PipeViz.png";
+    std::ifstream source(SrcPath, std::ios::binary);
+    std::ofstream dest(DestPath, std::ios::binary);
+    dest << source.rdbuf();
+    source.close();
+    dest.close();
+  }
 
   // generate the bitmap
   bmp = new wxBitmap( ImgPath,wxBITMAP_TYPE_PNG );

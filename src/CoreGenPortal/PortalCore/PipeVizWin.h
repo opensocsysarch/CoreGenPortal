@@ -37,7 +37,12 @@
 #include <wx/panel.h>
 #include <wx/dcclient.h>
 #include <wx/scrolwin.h>
+
+//-- C++ HEADERS
 #include <stdlib.h>
+#include <iostream>
+#include <fstream>
+
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
@@ -47,6 +52,7 @@
 #endif
 
 class PipeImageViewer : public wxScrolledWindow {
+private:
   DECLARE_CLASS(PipeImageViewer)
   DECLARE_EVENT_TABLE()
 
@@ -98,13 +104,18 @@ protected:
   PipeImageViewer *viewer;      ///< image viewer object
 
 public:
+  /// Default Constructor
   PipeVizWin(wxWindow* parent,
            wxWindowID id = wxID_ANY,
            const wxString& title = wxT("Pipeline Visualization"),
            const wxPoint& pos = wxDefaultPosition,
            const wxSize& size = wxDefaultSize,
            long style = wxDEFAULT_DIALOG_STYLE,
-           wxString ImgPath = wxT("") );
+           wxString ImgPath = wxT(""),
+           wxString ProjPath = wxT(""),
+           bool SaveViz = false);
+
+  /// Default destructor
   ~PipeVizWin();
 };
 

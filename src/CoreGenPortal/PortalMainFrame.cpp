@@ -2426,7 +2426,9 @@ void PortalMainFrame::OnVizPipeline(wxCommandEvent& WXUNUSED(event)){
                                    wxDefaultPosition,
                                    wxSize(1024,768),
                                    wxDEFAULT_DIALOG_STYLE|wxVSCROLL|wxHSCROLL,
-                                   wxString(ImgPath) );
+                                   wxString(ImgPath),
+                                   wxString(CGProject->GetProj()->GetProjRoot()),
+                                   UserConfig->IsSavePipeViz() );
   PV->ShowModal();
   PV->Destroy();
   delete Viz;
