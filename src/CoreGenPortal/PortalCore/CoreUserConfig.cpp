@@ -48,6 +48,7 @@ bool CoreUserConfig::BuildDefaultConfigFile(){
   file.AddLine( wxT("#-- OpenSoC System Architect User Configuration File" ) );
   file.AddLine( wxT("PROJECT_DIR = ") + ProjectDir );
   file.AddLine( wxT("ARCHIVE_DIR = /opt/coregen/archive") );
+  file.AddLine( wxT("SAVE_PIPE_VIZ = false") );
 
   file.Write();
   file.Close();
