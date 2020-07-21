@@ -2508,6 +2508,8 @@ void PortalMainFrame::OpenProject(wxString NP, bool editing){
   // read the ir
   if( !CGProject->ReadIR( std::string(NP.mb_str()) ) ){
     if(!editing) LogPane->AppendText( "Error reading IR into CoreGen from " + NP + wxT("\n") );
+    delete CGProject;
+    CGProject = nullptr;
     return ;
   }
 
