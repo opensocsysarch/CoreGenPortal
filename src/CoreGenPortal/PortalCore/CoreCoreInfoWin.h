@@ -84,8 +84,8 @@ protected:
   wxTextCtrl *RegClassCtrl;       ///< name of the register classes
   wxTextCtrl *ExtCtrl;            ///< name of the extensions
 
-  wxArrayString SMTOptionsArray;
-  wxComboBox *SMTMethodName;    ///< name of SMT Method
+  wxArrayString SMTOptionsArray;  ///< options for SMT Method
+  wxComboBox *SMTMethodName;      ///< name of SMT Method
   // buttons
   wxStdDialogButtonSizer* m_socbuttonsizer;   ///< button sizer
   wxButton *m_userOK;                         ///< ok button

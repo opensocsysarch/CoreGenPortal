@@ -35,7 +35,7 @@
 #include <wx/msgdlg.h>
 #include <wx/textctrl.h>
 #include <wx/scrolwin.h>
-
+#include <wx/arrstr.h>
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 

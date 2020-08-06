@@ -79,6 +79,8 @@
 #include <tuple>
 #include <string>
 #include <sstream>
+#include <any>
+#include <cstdlib>
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -93,6 +95,12 @@ public:
 
   // node info update handlers
   bool OnSave(wxDialog *InfoWin, CoreGenNode *node, CGNodeType InfoWinType);
+  bool OnSaveInstFormat(wxDialog *InfoWin,
+                        CoreGenNode *node, 
+                        CGNodeType InfoWinType, 
+                        std::vector<std::vector<std::any>> *FieldsInformation,
+                        std::vector<std::string> ExistingFields);
+  void LogError(wxString Str);
 
 private:
   // CoreGenHandlers
@@ -212,6 +220,9 @@ private:
   bool SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode);
   bool SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode);
   bool SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode);
+  bool SaveInstFormat(wxDialog* InfoWin, CoreGenInstFormat* InstFNode,
+  std::vector<std::vector<std::any>> *FieldsInformation,
+  std::vector<std::string> ExistingFields);
   bool SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode);
   bool SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode);
   bool SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode);
