@@ -36,6 +36,7 @@
 class CoreUserConfig{
 private:
   bool isValidConfig;           ///< Is this configuration valid?
+  bool SavePipeViz;             ///< Determines whether to save the pipeline visualizations
   wxString HomeDir;             ///< User's home directory
   wxString ConfFile;            ///< Configuration file path
   wxString ProjectDir;          ///< Top-level project directory
@@ -92,6 +93,12 @@ public:
 
   /// Retrieve the user's archive directory as a std::string
   std::string GetArchiveDir() { return std::string(ArchiveDir.mb_str()); }
+
+  /// Do we retain the pipeline visualization
+  bool IsSavePipeViz() { return SavePipeViz; }
+
+  /// Sets the SavePipeViz feature value
+  bool SetSavePipeViz( bool viz );
 
   /// Sets the user's home directory
   bool SetHomeDir( wxString S );

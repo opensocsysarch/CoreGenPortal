@@ -55,6 +55,14 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
+# Find Graphviz packages
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GRAPHVIZ REQUIRED libgvc)
+set(GRAPHVIZ_LINK_OPTS "${GRAPHVIZ_LIBRARIES}")
+set(GRAPHVIZ_INCLUDE_PATH "${GRAPHVIZ_INCLUDE_DIRS}")
+message(STATUS "GRAPHVIZ_LINK_OPTS set to ${GRAPHVIZ_LINK_OPTS}")
+message(STATUS "GRAPHVIZ_INCLUDE_PATH set to ${GRAPHVIZ_INCLUDE_PATH}")
+
 #------------------------------------------------------------------------
 #-- COREGEN PATHS
 #------------------------------------------------------------------------
@@ -133,7 +141,7 @@ if(COREGEN_BUILD_RPM)
   set(CPACK_PACKAGE_RELEASE 2)
   set(CPACK_PACKAGE_CONTACT "John Leidel")
   set(CPACK_PACKAGE_VENDOR "Tactical Computing Laboratories, LLC")
-  set(CPACK_RPM_PACKAGE_REQUIRES "CoreGen wxGTK3 wxGTK3-devel")
+  set(CPACK_RPM_PACKAGE_REQUIRES "CoreGen wxGTK3 wxGTK3-devel graphviz-devel")
   set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
   set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
   include(CPack)

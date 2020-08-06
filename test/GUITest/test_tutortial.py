@@ -127,8 +127,13 @@ print("Found CoreGen at: (" + str(windowTopX) + "," + str(windowTopY) + ")" )
 #Create a new project
 ########################
 if(runningOS is Darwin):
-    pyautogui.click(1,1)
-    pyautogui.press(['right', 'right', 'right', 'right', 'right', 'down', 'enter'])             # Select Build -> New Project
+    print("Creating new project")
+    #pyautogui.moveTo(20,10)
+    #pyautogui.click(button='left')
+
+    pyautogui.hotkey('ctrl', 'f2')                                                        # Quit Coregen
+    time.sleep(1)
+    pyautogui.press(['right', 'right', 'right', 'right', 'right', 'down', 'down', 'enter'])             # Select Build -> New Project
     pyautogui.click(x=(windowTopX + newProjDiagX), y=(windowTopY + newProjDiagY), clicks=2)     # Click in project name text box
     pyautogui.write(newProjName)                                                                # Name the project
     pyautogui.click(x=(windowTopX + newProjOKX), y=(windowTopY + newProjOKY))                   # Default project type is SoC - leave unchanged and click OK

@@ -38,11 +38,11 @@ void SCCompConfig::SetupDefaultOptimizations(){
   SCPasses.push_back(std::make_pair("SCIOWarn",true));
   SCPasses.push_back(std::make_pair("SCFieldIO",true));
 
-  // default optimization level is -O2
-  OptLevel = 2;
+  // default optimization level is -O3
+  OptLevel = 3;
 
   IsValid = true;
-  IsPipeline = false;
+  IsPipeline = true;
   IsParse = false;
   IsKeep = false;
 }

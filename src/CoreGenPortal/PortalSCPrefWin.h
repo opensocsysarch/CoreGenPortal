@@ -72,14 +72,15 @@ protected:
   wxScrolledWindow *Wnd;    ///< main scrolled window
 
   wxStaticLine *FirstStaticLine;  ///< first static line
-  wxStaticLine *SecondStaticLine; ///< final static line
-  wxStaticLine *ThirdStaticLine;  ///< final static line
+  wxStaticLine *SecondStaticLine; ///< second static line
+  wxStaticLine *ThirdStaticLine;  ///< third static line
   wxStaticLine *FinalStaticLine;  ///< final static line
 
   // buttons
   wxStdDialogButtonSizer* m_scbuttonsizer;  ///< button sizer
   wxButton* m_scOK;                         ///< OK button
   wxButton* m_scCancel;                     ///< Cancel button
+
 public:
   PortalSCPrefWin( wxWindow *parent,
                    wxWindowID id = wxID_ANY,

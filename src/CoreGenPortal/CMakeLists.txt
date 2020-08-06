@@ -10,6 +10,7 @@
 #-- add subdirectory
 add_subdirectory( imgs )
 add_subdirectory( PortalCore )
+add_subdirectory( PortalViz )
 
 set(CGPortalSrcs
 PortalMain.cpp
@@ -68,9 +69,16 @@ IF(wxWidgets_FOUND)
   include_directories (${PORTAL_INCLUDE_PATH})
   link_directories (${COREGEN_INSTALL_PATH}/lib)
   link_directories (${COREGEN_INSTALL_PATH}/lib64)
+  include_directories (${GRAPHVIZ_INCLUDE_PATH})
   add_executable( CoreGenPortal ${CGPortalSrcs}
-                                $<TARGET_OBJECTS:PortalCoreObjs> )
-  TARGET_LINK_LIBRARIES( CoreGenPortal SCComp ${llvm_libs} ${COREGEN_LINK_LIBS} ${wxWidgets_LIBRARIES} )
+                                $<TARGET_OBJECTS:PortalCoreObjs>
+                                $<TARGET_OBJECTS:PortalVizObjs> )
+  TARGET_LINK_LIBRARIES( CoreGenPortal
+                         SCComp
+                         ${llvm_libs}
+                         ${COREGEN_LINK_LIBS}
+                         ${wxWidgets_LIBRARIES}
+                         ${GRAPHVIZ_LINK_OPTS} )
   install(TARGETS CoreGenPortal DESTINATION bin)
 ELSE(wxWidgets_FOUND)
   MESSAGE("wxWidgets not found!")

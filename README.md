@@ -31,7 +31,7 @@ versions, we do not currently test these scenarios.
 #### Ubuntu 16.04
 1. Install the system dependencies
 ```
-sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev
+sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev libgraphviz-dev
 ```
 1. Clone the CoreGenPortal repository
 ```
@@ -55,7 +55,31 @@ make
 #### Ubuntu 18.04
 1. Install the system dependencies
 ```
-sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev
+sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev libgraphviz-dev
+```
+1. Clone the CoreGenPortal repository
+```
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
+```
+1. Setup your build tree
+```
+cd CoreGenPortal
+mkdir build
+cd build
+```
+1. Execute CMake to generate the makefiles
+```
+cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
+```
+1. Execute the build
+```
+make
+```
+
+#### Ubuntu 20.04
+1. Install the system dependencies
+```
+sudo apt-get install libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5 libgraphviz-dev
 ```
 1. Clone the CoreGenPortal repository
 ```
@@ -113,7 +137,7 @@ sudo rpm -Uvh epel-release-7-11.noarch.rpm
 ```
 1. Install the system dependencies:
 ```
-sudo yum -y install wxGTK3 wxGTK3-devel
+sudo yum -y install wxGTK3 wxGTK3-devel graphviz-devel
 ```
 1. [Optional] For those wishing to build CentOS7 RPMS, you also need the following packages.
 ```
@@ -153,7 +177,7 @@ sudo rpm -Uvh epel-release-8-8.el8.noarch.rpm
 ```
 1. Install the system dependencies:
 ```
-sudo yum -y install wxGTK3 wxGTK3-devel
+sudo yum -y install wxGTK3 wxGTK3-devel graphviz-devel
 ```
 1. [Optional] For those wishing to build CentOS7 RPMS, you also need the following packages.
 ```
@@ -181,9 +205,9 @@ make
 ### Darwin (OSX)
 
 1. Install the homebrew package: https://brew.sh/
-1. Install the ``wxmac`` package system dependency for wxWidgets
+1. Install the ``wxmac`` and ``graphviz`` packages
 ```
-brew install wxmac
+brew install wxmac graphviz
 ```
 1. Clone the CoreGenPortal repository
 ```
