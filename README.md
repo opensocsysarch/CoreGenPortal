@@ -18,9 +18,9 @@ Generally speaking, the CoreGen Portal package is built
 using the following steps: 
 
 1. Clone the CoreGenPortal repository.  There are currently no git dependencies
-1. Create a ``build`` directory within the CoreGen source tree (and change to that directory)
-1. Execute cmake to generate the target-specific makefiles
-1. Execute the build
+2. Create a ``build`` directory within the CoreGen source tree (and change to that directory)
+3. Execute cmake to generate the target-specific makefiles
+4. Execute the build
 
 ### Ubuntu
 
@@ -31,23 +31,39 @@ versions, we do not currently test these scenarios.
 #### Ubuntu 16.04
 1. Install the system dependencies
 ```
-sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev libgraphviz-dev
+sudo apt-get install -y software-properties-common
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt update
+sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev libgraphviz-dev g++-9
 ```
-1. Clone the CoreGenPortal repository
+2. [Optional] Update the default GCC/G++ pointer to default to GCC/G++-9
+```
+sudo update-alternatives --remove-all gcc
+sudo update-alternatives --remove-all g++
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 20
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 20
+sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30
+sudo update-alternatives --set cc /usr/bin/gcc
+sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
+sudo update-alternatives --set c++ /usr/bin/g++
+sudo update-alternatives --config gcc
+sudo update-alternatives --config g++
+```
+3. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
-1. Setup your build tree
+4. Setup your build tree
 ```
 cd CoreGenPortal
 mkdir build
 cd build
 ```
-1. Execute CMake to generate the makefiles
+5. Execute CMake to generate the makefiles
 ```
 cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
 ```
-1. Execute the build
+6. Execute the build
 ```
 make
 ```
@@ -57,21 +73,21 @@ make
 ```
 sudo apt-get install libwxgtk3.0-0v5 libwxgtk3.0-dev libwxgtk3.0-gtk3-0v5 libwxgtk3.0-gtk3-dev libgraphviz-dev
 ```
-1. Clone the CoreGenPortal repository
+2. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
-1. Setup your build tree
+3. Setup your build tree
 ```
 cd CoreGenPortal
 mkdir build
 cd build
 ```
-1. Execute CMake to generate the makefiles
+4. Execute CMake to generate the makefiles
 ```
 cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
 ```
-1. Execute the build
+5. Execute the build
 ```
 make
 ```
@@ -81,21 +97,21 @@ make
 ```
 sudo apt-get install libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5 libgraphviz-dev
 ```
-1. Clone the CoreGenPortal repository
+2. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
-1. Setup your build tree
+3. Setup your build tree
 ```
 cd CoreGenPortal
 mkdir build
 cd build
 ```
-1. Execute CMake to generate the makefiles
+4. Execute CMake to generate the makefiles
 ```
 cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
 ```
-1. Execute the build
+5. Execute the build
 ```
 make
 ```
@@ -105,21 +121,21 @@ make
 ```
 sudo apt-get install libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
 ```
-1. Clone the CoreGenPortal repository
+2. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
-1. Setup your build tree
+3. Setup your build tree
 ```
 cd CoreGenPortal
 mkdir build
 cd build
 ```
-1. Execute CMake to generate the makefiles
+4. Execute CMake to generate the makefiles
 ```
 cmake -DLLVM_DIR=/usr/lib/llvm-8/cmake -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
 ```
-1. Execute the build
+5. Execute the build
 ```
 make
 ```
@@ -135,33 +151,33 @@ steps on vanilla CentOS 7.4 systems.
 wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm
 sudo rpm -Uvh epel-release-7-11.noarch.rpm
 ```
-1. Install the system dependencies:
+2. Install the system dependencies:
 ```
 sudo yum -y install wxGTK3 wxGTK3-devel graphviz-devel
 ```
-1. [Optional] For those wishing to build CentOS7 RPMS, you also need the following packages.
+3. [Optional] For those wishing to build CentOS7 RPMS, you also need the following packages.
 ```
 sudo yum install rpm-build rpmdevtools
 ```
-1. Enable the SCL LLVM environment (this will create a fresh bash shell with the correct paths)
+4. Enable the SCL LLVM environment (this will create a fresh bash shell with the correct paths)
 ```
 scl enable llvm-toolset-7 bash
 ```
-1. Clone the CoreGenPortal repository
+5. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
-1. Setup your build tree
+6. Setup your build tree
 ```
 cd CoreGenPortal
 mkdir build
 cd build
 ```
-1. Execute CMake to generate the makefiles
+7. Execute CMake to generate the makefiles
 ```
 cmake -DLLVM_DIR=/opt/rh/llvm-toolset-7.0/root/usr/lib64/cmake/llvm -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
 ```
-1. Execute the build
+8. Execute the build
 ```
 make
 ```
@@ -175,58 +191,86 @@ packages from the EPEL repository.  Utilize the following steps on the CentOS 8 
 wget https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/e/epel-release-8-8.el8.noarch.rpm
 sudo rpm -Uvh epel-release-8-8.el8.noarch.rpm
 ```
-1. Install the system dependencies:
+2. Install the system dependencies:
 ```
 sudo yum -y install wxGTK3 wxGTK3-devel graphviz-devel
 ```
-1. [Optional] For those wishing to build CentOS7 RPMS, you also need the following packages.
+3. [Optional] For those wishing to build CentOS7 RPMS, you also need the following packages.
 ```
 sudo yum install rpm-build rpmdevtools
 ```
-1. Clone the CoreGenPortal repository
+4. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
-1. Setup your build tree
+5. Setup your build tree
 ```
 cd CoreGenPortal
 mkdir build
 cd build
 ```
-1. Execute CMake to generate the makefiles
+6. Execute CMake to generate the makefiles
 ```
 cmake -DLLVM_DIR=/usr/lib64/cmake/llvm -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
 ```
-1. Execute the build
+7. Execute the build
 ```
 make
 ```
 
 ### Darwin (OSX)
 
+#### Darwin (OSX) 10.13
 1. Install the homebrew package: https://brew.sh/
-1. Install the ``wxmac`` and ``graphviz`` packages
+2. Install the ``llvm@7``, ``llvm@8``, ``wxmac`` and ``graphviz`` packages.  It is very important on 10.13 to install both versions of LLVM.  
 ```
-brew install wxmac graphviz
+brew install llvm@7 llvm@8 wxmac graphviz
 ```
-1. Clone the CoreGenPortal repository
+3. Clone the CoreGenPortal repository
 ```
 git clone https://github.com/opensocsysarch/CoreGenPortal.git
 ```
-1. Setup your build tree
+4. Setup your build tree
 ```
 cd CoreGenPortal
 mkdir build
 cd build
 ```
-1. Execute CMake to generate the makefiles
+5. Execute CMake to generate the makefiles.  Note the use of LLVM@7 as the base compiler and LLVM@8 for the runtime target.  This is important as OSX 10.13 does not support using C++17 features and LLVM@8 for compilation.
 ```
-cmake -DLLVM_DIR=/usr/local/opt/llvm\@8/lib/cmake/llvm -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
+CC=/usr/local/opt/llvm\@7/bin/clang CXX=/usr/local/opt/llvm\@7/bin/clang++ cmake -DLLVM_DIR=/usr/local/opt/llvm\@8/lib/cmake/llvm -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
 ```
-1. Execute the build
+6. Execute the build
 ```
 make
 ```
+
+
+#### Darwin (OSX) 10.15
+1. Install the homebrew package: https://brew.sh/
+2. Install the ``llvm@8``, ``wxmac`` and ``graphviz`` packages.
+```
+brew install llvm@7 llvm@8 wxmac graphviz
+```
+3. Clone the CoreGenPortal repository
+```
+git clone https://github.com/opensocsysarch/CoreGenPortal.git
+```
+4. Setup your build tree
+```
+cd CoreGenPortal
+mkdir build
+cd build
+```
+5. Execute CMake to generate the makefiles.  Note the use of LLVM@8 for the actual compilation.  This provides sufficient C++17 support.
+```
+CC=/usr/local/opt/llvm\@7/bin/clang CXX=/usr/local/opt/llvm\@7/bin/clang++ cmake -DLLVM_DIR=/usr/local/opt/llvm\@8/lib/cmake/llvm -DCOREGEN_INSTALL_PATH=/path/to/CoreGen/install ../
+```
+6. Execute the build
+```
+make
+```
+
 
 ## CMake Build Options
 
