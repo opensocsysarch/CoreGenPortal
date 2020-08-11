@@ -41,10 +41,15 @@
 #include <wx/treectrl.h>
 #include <wx/textctrl.h>
 #include <wx/clipbrd.h>
+#include <wx/print.h>
+#include <wx/html/htmlwin.h>
+#include <wx/html/htmprint.h>
+#include <wx/combobox.h>
 
 //-- PORTAL HEADERS
 #include "CoreGenPortal/PortalConsts.h"
 #include "CoreGenPortal/PortalVerifPrefWin.h"
+#include "CoreGenPortal/PortalSCPrefWin.h"
 #include "CoreGenPortal/PortalUserPrefWin.h"
 #include "CoreGenPortal/PortalNewProjWin.h"
 #include "CoreGenPortal/PortalCore/CoreErrorDiag.h"
@@ -54,15 +59,19 @@
 #include "CoreGenPortal/PortalCore/CoreConsts.h"
 #include "CoreGenPortal/PortalCore/CoreInfoWin.h"
 #include "CoreGenPortal/PortalCore/CoreVerifWin.h"
+#include "CoreGenPortal/PortalCore/SCCompConfig.h"
 #include "CoreGenPortal/PortalCore/CoreStatsWin.h"
 #include "CoreGenPortal/PortalCore/CoreSpecDocWin.h"
 #include "CoreGenPortal/PortalCore/CorePluginBrowser.h"
+#include "CoreGenPortal/PortalCore/IRVizWin.h"
+#include "CoreGenPortal/PortalCore/PipeVizWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
 //-- STONECUTTER HEADERS
 #include "CoreGen/StoneCutter/StoneCutter.h"
+#include "CoreGen/CoreGenSigMap/CoreGenSigMap.h"
 
 //-- STANDARD HEADERS
 #include <stdlib.h>
@@ -70,6 +79,8 @@
 #include <tuple>
 #include <string>
 #include <sstream>
+#include <any>
+#include <cstdlib>
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -84,6 +95,12 @@ public:
 
   // node info update handlers
   bool OnSave(wxDialog *InfoWin, CoreGenNode *node, CGNodeType InfoWinType);
+  bool OnSaveInstFormat(wxDialog *InfoWin,
+                        CoreGenNode *node, 
+                        CGNodeType InfoWinType, 
+                        std::vector<std::vector<std::any>> *FieldsInformation,
+                        std::vector<std::string> ExistingFields);
+  void LogError(wxString Str);
 
 private:
   // CoreGenHandlers
@@ -92,12 +109,16 @@ private:
   // data handlers
   CoreUserConfig *UserConfig;
   CoreVerifConfig *VerifConfig;
+  SCCompConfig *SCConfig;
 
   // selected runtime components
   std::string LLVMComp;
 
   // top level manager
   wxAuiManager Mgr;
+
+  // printer handler
+  wxPrintDialogData PrintData;
 
   // menu bar items
   wxMenuBar *MenuBar;
@@ -156,14 +177,18 @@ private:
   void OpenYamlFile(wxString NP, wxFileName NPF);
   void OpenSCFile(wxString NP, wxFileName NPF);
   void OpenProject(wxString NP, bool editing = false);
+  wxString AddNewlines(wxStyledTextCtrl *CW);
 
   CGNodeType TreeIdToCGType(wxTreeItemId ID);
   wxString FindNodeStr(CoreGenNode *Parent);
   CoreGenNode *GetNodeFromItem(wxTreeItemId Id);
+  wxTreeItemId GetItemFromNode(CoreGenNode *Node);
 
   // menu handlers
+  void OnPrint(wxCommandEvent& event);
   void OnQuit(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
+  void OnSCPref(wxCommandEvent& event);
   void OnVerifPref(wxCommandEvent& event);
   void OnUserPref(wxCommandEvent& event);
   void OnProjNew(wxCommandEvent& event);
@@ -185,6 +210,8 @@ private:
   void OnPopupNode(wxCommandEvent &event);
   void OnCopyText(wxCommandEvent &event );
   void OnPasteText(wxCommandEvent &event );
+  void OnVizIR(wxCommandEvent &event );
+  void OnVizPipeline(wxCommandEvent &event );
 
   // functions to save/edit node data
   bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
@@ -194,6 +221,9 @@ private:
   bool SaveExt(wxDialog* InfoWin, CoreGenExt* ExtNode);
   bool SaveISA(wxDialog* InfoWin, CoreGenISA* ISANode);
   bool SaveInst(wxDialog* InfoWin, CoreGenInst* InstNode);
+  bool SaveInstFormat(wxDialog* InfoWin, CoreGenInstFormat* InstFNode,
+  std::vector<std::vector<std::any>> *FieldsInformation,
+  std::vector<std::string> ExistingFields);
   bool SaveMCtrl(wxDialog* InfoWin, CoreGenMCtrl* MCtrlNode);
   bool SavePInst(wxDialog* InfoWin, CoreGenPseudoInst* PInstNode);
   bool SaveReg(wxDialog* InfoWin, CoreGenReg* RegNode);
@@ -203,6 +233,7 @@ private:
   bool SaveVTP(wxDialog* InfoWin, CoreGenVTP* VTPNode);
   bool IsInteger(std::string TestString);
   bool HasCacheCycle(CoreGenCache* SourceCache, CoreGenCache* Cache);
+  bool InitSCOpts(SCOpts *Opts);
 };
 
 enum
@@ -213,6 +244,8 @@ enum
   ID_PROJSUMMARY        = 12,
   ID_PROJSPECDOC        = 13,
   ID_PROJFILESAVE       = 14,
+  ID_PROJVIZIR          = 15,
+  ID_PROJVIZPIPE        = 16,
   ID_BUILD_VERIFY       = 20,
   ID_BUILD_CODEGEN      = 21,
   ID_BUILD_SIGMAP       = 22,

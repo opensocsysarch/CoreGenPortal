@@ -53,6 +53,8 @@
 #include "CoreGenPortal/PortalCore/CoreVTPInfoWin.h"
 #include "CoreGenPortal/PortalCore/CorePluginInfoWin.h"
 
+#include "CoreGenPortal/PortalViz/PortalViz.h"
+
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
 
@@ -61,7 +63,8 @@ public:
   CoreInfoWin( wxWindow* parent,
                wxWindowID id = wxID_ANY,
                CoreGenNode *Node = nullptr,
-               CGNodeType Type = CGTop);
+               CGNodeType Type = CGTop,
+               CoreGenBackend *CG = nullptr);
   ~CoreInfoWin();
 
 protected:

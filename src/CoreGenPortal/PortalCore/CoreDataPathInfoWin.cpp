@@ -21,7 +21,7 @@ CoreDataPathInfoWin::CoreDataPathInfoWin( wxWindow* parent,
                               const wxString& title,
                               CoreGenDataPath *DP )
   : wxDialog( parent, id, title, wxDefaultPosition,
-              wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
+              wxSize(500,200), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
 
   this->CoreGenDPath = DP;
 
@@ -70,7 +70,7 @@ CoreDataPathInfoWin::CoreDataPathInfoWin( wxWindow* parent,
   //-- style
   StyleNameSizer = new wxBoxSizer( wxHORIZONTAL );
   StyleNameText = new wxStaticText(Wnd,
-                                 6,
+                                 7,
                                  wxT("Style"),
                                  wxDefaultPosition,
                                  wxSize(160,-1),
@@ -80,7 +80,7 @@ CoreDataPathInfoWin::CoreDataPathInfoWin( wxWindow* parent,
 
   // -- style name box
   StyleNameCtrl = new wxTextCtrl(Wnd,
-                               0,
+                               1,
                                CoreGenDPath ? wxString(CoreGenDPath->GetStyle()) : "",
                                wxDefaultPosition,
                                wxSize(320,25),
