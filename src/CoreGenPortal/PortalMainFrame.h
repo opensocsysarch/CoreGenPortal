@@ -65,6 +65,7 @@
 #include "CoreGenPortal/PortalCore/CorePluginBrowser.h"
 #include "CoreGenPortal/PortalCore/IRVizWin.h"
 #include "CoreGenPortal/PortalCore/PipeVizWin.h"
+#include "CoreGenPortal/PortalCore/InstFormatVizWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
@@ -96,8 +97,8 @@ public:
   // node info update handlers
   bool OnSave(wxDialog *InfoWin, CoreGenNode *node, CGNodeType InfoWinType);
   bool OnSaveInstFormat(wxDialog *InfoWin,
-                        CoreGenNode *node, 
-                        CGNodeType InfoWinType, 
+                        CoreGenNode *node,
+                        CGNodeType InfoWinType,
                         std::vector<std::vector<std::any>> *FieldsInformation,
                         std::vector<std::string> ExistingFields);
   void LogError(wxString Str);
@@ -212,6 +213,7 @@ private:
   void OnPasteText(wxCommandEvent &event );
   void OnVizIR(wxCommandEvent &event );
   void OnVizPipeline(wxCommandEvent &event );
+  void OnVizInstFormat(wxCommandEvent &event );
 
   // functions to save/edit node data
   bool SaveCache(wxDialog* InfoWin, CoreGenCache* CacheNode);
@@ -246,6 +248,7 @@ enum
   ID_PROJFILESAVE       = 14,
   ID_PROJVIZIR          = 15,
   ID_PROJVIZPIPE        = 16,
+  ID_PROJVIZINSTF       = 17,
   ID_BUILD_VERIFY       = 20,
   ID_BUILD_CODEGEN      = 21,
   ID_BUILD_SIGMAP       = 22,
