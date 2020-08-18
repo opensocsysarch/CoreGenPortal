@@ -36,8 +36,7 @@ PortalMainFrame::PortalMainFrame(const wxString &title,
       PluginBox(NULL),
       ProjDir(NULL),
       EditorNotebook(NULL),
-      IRPane(NULL)
-{
+      IRPane(NULL){
 
   // init the aui window manager
   InitAuiMgr();
@@ -77,8 +76,7 @@ PortalMainFrame::PortalMainFrame(const wxString &title,
 }
 
 // PortalMainFrame::~PortalMainFrame
-PortalMainFrame::~PortalMainFrame()
-{
+PortalMainFrame::~PortalMainFrame(){
 
   if (CGProject)
     CloseProject();
@@ -97,24 +95,21 @@ PortalMainFrame::~PortalMainFrame()
 
 // PortalMainFrame::InitAuiMgr
 // Initialize the AUI window manager
-void PortalMainFrame::InitAuiMgr()
-{
+void PortalMainFrame::InitAuiMgr(){
   // notify the wxAUI which frame to use
   Mgr.SetManagedWindow(this);
 }
 
 // PortalMainFrame::UpdateAuiMgr
 // Update the AUI window context
-void PortalMainFrame::UpdateAuiMgr()
-{
+void PortalMainFrame::UpdateAuiMgr(){
   // commit all the changes to the window
   Mgr.Update();
 }
 
 // PortalMainFrame::CreateMenuBar
 // Initialize the menu bar
-void PortalMainFrame::CreateMenuBar()
-{
+void PortalMainFrame::CreateMenuBar(){
   MenuBar = new wxMenuBar;
   FileMenu = new wxMenu();
   EditMenu = new wxMenu();
@@ -275,8 +270,7 @@ void PortalMainFrame::CreatePortalToolBar()
 
 // PortalMainFrame::CreateWindowLayout
 // Initialize the window layout
-void PortalMainFrame::CreateWindowLayout()
-{
+void PortalMainFrame::CreateWindowLayout(){
 
   // Log pane
   LogPane = new wxTextCtrl(this, -1, _("CoreGenPortal Log....\n"),
@@ -370,28 +364,22 @@ void PortalMainFrame::CreateWindowLayout()
 
 // PortalMainFrame::SetupPluginBox
 // initializes the plugin box
-void PortalMainFrame::SetupPluginBox()
-{
+void PortalMainFrame::SetupPluginBox(){
   // walk the plugin directory and derive our installed
   // set of plugins
   wxDir PluginDir(UserConfig->wxGetPluginDir());
-  if (!PluginDir.IsOpened())
-  {
+  if (!PluginDir.IsOpened()){
     LogPane->AppendText("Could not open plugin directory at " +
                         UserConfig->wxGetPluginDir() + "\n");
-  }
-  else
-  {
+  }else{
     LogPane->AppendText("Initializing plugin directories\n");
     wxString filename;
     unsigned pos = 0;
     bool cont = PluginDir.GetFirst(&filename, wxEmptyString, wxDIR_DIRS);
-    while (cont)
-    {
+    while (cont){
       wxDir LPluginDir(UserConfig->wxGetPluginDir() + wxT("/") + filename);
       wxString FullPluginPath;
-      if (LPluginDir.HasFiles(wxT("*.so")))
-      {
+      if (LPluginDir.HasFiles(wxT("*.so"))){
         FullPluginPath = UserConfig->wxGetPluginDir() +
                          wxT("/") + filename +
                          wxT("/") + wxT("lib") + filename + wxT(".so");
@@ -400,9 +388,7 @@ void PortalMainFrame::SetupPluginBox()
         LogPane->AppendText("Loaded Plugin Path: " + FullPluginPath + wxT("\n"));
         PluginBox->InsertItems(1, &filename, pos);
         pos = pos + 1;
-      }
-      else if (LPluginDir.HasFiles(wxT("*.dylib")))
-      {
+      }else if (LPluginDir.HasFiles(wxT("*.dylib"))){
         FullPluginPath = UserConfig->wxGetPluginDir() +
                          wxT("/") + filename +
                          wxT("/") + wxT("lib") + filename + wxT(".dylib");
@@ -411,9 +397,7 @@ void PortalMainFrame::SetupPluginBox()
         LogPane->AppendText("Loaded Plugin Path: " + FullPluginPath + wxT("\n"));
         PluginBox->InsertItems(1, &filename, pos);
         pos = pos + 1;
-      }
-      else
-      {
+      }else{
         LogPane->AppendText("No plugin library found for " + filename);
       }
       cont = PluginDir.GetNext(&filename);
@@ -423,8 +407,7 @@ void PortalMainFrame::SetupPluginBox()
 
 // PortalMainFrame::SetupModuleBox
 // initializes the modulebox tree hierarchy
-void PortalMainFrame::SetupModuleBox()
-{
+void PortalMainFrame::SetupModuleBox(){
 
   ParentModule = ModuleBox->AddRoot(wxT("Nodes"), -1, -1, NULL);
 
@@ -518,15 +501,12 @@ void PortalMainFrame::SetupModuleBox()
 
 // PortalMainFrame::OnPasteText
 // pastes the clipboard text to the current window
-void PortalMainFrame::OnPasteText(wxCommandEvent &WXUNUSED(event))
-{
+void PortalMainFrame::OnPasteText(wxCommandEvent &WXUNUSED(event)){
   if (!CGProject)
     return;
 
-  if (wxTheClipboard->Open())
-  {
-    if (wxTheClipboard->IsSupported(wxDF_TEXT))
-    {
+  if (wxTheClipboard->Open()){
+    if (wxTheClipboard->IsSupported(wxDF_TEXT)){
       wxTextDataObject data;
       wxTheClipboard->GetData(data);
       wxStyledTextCtrl *SW = (wxStyledTextCtrl *)(EditorNotebook->GetPage(
@@ -539,15 +519,12 @@ void PortalMainFrame::OnPasteText(wxCommandEvent &WXUNUSED(event))
 
 // PortalMainFrame::OnCopyText
 // copies the text from the current window to the clipboard
-void PortalMainFrame::OnCopyText(wxCommandEvent &WXUNUSED(event))
-{
+void PortalMainFrame::OnCopyText(wxCommandEvent &WXUNUSED(event)){
   if (!CGProject)
     return;
 
-  if (wxTheClipboard->Open())
-  {
-    if (wxTheClipboard->IsSupported(wxDF_TEXT))
-    {
+  if (wxTheClipboard->Open()){
+    if (wxTheClipboard->IsSupported(wxDF_TEXT)){
       wxStyledTextCtrl *SW = (wxStyledTextCtrl *)(EditorNotebook->GetPage(
           EditorNotebook->GetSelection()));
       wxTheClipboard->AddData(
@@ -560,10 +537,8 @@ void PortalMainFrame::OnCopyText(wxCommandEvent &WXUNUSED(event))
 
 // PortalMainFrame::FindNodeStr
 // converts a node name into its appropriate Yaml text for searching
-wxString PortalMainFrame::FindNodeStr(CoreGenNode *Parent)
-{
-  switch (Parent->GetType())
-  {
+wxString PortalMainFrame::FindNodeStr(CoreGenNode *Parent){
+  switch (Parent->GetType()){
   case CGSoc:
     return wxT("- Soc: ") + wxString(Parent->GetName());
     break;
@@ -621,12 +596,10 @@ wxString PortalMainFrame::FindNodeStr(CoreGenNode *Parent)
 
 // PortalMainFrame::LoadModuleBox
 // loads all the module box items
-void PortalMainFrame::LoadModuleBox(bool editing)
-{
+void PortalMainFrame::LoadModuleBox(bool editing){
   CoreGenNode *Top = CGProject->GetTop();
 
-  if (Top == nullptr)
-  {
+  if (Top == nullptr){
     LogPane->AppendText("Error loading modules...\n");
     return;
   }
@@ -634,10 +607,8 @@ void PortalMainFrame::LoadModuleBox(bool editing)
   if (!editing)
     LogPane->AppendText("Loading modules...\n");
 
-  for (unsigned i = 0; i < Top->GetNumChild(); i++)
-  {
-    switch (Top->GetChild(i)->GetType())
-    {
+  for (unsigned i = 0; i < Top->GetNumChild(); i++){
+    switch (Top->GetChild(i)->GetType()){
     case CGSoc:
       NodeItems.push_back(std::make_pair(ModuleBox->AppendItem(TreeItems[TREE_NODE_SOC],
                                                                wxString(Top->GetChild(i)->GetName()),
@@ -787,8 +758,7 @@ void PortalMainFrame::LoadModuleBox(bool editing)
 // PortalMainFrame::LoadExtNodes
 // loads the wxTreeCtrl Ext node with child nodes
 void PortalMainFrame::LoadExtNodes(wxTreeItemId Parent,
-                                   CoreGenExt *Ext)
-{
+                                   CoreGenExt *Ext){
   std::vector<wxTreeItemId> wxExtItems;
   wxTreeItemId TmpItem;
 
@@ -860,11 +830,9 @@ void PortalMainFrame::LoadExtNodes(wxTreeItemId Parent,
 
   // retrieve all the children from the ext and insert them
   // into the appropriate slot
-  for (unsigned i = 0; i < Ext->GetNumChild(); i++)
-  {
+  for (unsigned i = 0; i < Ext->GetNumChild(); i++){
     CoreGenNode *Child = Ext->GetChild(i);
-    switch (Child->GetType())
-    {
+    switch (Child->GetType()){
     case CGCache:
       ExtItems.push_back(std::make_tuple(
           ModuleBox->AppendItem(
@@ -1010,8 +978,7 @@ void PortalMainFrame::LoadExtNodes(wxTreeItemId Parent,
 // PortalMainFrame::LoadPluginNodes
 // loads the wxTreeCtrl Plugin node with child nodes
 void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
-                                      CoreGenPlugin *Plugin)
-{
+                                      CoreGenPlugin *Plugin){
   std::vector<wxTreeItemId> wxPluginItems;
   wxTreeItemId TmpItem;
 
@@ -1088,8 +1055,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- cache
   std::vector<CoreGenCache *> CacheVect = Plugin->GetCacheVect();
-  for (unsigned i = 0; i < CacheVect.size(); i++)
-  {
+  for (unsigned i = 0; i < CacheVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(CacheVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1103,8 +1069,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- core
   std::vector<CoreGenCore *> CoreVect = Plugin->GetCoreVect();
-  for (unsigned i = 0; i < CoreVect.size(); i++)
-  {
+  for (unsigned i = 0; i < CoreVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(CoreVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1118,8 +1083,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- data paths
   std::vector<CoreGenDataPath *> DPathVect = Plugin->GetDataPathVect();
-  for (unsigned i = 0; i < DPathVect.size(); i++)
-  {
+  for (unsigned i = 0; i < DPathVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(DPathVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1133,8 +1097,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- inst
   std::vector<CoreGenInst *> InstVect = Plugin->GetInstVect();
-  for (unsigned i = 0; i < InstVect.size(); i++)
-  {
+  for (unsigned i = 0; i < InstVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(InstVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1151,8 +1114,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- pinst
   std::vector<CoreGenPseudoInst *> PInstVect = Plugin->GetPseudoInstVect();
-  for (unsigned i = 0; i < PInstVect.size(); i++)
-  {
+  for (unsigned i = 0; i < PInstVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(PInstVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1169,8 +1131,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- instformat
   std::vector<CoreGenInstFormat *> InstFVect = Plugin->GetInstFormatVect();
-  for (unsigned i = 0; i < InstFVect.size(); i++)
-  {
+  for (unsigned i = 0; i < InstFVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(InstFVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1184,8 +1145,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- reg
   std::vector<CoreGenReg *> RegVect = Plugin->GetRegVect();
-  for (unsigned i = 0; i < RegVect.size(); i++)
-  {
+  for (unsigned i = 0; i < RegVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(RegVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1199,8 +1159,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- regclass
   std::vector<CoreGenRegClass *> RegCVect = Plugin->GetRegClassVect();
-  for (unsigned i = 0; i < RegCVect.size(); i++)
-  {
+  for (unsigned i = 0; i < RegCVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(RegCVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1214,8 +1173,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- soc
   std::vector<CoreGenSoC *> SocVect = Plugin->GetSocVect();
-  for (unsigned i = 0; i < SocVect.size(); i++)
-  {
+  for (unsigned i = 0; i < SocVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(SocVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1229,8 +1187,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- isa
   std::vector<CoreGenISA *> ISAVect = Plugin->GetISAVect();
-  for (unsigned i = 0; i < ISAVect.size(); i++)
-  {
+  for (unsigned i = 0; i < ISAVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(ISAVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1244,8 +1201,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- ext
   std::vector<CoreGenExt *> ExtVect = Plugin->GetExtVect();
-  for (unsigned i = 0; i < ExtVect.size(); i++)
-  {
+  for (unsigned i = 0; i < ExtVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(ExtVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1262,8 +1218,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- comm
   std::vector<CoreGenComm *> CommVect = Plugin->GetCommVect();
-  for (unsigned i = 0; i < CommVect.size(); i++)
-  {
+  for (unsigned i = 0; i < CommVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(CommVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1277,8 +1232,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- spad
   std::vector<CoreGenSpad *> SpadVect = Plugin->GetSpadVect();
-  for (unsigned i = 0; i < SpadVect.size(); i++)
-  {
+  for (unsigned i = 0; i < SpadVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(SpadVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1292,8 +1246,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- mctrl
   std::vector<CoreGenMCtrl *> MCtrlVect = Plugin->GetMCtrlVect();
-  for (unsigned i = 0; i < MCtrlVect.size(); i++)
-  {
+  for (unsigned i = 0; i < MCtrlVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(MCtrlVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1307,8 +1260,7 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 
   //-- vtp
   std::vector<CoreGenVTP *> VTPVect = Plugin->GetVTPVect();
-  for (unsigned i = 0; i < VTPVect.size(); i++)
-  {
+  for (unsigned i = 0; i < VTPVect.size(); i++){
     CoreGenNode *Child = static_cast<CoreGenNode *>(VTPVect[i]);
     PluginItems.push_back(std::make_tuple(
         ModuleBox->AppendItem(
@@ -1324,10 +1276,8 @@ void PortalMainFrame::LoadPluginNodes(wxTreeItemId Parent,
 // PortalMainFrame::LoadInstEncodings
 // loads the wxTreeCtrl Inst node with its child encodings
 void PortalMainFrame::LoadInstEncodings(wxTreeItemId Parent,
-                                        CoreGenInst *Inst)
-{
-  for (unsigned j = 0; j < Inst->GetNumEncodings(); j++)
-  {
+                                        CoreGenInst *Inst){
+  for (unsigned j = 0; j < Inst->GetNumEncodings(); j++){
     CoreGenEncoding *E = Inst->GetEncoding(j);
     EncItems.push_back(std::make_pair(ModuleBox->AppendItem(Parent,
                                                             wxString(E->GetName()),
@@ -1341,10 +1291,8 @@ void PortalMainFrame::LoadInstEncodings(wxTreeItemId Parent,
 // PortalMainFrame::LoadPInstEncodings
 // loads the wxTreeCtrl PInst node with its child encodings
 void PortalMainFrame::LoadPInstEncodings(wxTreeItemId Parent,
-                                         CoreGenPseudoInst *PInst)
-{
-  for (unsigned j = 0; j < PInst->GetNumEncodings(); j++)
-  {
+                                         CoreGenPseudoInst *PInst){
+  for (unsigned j = 0; j < PInst->GetNumEncodings(); j++){
     CoreGenEncoding *E = PInst->GetEncoding(j);
     EncItems.push_back(std::make_pair(ModuleBox->AppendItem(Parent,
                                                             wxString(E->GetName()),
@@ -1357,8 +1305,7 @@ void PortalMainFrame::LoadPInstEncodings(wxTreeItemId Parent,
 
 // PortalMainFrame::CloseProject
 // closes any open project files
-void PortalMainFrame::CloseProject(bool editing)
-{
+void PortalMainFrame::CloseProject(bool editing){
   if (!CGProject){
     return;
   }
@@ -1415,8 +1362,7 @@ void PortalMainFrame::CloseProject(bool editing)
 }
 
 // PortalMainFrame::AddNewlines
-wxString PortalMainFrame::AddNewlines(wxStyledTextCtrl *CW)
-{
+wxString PortalMainFrame::AddNewlines(wxStyledTextCtrl *CW){
   wxString Str;
 
   // we insert <pre> tags in the header and footer of text
@@ -1425,8 +1371,7 @@ wxString PortalMainFrame::AddNewlines(wxStyledTextCtrl *CW)
   // class
 
   Str += "<pre>";
-  for (unsigned i = 0; i < CW->GetNumberOfLines(); i++)
-  {
+  for (unsigned i = 0; i < CW->GetNumberOfLines(); i++){
     Str += (CW->GetLineText(i) + "\n");
   }
   Str += "</pre>";
@@ -1435,16 +1380,13 @@ wxString PortalMainFrame::AddNewlines(wxStyledTextCtrl *CW)
 
 // PortalMainFrame::OnPrint
 // handles the print request
-void PortalMainFrame::OnPrint(wxCommandEvent &event)
-{
-  if (EditorNotebook->GetPageCount() == 0)
-  {
+void PortalMainFrame::OnPrint(wxCommandEvent &event){
+  if (EditorNotebook->GetPageCount() == 0){
     LogPane->AppendText("No editor panes to print\n");
     return;
   }
   wxStyledTextCtrl *CW = (wxStyledTextCtrl *)(EditorNotebook->GetCurrentPage());
-  if (!CW)
-  {
+  if (!CW){
     LogPane->AppendText("No editor pane selected\n");
     return;
   }
@@ -1452,18 +1394,13 @@ void PortalMainFrame::OnPrint(wxCommandEvent &event)
   wxString PFileName = wxT("");
 
   // determine what the file name is
-  if (CW == IRPane)
-  {
+  if (CW == IRPane){
     // we're using the IR File
     PFileName = IRFileName;
-  }
-  else
-  {
+  }else{
     // its an SCPane
-    for (unsigned i = 0; i < SCPanes.size(); i++)
-    {
-      if (SCPanes[i].first == CW)
-      {
+    for (unsigned i = 0; i < SCPanes.size(); i++){
+      if (SCPanes[i].first == CW){
         PFileName = SCPanes[i].second;
       }
     }
@@ -1480,12 +1417,10 @@ void PortalMainFrame::OnPrint(wxCommandEvent &event)
 
 // PortalMainFrame::OnQuit
 // handles quit signals to end the application
-void PortalMainFrame::OnQuit(wxCommandEvent &event)
-{
+void PortalMainFrame::OnQuit(wxCommandEvent &event){
   int answer = wxMessageBox("Close CoreGenPortal?", "Confirm",
                             wxYES_NO | wxCANCEL, this);
-  if (answer == wxYES)
-  {
+  if (answer == wxYES){
     // close the project
     CloseProject();
     Close(true);
@@ -1494,8 +1429,7 @@ void PortalMainFrame::OnQuit(wxCommandEvent &event)
 
 // PortalMainFrame::OnAbout
 // handles the Help->About command event
-void PortalMainFrame::OnAbout(wxCommandEvent &event)
-{
+void PortalMainFrame::OnAbout(wxCommandEvent &event){
   CoreGenBackend *CGA = new CoreGenBackend("", "", "");
   int major = -1;
   int minor = -1;
@@ -1519,8 +1453,7 @@ void PortalMainFrame::OnAbout(wxCommandEvent &event)
 }
 
 // PortalMainFrame::DeleteNode
-void PortalMainFrame::DeleteNode(CoreGenNode *Node)
-{
+void PortalMainFrame::DeleteNode(CoreGenNode *Node){
   //delete from UI
   //ModuleBox->DeleteChildren(ModuleBox->GetFocusedItem());
   //ModuleBox->Delete(ModuleBox->GetFocusedItem());
@@ -1533,8 +1466,7 @@ void PortalMainFrame::DeleteNode(CoreGenNode *Node)
   unsigned int i;
   for (i = 0; i < line.size() && line[i] != '-'; i++)
     ;
-  do
-  {
+  do{
     IRPane->LineDelete();
     line = IRPane->GetCurLine();
   } while (line.size() > 0 && line[i] != '-' && isspace(line[i]));
@@ -1558,17 +1490,14 @@ void PortalMainFrame::DeleteNode(CoreGenNode *Node)
 }
 
 // PortalMainFrame::AddNodeWin
-void PortalMainFrame::AddNodeWin()
-{
+void PortalMainFrame::AddNodeWin(){
   LogPane->AppendText("AddNodeWin\n");
 }
 
 // PortalMainFrame::OnPopupNode
-void PortalMainFrame::OnPopupNode(wxCommandEvent &event)
-{
+void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
   CoreInfoWin *InfoWin = nullptr;
-  switch (event.GetId())
-  {
+  switch (event.GetId()){
   case ID_TREE_INFONODE:
     // open tree info node
     InfoWin = new CoreInfoWin(this, wxID_ANY,
@@ -1582,31 +1511,25 @@ void PortalMainFrame::OnPopupNode(wxCommandEvent &event)
     break;
   case ID_TREE_ADDNODE:
 
-    if (CGProject)
-    {
+    if (CGProject){
       wxTreeItemId ID = ModuleBox->GetFocusedItem();
       InfoWin = new CoreInfoWin(this, wxID_ANY, NULL, TreeIdToCGType(ID),CGProject);
       delete InfoWin;
-    }
-    else
-    {
+    }else{
       LogPane->AppendText("No project open. You must open a project before you can add a node.\n");
     }
     break;
   }
 }
 
-CGNodeType PortalMainFrame::TreeIdToCGType(wxTreeItemId ID)
-{
+CGNodeType PortalMainFrame::TreeIdToCGType(wxTreeItemId ID){
   unsigned i;
-  for (i = 0; i < TreeItems.size(); i++)
-  {
+  for (i = 0; i < TreeItems.size(); i++){
     if (TreeItems[i] == ID)
       break;
   }
 
-  switch (i)
-  {
+  switch (i){
   case 0:
     return CGCache;
   case 1:
@@ -1645,16 +1568,12 @@ CGNodeType PortalMainFrame::TreeIdToCGType(wxTreeItemId ID)
 }
 
 // PortalMainFrame::OnRightClickNode
-void PortalMainFrame::OnRightClickNode(wxTreeEvent &event)
-{
+void PortalMainFrame::OnRightClickNode(wxTreeEvent &event){
   wxMenu mnu;
-  if (ModuleBox->GetItemParent(ModuleBox->GetFocusedItem()) == ParentModule)
-  {
+  if (ModuleBox->GetItemParent(ModuleBox->GetFocusedItem()) == ParentModule){
     // this is a node descriptor type
     mnu.Append(ID_TREE_ADDNODE, "Add Node");
-  }
-  else
-  {
+  }else{
     // this is an actual node
     mnu.Append(ID_TREE_INFONODE, "Node Info");
     mnu.Append(ID_TREE_DELNODE, "Delete Node");
@@ -1667,34 +1586,29 @@ void PortalMainFrame::OnRightClickNode(wxTreeEvent &event)
 }
 
 // PortalMainFrame:GetItemFromNode
-wxTreeItemId PortalMainFrame::GetItemFromNode(CoreGenNode *Node)
-{
+wxTreeItemId PortalMainFrame::GetItemFromNode(CoreGenNode *Node){
   wxTreeItemId Id;
 
   // walk all the main nodes
-  for (unsigned i = 0; i < NodeItems.size(); i++)
-  {
+  for (unsigned i = 0; i < NodeItems.size(); i++){
     if (NodeItems[i].second == Node)
       return NodeItems[i].first;
   }
 
   // walk the encoding nodes
-  for (unsigned i = 0; i < EncItems.size(); i++)
-  {
+  for (unsigned i = 0; i < EncItems.size(); i++){
     if (EncItems[i].second == Node)
       return EncItems[i].first;
   }
 
   // walk the ext nodes
-  for (unsigned i = 0; i < ExtItems.size(); i++)
-  {
+  for (unsigned i = 0; i < ExtItems.size(); i++){
     if (std::get<2>(ExtItems[i]) == Node)
       return std::get<0>(ExtItems[i]);
   }
 
   // walk the plugin nodes
-  for (unsigned i = 0; i < PluginItems.size(); i++)
-  {
+  for (unsigned i = 0; i < PluginItems.size(); i++){
     if (std::get<2>(PluginItems[i]))
       return std::get<0>(PluginItems[i]);
   }
@@ -1703,29 +1617,23 @@ wxTreeItemId PortalMainFrame::GetItemFromNode(CoreGenNode *Node)
 }
 
 // PortalMainFrame::GetNodeFromItem
-CoreGenNode *PortalMainFrame::GetNodeFromItem(wxTreeItemId SelId)
-{
-  if (!SelId.IsOk())
-  {
+CoreGenNode *PortalMainFrame::GetNodeFromItem(wxTreeItemId SelId){
+  if (!SelId.IsOk()){
     LogPane->AppendText("Error: could not derive node from selection\n");
     return nullptr;
   }
 
   // walk the main nodes
-  for (unsigned i = 0; i < NodeItems.size(); i++)
-  {
+  for (unsigned i = 0; i < NodeItems.size(); i++){
     if (NodeItems[i].first == SelId)
       return NodeItems[i].second;
   }
 
   // walk the encoding nodes
-  for (unsigned i = 0; i < EncItems.size(); i++)
-  {
-    if (EncItems[i].first == SelId)
-    {
+  for (unsigned i = 0; i < EncItems.size(); i++){
+    if (EncItems[i].first == SelId){
       wxTreeItemId ParentId = ModuleBox->GetItemParent(EncItems[i].first);
-      for (unsigned j = 0; j < NodeItems.size(); j++)
-      {
+      for (unsigned j = 0; j < NodeItems.size(); j++){
         if (NodeItems[j].first == ParentId)
           return NodeItems[j].second;
       }
@@ -1733,21 +1641,17 @@ CoreGenNode *PortalMainFrame::GetNodeFromItem(wxTreeItemId SelId)
   }
 
   // walk the Ext nodes
-  for (unsigned i = 0; i < ExtItems.size(); i++)
-  {
+  for (unsigned i = 0; i < ExtItems.size(); i++){
     wxTreeItemId TmpItem = std::get<0>(ExtItems[i]);
-    if (TmpItem == SelId)
-    {
+    if (TmpItem == SelId){
       return std::get<2>(ExtItems[i]);
     }
   }
 
   // walk the plugin nodes
-  for (unsigned i = 0; i < PluginItems.size(); i++)
-  {
+  for (unsigned i = 0; i < PluginItems.size(); i++){
     wxTreeItemId TmpItem = std::get<0>(PluginItems[i]);
-    if (TmpItem == SelId)
-    {
+    if (TmpItem == SelId){
       return std::get<2>(PluginItems[i]);
     }
   }
@@ -1756,22 +1660,19 @@ CoreGenNode *PortalMainFrame::GetNodeFromItem(wxTreeItemId SelId)
 }
 
 // PortalMainFrame::OnMiddleClickNode
-void PortalMainFrame::OnMiddleClickNode(wxTreeEvent &event)
-{
+void PortalMainFrame::OnMiddleClickNode(wxTreeEvent &event){
   // retrieve the name of the selection and search for it
   // in the IRPane, then refocus the IRPane on the target node
   wxTreeItemId SelId = ModuleBox->GetFocusedItem();
 
-  if (!SelId.IsOk())
-  {
+  if (!SelId.IsOk()){
     LogPane->AppendText("Error: Could not select node\n");
     return;
   }
 
   // we have a valid node, search for its corresponding object
   CoreGenNode *Node = GetNodeFromItem(SelId);
-  if (Node == nullptr)
-  {
+  if (Node == nullptr){
     LogPane->AppendText("Error : node object is null\n");
     return;
   }
@@ -1781,51 +1682,40 @@ void PortalMainFrame::OnMiddleClickNode(wxTreeEvent &event)
 }
 
 // PortalMainFrame::OpenFile
-void PortalMainFrame::OpenFileFromWin(wxString Path)
-{
+void PortalMainFrame::OpenFileFromWin(wxString Path){
   wxFileName NPF(Path);
   wxString Ext = NPF.GetExt();
 
-  if (Ext.IsSameAs(wxT("sc"), false))
-  {
+  if (Ext.IsSameAs(wxT("sc"), false)){
     // open a new stonecutter window
     OpenSCFile(Path, NPF);
-  }
-  else if (Ext.IsSameAs(wxT("yaml"), false))
-  {
+  }else if (Ext.IsSameAs(wxT("yaml"), false)){
     // open a new yaml window (not a new project)
     OpenYamlFile(Path, NPF);
-  }
-  else
-  {
+  }else{
     LogPane->AppendText("Could not open unknown file type at " +
                         Path + wxT("\n"));
   }
 }
 
 // PortalMainFrame::OpenYamlFile
-void PortalMainFrame::OpenYamlFile(wxString NP, wxFileName NPF)
-{
+void PortalMainFrame::OpenYamlFile(wxString NP, wxFileName NPF){
   LogPane->AppendText("Opening Yaml file at " +
                       NPF.GetFullName() + wxT("\n"));
 
   // check to see if the window is already open
   wxString TmpName = NPF.GetFullName();
   size_t TmpPage = -1;
-  for (unsigned i = 0; i < SCPanes.size(); i++)
-  {
+  for (unsigned i = 0; i < SCPanes.size(); i++){
     if (std::get<1>(SCPanes[i]) == TmpName)
       TmpPage = i + 1;
   }
 
-  if (TmpPage != -1)
-  {
+  if (TmpPage != -1){
     // page already exists, refocus to the target tab
     LogPane->AppendText("File is already open... refocusing to the appropriate tab\n");
     EditorNotebook->SetSelection(TmpPage);
-  }
-  else
-  {
+  }else{
     // create a new window
     wxStyledTextCtrl *SCPane = new wxStyledTextCtrl(this, wxID_ANY);
 
@@ -1874,28 +1764,23 @@ void PortalMainFrame::OpenYamlFile(wxString NP, wxFileName NPF)
 }
 
 // PortalMainFrame::OpenSCFile
-void PortalMainFrame::OpenSCFile(wxString NP, wxFileName NPF)
-{
+void PortalMainFrame::OpenSCFile(wxString NP, wxFileName NPF){
   LogPane->AppendText("Opening StoneCutter file at " +
                       NPF.GetFullName() + wxT("\n"));
 
   // check to see if the window is already open
   wxString TmpName = NPF.GetFullName();
   size_t TmpPage = -1;
-  for (unsigned i = 0; i < SCPanes.size(); i++)
-  {
+  for (unsigned i = 0; i < SCPanes.size(); i++){
     if (std::get<1>(SCPanes[i]) == TmpName)
       TmpPage = i + 1;
   }
 
-  if (TmpPage != -1)
-  {
+  if (TmpPage != -1){
     // page already exists, refocus to the target tab
     LogPane->AppendText("File is already open... refocusing to the appropriate tab\n");
     EditorNotebook->SetSelection(TmpPage);
-  }
-  else
-  {
+  }else{
     // create a new window
     wxStyledTextCtrl *SCPane = new wxStyledTextCtrl(this, wxID_ANY);
     SCPane->StyleClearAll();
@@ -1941,29 +1826,21 @@ void PortalMainFrame::OpenSCFile(wxString NP, wxFileName NPF)
 }
 
 // PortalMainFrame::OnSelectPlugin
-void PortalMainFrame::OnSelectPlugin(wxCommandEvent &event)
-{
-  if (!CGProject)
-  {
+void PortalMainFrame::OnSelectPlugin(wxCommandEvent &event){
+  if (!CGProject){
     LogPane->AppendText("Cannot load plugin; no project open\n");
     return;
   }
   int Plugin = PluginBox->GetSelection();
-  if ((unsigned)(Plugin) > (PluginPanes.size() - 1))
-  {
+  if ((unsigned)(Plugin) > (PluginPanes.size() - 1)){
     LogPane->AppendText("Invalid plugin item\n");
-  }
-  else
-  {
+  }else{
     wxString PName = std::get<0>(PluginPanes[(unsigned)(Plugin)]);
     wxString PPath = std::get<1>(PluginPanes[(unsigned)(Plugin)]);
-    if (!CGProject->LoadPlugin(std::string(PPath.mb_str())))
-    {
+    if (!CGProject->LoadPlugin(std::string(PPath.mb_str()))){
       LogPane->AppendText(wxT("Failed to load plugin at ") + PPath + wxT("\n"));
       LogPane->AppendText(wxString(CGProject->GetErrStr()));
-    }
-    else
-    {
+    }else{
       // open a new plugin information window
       unsigned PID = CGProject->GetNumPlugins() - 1;
       CoreGenPlugin *PLUGIN = CGProject->GetPlugin(PID);
@@ -1975,11 +1852,9 @@ void PortalMainFrame::OnSelectPlugin(wxCommandEvent &event)
                                                     PLUGIN,
                                                     CGProject,
                                                     LogPane);
-      if (PB->ShowModal() == wxID_OK)
-      {
+      if (PB->ShowModal() == wxID_OK){
         PB->Destroy();
-        if (!CGProject->ReleasePlugin(PID))
-        {
+        if (!CGProject->ReleasePlugin(PID)){
           LogPane->AppendText(wxT("Failed to release plugin at ") + PPath + wxT("\n"));
           LogPane->AppendText(wxString(CGProject->GetErrStr()));
         }
@@ -1989,8 +1864,7 @@ void PortalMainFrame::OnSelectPlugin(wxCommandEvent &event)
 }
 
 // PortalMainFrame::OnSelectNode
-void PortalMainFrame::OnSelectNode(wxTreeEvent &event)
-{
+void PortalMainFrame::OnSelectNode(wxTreeEvent &event){
   switch (ModulesNotebook->GetSelection())
   {
   case 0:
@@ -2007,8 +1881,7 @@ void PortalMainFrame::OnSelectNode(wxTreeEvent &event)
 }
 
 // PortalMainFrame::OnVerifPref
-void PortalMainFrame::OnVerifPref(wxCommandEvent &event)
-{
+void PortalMainFrame::OnVerifPref(wxCommandEvent &event){
   LogPane->AppendText("Loading verification preferences...\n");
   PortalVerifPrefWin *VP = new PortalVerifPrefWin(this,
                                                   wxID_ANY,
@@ -2017,16 +1890,14 @@ void PortalMainFrame::OnVerifPref(wxCommandEvent &event)
                                                   wxSize(500, 500),
                                                   wxDEFAULT_DIALOG_STYLE | wxVSCROLL,
                                                   VerifConfig);
-  if (VP->ShowModal() == wxID_OK)
-  {
+  if (VP->ShowModal() == wxID_OK){
     LogPane->AppendText("Committed verification preferences\n");
   }
   VP->Destroy();
 }
 
 // PortalMainFram::OnSCPref
-void PortalMainFrame::OnSCPref(wxCommandEvent &event)
-{
+void PortalMainFrame::OnSCPref(wxCommandEvent &event){
   LogPane->AppendText("Loading StoneCutter compiler preferences...\n");
   PortalSCPrefWin *SP = new PortalSCPrefWin(this,
                                             wxID_ANY,
@@ -2035,16 +1906,14 @@ void PortalMainFrame::OnSCPref(wxCommandEvent &event)
                                             wxSize(500, 500),
                                             wxDEFAULT_DIALOG_STYLE | wxVSCROLL,
                                             SCConfig);
-  if (SP->ShowModal() == wxID_OK)
-  {
+  if (SP->ShowModal() == wxID_OK){
     LogPane->AppendText("Committed StoneCutter compiler preferences\n");
   }
   SP->Destroy();
 }
 
 // PortalMainFrame::OnUserPref
-void PortalMainFrame::OnUserPref(wxCommandEvent &event)
-{
+void PortalMainFrame::OnUserPref(wxCommandEvent &event){
   LogPane->AppendText("Loading user preferences...\n");
   PortalUserPrefWin *UP = new PortalUserPrefWin(this,
                                                 wxID_ANY,
@@ -2053,26 +1922,22 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event)
                                                 wxSize(500, 500),
                                                 wxDEFAULT_DIALOG_STYLE | wxVSCROLL,
                                                 UserConfig);
-  if (UP->ShowModal() == wxID_OK)
-  {
+  if (UP->ShowModal() == wxID_OK){
     LogPane->AppendText("Committed user preferences\n");
   }
   UP->Destroy();
 }
 
 // PortalMainFrame::OnProjSaveFile
-void PortalMainFrame::OnProjSaveFile(wxCommandEvent &event)
-{
-  if (!CGProject)
-  {
+void PortalMainFrame::OnProjSaveFile(wxCommandEvent &event){
+  if (!CGProject){
     LogPane->AppendText("No project is open!\n");
     return;
   }
 
   wxStyledTextCtrl *SW = (wxStyledTextCtrl *)(EditorNotebook->GetPage(
       EditorNotebook->GetSelection()));
-  if (SW == IRPane)
-  {
+  if (SW == IRPane){
     // write out the new IR file
     IRPane->SaveFile(IRFileName);
     CloseProject(true);
@@ -2082,14 +1947,10 @@ void PortalMainFrame::OnProjSaveFile(wxCommandEvent &event)
     SetupModuleBox();
     OpenProject(IRFileName, true);
     LogPane->AppendText("Updated modules\n");
-  }
-  else
-  {
+  }else{
     // just save the file
-    for (unsigned i = 0; i < SCPanes.size(); i++)
-    {
-      if (std::get<0>(SCPanes[i]) == SW)
-      {
+    for (unsigned i = 0; i < SCPanes.size(); i++){
+      if (std::get<0>(SCPanes[i]) == SW){
         SW->SaveFile(std::get<1>(SCPanes[i]));
       }
     }
@@ -2097,21 +1958,17 @@ void PortalMainFrame::OnProjSaveFile(wxCommandEvent &event)
 }
 
 // PortalMainFrame::OnProjSpecDoc
-void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event)
-{
-  if (!CGProject)
-  {
+void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event){
+  if (!CGProject){
     LogPane->AppendText("No project is open!\n");
     return;
   }
 
   // create the directory
   wxString FullPath = ProjDir->GetPath() + wxT("/spec/");
-  if (!wxDirExists(FullPath))
-  {
+  if (!wxDirExists(FullPath)){
     LogPane->AppendText("Creating spec directory at " + FullPath + wxT("\n"));
-    if (!wxFileName::Mkdir(FullPath, wxS_DIR_DEFAULT, 0))
-    {
+    if (!wxFileName::Mkdir(FullPath, wxS_DIR_DEFAULT, 0)){
       LogPane->AppendText("Error creating spec directory at " + FullPath + wxT("\n"));
       return;
     }
@@ -2121,15 +1978,13 @@ void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event)
   ProjDir->ReCreateTree();
 
   // build the dag
-  if (!CGProject->BuildDAG())
-  {
+  if (!CGProject->BuildDAG()){
     LogPane->AppendText("Error constructing DAG of hardware nodes\n");
     return;
   }
 
   // init the pass manager
-  if (!CGProject->InitPassMgr())
-  {
+  if (!CGProject->InitPassMgr()){
     LogPane->AppendText("Error initializing the CoreGen pass manager\n");
     return;
   }
@@ -2138,8 +1993,7 @@ void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event)
 
   // Set the pass output path
   if (!CGProject->SetPassOutputPath("SpecDoc",
-                                    std::string(FullPath.mb_str())))
-  {
+                                    std::string(FullPath.mb_str()))){
     LogPane->AppendText("Error initializing SpecDoc pass output\n");
     LogPane->AppendText(wxString(CGProject->GetErrStr()) + wxT("\n"));
     return;
@@ -2153,8 +2007,7 @@ void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event)
   bool failed = false;
 
   // Execute the pass
-  if (!CGProject->ExecuteSysPass("SpecDoc"))
-  {
+  if (!CGProject->ExecuteSysPass("SpecDoc")){
     LogPane->AppendText("Error executing SpecDoc\n");
     LogPane->AppendText(wxString(CGProject->GetErrStr()) + wxT("\n"));
     failed = true;
@@ -2162,8 +2015,7 @@ void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event)
 
   // restore the old cout buffer
   std::cout.rdbuf(oldBuf);
-  if (failed)
-  {
+  if (failed){
     return;
   }
 
@@ -2172,31 +2024,26 @@ void PortalMainFrame::OnProjSpecDoc(wxCommandEvent &event)
                                           wxID_ANY,
                                           wxT("Specification Document"),
                                           &newBuf);
-  if (SW->ShowModal() == wxID_OK)
-  {
+  if (SW->ShowModal() == wxID_OK){
     SW->Destroy();
   }
 }
 
 // PortalMainFrame::OnProjSummary
-void PortalMainFrame::OnProjSummary(wxCommandEvent &event)
-{
-  if (!CGProject)
-  {
+void PortalMainFrame::OnProjSummary(wxCommandEvent &event){
+  if (!CGProject){
     LogPane->AppendText("No project is open!\n");
     return;
   }
 
   // build the dag
-  if (!CGProject->BuildDAG())
-  {
+  if (!CGProject->BuildDAG()){
     LogPane->AppendText("Error constructing DAG of hardware nodes\n");
     return;
   }
 
   // init the pass manager
-  if (!CGProject->InitPassMgr())
-  {
+  if (!CGProject->InitPassMgr()){
     LogPane->AppendText("Error initializing the CoreGen pass manager\n");
     return;
   }
@@ -2209,8 +2056,7 @@ void PortalMainFrame::OnProjSummary(wxCommandEvent &event)
   std::cout.rdbuf(newBuf.rdbuf());
 
   // Execute the pass
-  if (!CGProject->ExecutePass("StatsPass"))
-  {
+  if (!CGProject->ExecutePass("StatsPass")){
     LogPane->AppendText("Error executing StatsPass\n");
   }
 
@@ -2220,8 +2066,7 @@ void PortalMainFrame::OnProjSummary(wxCommandEvent &event)
                                       wxID_ANY,
                                       wxT("Project Summary"),
                                       &newBuf);
-  if (SW->ShowModal() == wxID_OK)
-  {
+  if (SW->ShowModal() == wxID_OK){
     SW->Destroy();
   }
 }
