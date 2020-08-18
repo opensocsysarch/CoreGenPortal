@@ -38,6 +38,7 @@ CorePluginBrowser.cpp
 SCCompConfig.cpp
 IRVizWin.cpp
 PipeVizWin.cpp
+InstFormatVizWin.cpp
 )
 
 #-- target deps

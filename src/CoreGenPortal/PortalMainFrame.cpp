@@ -149,6 +149,7 @@ void PortalMainFrame::CreateMenuBar(){
   ProjectMenu->Append(ID_PROJSPECDOC, wxT("&Build Specification Doc"));
   ProjectMenu->AppendSeparator();
   ProjectMenu->Append(ID_PROJVIZIR, wxT("&Visualize IR"));
+  ProjectMenu->Append(ID_PROJVIZINSTF, wxT("&Visualize Instruction Format"));
   ProjectMenu->Append(ID_PROJVIZPIPE, wxT("&Visualize Pipeline"));
 
   //-- Build Menu
@@ -218,6 +219,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjSaveFile));
   Connect(ID_PROJVIZIR, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnVizIR));
+  Connect(ID_PROJVIZINSTF, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnVizInstFormat));
   Connect(ID_PROJVIZPIPE, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnVizPipeline));
 
@@ -2509,6 +2512,57 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event)
   }
 }
 
+// PortalMainFrame::OnVizInstFormat
+void PortalMainFrame::OnVizInstFormat(wxCommandEvent& WXUNUSED(event)){
+  if( !CGProject ){
+    LogPane->AppendText( "No project open\n" );
+    return ;
+  }
+
+  // retrieve the selected node
+  wxTreeItemId SelId = ModuleBox->GetFocusedItem();
+
+  if (!SelId.IsOk()){
+    LogPane->AppendText("Error: Could not select node\n");
+    return;
+  }
+
+  // we have a valid node, search for its corresponding object
+  CoreGenNode *Node = GetNodeFromItem(SelId);
+  if (Node == nullptr){
+    LogPane->AppendText("Error : node object is null\n");
+    return;
+  }
+  if( Node->GetType() != CGInstF ){
+    LogPane->AppendText("Error : select a valid instruction format node\n");
+    return;
+  }
+
+  CoreGenInstFormat *IF = static_cast<CoreGenInstFormat *>(Node);
+
+  // generate a new image for the instruction format
+  std::string ImgPath;
+  PortalViz *Viz = new PortalViz();
+  if( !Viz->GenerateInstFormatImg(IF,ImgPath) ){
+    LogPane->AppendText( "Could not visualize instruction format\n" );
+    delete Viz;
+    return ;
+  }
+
+  // visualize it
+  InstFormatVizWin *PV = new InstFormatVizWin( this,
+                                               wxID_ANY,
+                                               wxT("Instruction Format Visualization"),
+                                               wxDefaultPosition,
+                                               wxSize(500,100),
+                                               wxDEFAULT_DIALOG_STYLE|wxVSCROLL|wxHSCROLL,
+                                               wxString(ImgPath) );
+  PV->ShowModal();
+  PV->Destroy();
+
+  delete Viz;
+}
+
 // PortalMainFrame::OnVizPipeline
 void PortalMainFrame::OnVizPipeline(wxCommandEvent& WXUNUSED(event)){
   if( !CGProject ){
@@ -2541,7 +2595,7 @@ void PortalMainFrame::OnVizPipeline(wxCommandEvent& WXUNUSED(event)){
     return ;
   }
 
-  // visualization the pipeline
+  // visualize the pipeline
   PipeVizWin *PV = new PipeVizWin( this,
                                    wxID_ANY,
                                    wxT("Pipeline Visualization"),
