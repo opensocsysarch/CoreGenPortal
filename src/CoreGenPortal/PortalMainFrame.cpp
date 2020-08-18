@@ -154,6 +154,7 @@ void PortalMainFrame::CreateMenuBar()
   ProjectMenu->Append(ID_PROJSPECDOC, wxT("&Build Specification Doc"));
   ProjectMenu->AppendSeparator();
   ProjectMenu->Append(ID_PROJVIZIR, wxT("&Visualize IR"));
+  ProjectMenu->Append(ID_PROJVIZPIPE, wxT("&Visualize Pipeline"));
 
   //-- Build Menu
   BuildMenu->Append(ID_BUILD_VERIFY, wxT("&Verify Design"));
@@ -222,6 +223,8 @@ void PortalMainFrame::CreateMenuBar()
           wxCommandEventHandler(PortalMainFrame::OnProjSaveFile));
   Connect(ID_PROJVIZIR, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnVizIR));
+  Connect(ID_PROJVIZPIPE, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnVizPipeline));
 
   //-- build menu
   Connect(ID_BUILD_VERIFY, wxEVT_COMMAND_MENU_SELECTED,
@@ -2224,25 +2227,21 @@ void PortalMainFrame::OnProjSummary(wxCommandEvent &event)
 }
 
 // PortalMainFrame::OnBuildSigmap
-void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event)
-{
-  if (!CGProject)
-  {
+void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event){
+  if (!CGProject){
     LogPane->AppendText("No project is open!\n");
     return;
   }
 
   // build the dag
-  if (!CGProject->BuildDAG())
-  {
+  if (!CGProject->BuildDAG()){
     LogPane->AppendText("Error constructing DAG of hardware nodes\n");
     return;
   }
 
   // determine if the target stonecutter directory exists
   wxString FullPath = ProjDir->GetPath() + wxT("/RTL/stonecutter/");
-  if (!wxDirExists(FullPath))
-  {
+  if (!wxDirExists(FullPath)){
     LogPane->AppendText("StoneCutter path does not exist: " + FullPath + "\n");
     return;
   }
@@ -2250,14 +2249,11 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event)
   // walk the ~/Project/RTL/stonecutter directory and discover all the
   // stonecutter source files
   wxString SCFile = wxFindFirstFile(FullPath + "*.sc");
-  while (!SCFile.empty())
-  {
+  while (!SCFile.empty()){
     bool isFound = false;
     unsigned Idx = 0;
-    for (unsigned i = 0; i < SCObjects.size(); i++)
-    {
-      if (std::get<0>(SCObjects[i]) == SCFile)
-      {
+    for (unsigned i = 0; i < SCObjects.size(); i++){
+      if (std::get<0>(SCObjects[i]) == SCFile){
         isFound = true;
         Idx = i;
       }
@@ -2270,11 +2266,15 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event)
 
     wxFileName::SplitPath(SCFile, &RawPath, &RawName, &RawExt);
 
-    if (!isFound)
-    {
+    if (!isFound){
 
       // create a new SCOpts context
       SCOpts *SCO = new SCOpts(Msgs);
+      if( !InitSCOpts(SCO) ){
+        LogPane->AppendText( "Failed to initialize StoneCutter options for signal map\n" );
+        delete SCO;
+        return ;
+      }
 
       // set all the options
       std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
@@ -2290,10 +2290,14 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event)
 
       // add it to the vector
       SCObjects.push_back(std::make_tuple(SCFile, SCO, SCE));
-    }
-    else
-    {
+    }else{
       SCOpts *SCO = std::get<1>(SCObjects[Idx]);
+      if( !InitSCOpts(SCO) ){
+        LogPane->AppendText( "Failed to initialize StoneCutter options for signal map\n" );
+        delete SCO;
+        return ;
+      }
+
       std::string OutFile = std::string(ProjDir->GetPath().mb_str()) +
                             "/RTL/stonecutter/" +
                             std::string(RawName.mb_str()) + ".yaml";
@@ -2307,65 +2311,51 @@ void PortalMainFrame::OnBuildSigmap(wxCommandEvent &event)
     SCFile = wxFindNextFile();
   }
 
+  // setup the text redirector
+  std::streambuf *oldBuf = std::cout.rdbuf();
+  std::ostringstream newBuf;
+  std::cout.rdbuf(newBuf.rdbuf());
   // execute each of the signal map generators
-  for (unsigned i = 0; i < SCObjects.size(); i++)
-  {
-    // setup the text redirector
-    std::streambuf *oldBuf = std::cout.rdbuf();
-    std::ostringstream newBuf;
-    std::cout.rdbuf(newBuf.rdbuf());
-
+  for (unsigned i = 0; i < SCObjects.size(); i++) {
     SCExec *SCE = std::get<2>(SCObjects[i]);
     bool Success = SCE->Exec();
     LogPane->AppendText(wxString(newBuf.str()) + wxT("\n"));
-    if (!Success)
-    {
+    if (!Success){
       LogPane->AppendText("Failed to build signal map from " +
                           std::get<0>(SCObjects[i]) + wxT("\n"));
-    }
-    else
-    {
+    }else{
       LogPane->AppendText("Successfully built signal map from " +
                           std::get<0>(SCObjects[i]) + wxT("\n"));
     }
-
-    // restore the old cout buffer
-    std::cout.rdbuf(oldBuf);
   }
+  // restore the old cout buffer
+  std::cout.rdbuf(oldBuf);
   ProjDir->ReCreateTree();
 }
 
 // PortalMainFrame::InitSCOpts
-bool PortalMainFrame::InitSCOpts(SCOpts *Opts)
-{
+bool PortalMainFrame::InitSCOpts(SCOpts *Opts){
   // set all the standard options
-  if (SCConfig->IsParseEnabled())
-  {
+  if (SCConfig->IsParseEnabled()){
     Opts->UnsetCG();
-  }
-  else
-  {
+  }else{
     Opts->SetCG();
   }
-  if (SCConfig->IsKeepEnabled())
-  {
+  if (SCConfig->IsKeepEnabled()){
     Opts->SetKeep();
-  }
-  else
-  {
+  }else{
     Opts->UnsetKeep();
   }
 
   // set the optimization options
-  if (SCConfig->GetOptLevel() == 0)
-  {
+  if (SCConfig->GetOptLevel() == 0){
     // optimize = false
     Opts->UnsetOptimize();
     // pipeline = false
     Opts->UnsetPipeline();
   }
-  if (SCConfig->GetOptLevel() == 1)
-  {
+
+  if (SCConfig->GetOptLevel() == 1){
     // optimize = true
     Opts->SetOptimize();
     // scenable = true, but disable all passes
@@ -2373,8 +2363,8 @@ bool PortalMainFrame::InitSCOpts(SCOpts *Opts)
     // pipeline = false
     Opts->UnsetPipeline();
   }
-  if (SCConfig->GetOptLevel() == 2)
-  {
+
+  if (SCConfig->GetOptLevel() == 2){
     // optimize = true
     Opts->SetOptimize();
     // scenable = true
@@ -2382,8 +2372,8 @@ bool PortalMainFrame::InitSCOpts(SCOpts *Opts)
     // pipeline = false
     Opts->UnsetPipeline();
   }
-  if (SCConfig->GetOptLevel() == 3)
-  {
+
+  if (SCConfig->GetOptLevel() == 3){
     // optimize = true
     Opts->SetOptimize();
     // scenable = true
@@ -2674,29 +2664,81 @@ void PortalMainFrame::OnProjNew(wxCommandEvent &event)
   }
 }
 
+// PortalMainFrame::OnVizPipeline
+void PortalMainFrame::OnVizPipeline(wxCommandEvent& WXUNUSED(event)){
+  if( !CGProject ){
+    LogPane->AppendText( "No project open\n" );
+    return ;
+  }
+
+  // retrieve the selected signal map
+  std::string SM = std::string(ProjDir->GetFilePath().mb_str());
+  if( SM.length() == 0 ){
+    LogPane->AppendText( "No signal map selected\n" );
+  }
+
+  // attempt to read it
+  CoreGenSigMap *SigMap = new CoreGenSigMap();
+  if( !SigMap->ReadSigMap( SM ) ){
+    LogPane->AppendText( "Could not read signal map " + wxString(SM) + "\n");
+    LogPane->AppendText( wxString(SigMap->GetErrStr()) + "\n" );
+    delete SigMap;
+    return ;
+  }
+
+  // generate a new image from the pipeline
+  std::string ImgPath;
+  PortalViz *Viz = new PortalViz();
+  if( !Viz->GeneratePipeline(SigMap,ImgPath) ){
+    LogPane->AppendText( "Could not generate pipeline visualization\n" );
+    delete Viz;
+    delete SigMap;
+    return ;
+  }
+
+  // visualization the pipeline
+  PipeVizWin *PV = new PipeVizWin( this,
+                                   wxID_ANY,
+                                   wxT("Pipeline Visualization"),
+                                   wxDefaultPosition,
+                                   wxSize(1024,768),
+                                   wxDEFAULT_DIALOG_STYLE|wxVSCROLL|wxHSCROLL,
+                                   wxString(ImgPath) );
+  PV->ShowModal();
+  PV->Destroy();
+  delete Viz;
+  delete SigMap;
+}
+
 // PortalMainFrame::OnVizIR
 void PortalMainFrame::OnVizIR(wxCommandEvent &WXUNUSED(event))
 {
-  if (!CGProject)
-  {
-    LogPane->AppendText("No project open\n");
-    return;
+  if( !CGProject ){
+    LogPane->AppendText( "No project open\n" );
+    return ;
   }
 
-  // insert web view functionality here
+  // visualize the design IR
+  IRVizWin *VW = new IRVizWin( this,
+                               wxID_ANY,
+                               wxT("IR Visualization"),
+                               wxDefaultPosition,
+                               wxSize(1024,768),
+                               wxDEFAULT_DIALOG_STYLE|wxVSCROLL|wxHSCROLL,
+                               CGProject);
+  VW->ShowModal();
+  VW->Destroy();
 }
 
 // PortalMainFrame::OnProjClose
-void PortalMainFrame::OnProjClose(wxCommandEvent &WXUNUSED(event))
-{
+void PortalMainFrame::OnProjClose(wxCommandEvent &WXUNUSED(event)){
   CloseProject();
 }
 
 // PortalMainFrame::OnProjSCOpen
-void PortalMainFrame::OnProjSCOpen(wxCommandEvent &WXUNUSED(event))
-{
-  if (!CGProject)
-  {
+void PortalMainFrame::OnProjSCOpen(wxCommandEvent &WXUNUSED(event)){
+
+  if (!CGProject){
     LogPane->AppendText("No project open\n");
     return;
   }
@@ -2710,8 +2752,7 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent &WXUNUSED(event))
                                               wxFD_OPEN, wxDefaultPosition);
 
   wxString NP;
-  if (OpenDialog->ShowModal() == wxID_OK)
-  {
+  if (OpenDialog->ShowModal() == wxID_OK){
     NP = OpenDialog->GetPath();
 
     // derive the file name
@@ -2727,8 +2768,7 @@ void PortalMainFrame::OnProjSCOpen(wxCommandEvent &WXUNUSED(event))
 }
 
 // PortalMainFrame::OpenProject
-void PortalMainFrame::OpenProject(wxString NP, bool editing)
-{
+void PortalMainFrame::OpenProject(wxString NP, bool editing){
   if (!editing)
     LogPane->AppendText("Opening project from IR at " + NP + wxT("\n"));
   wxFileName NPF(NP);
@@ -2737,24 +2777,21 @@ void PortalMainFrame::OpenProject(wxString NP, bool editing)
   CGProject = new CoreGenBackend(std::string(NPF.GetName().mb_str()),
                                  std::string(NPF.GetPath().mb_str()),
                                  UserConfig->GetArchiveDir());
-  if (CGProject == nullptr)
-  {
+  if (CGProject == nullptr){
     if (!editing)
       LogPane->AppendText("Error opening project from IR at " + NP + wxT("\n"));
     return;
   }
 
   // read the ir
-  if (!CGProject->ReadIR(std::string(NP.mb_str())))
-  {
+  if (!CGProject->ReadIR(std::string(NP.mb_str()))){
     if (!editing)
       LogPane->AppendText("Error reading IR into CoreGen from " + NP + wxT("\n"));
     return;
   }
 
   // Force the DAG to build
-  if (!CGProject->BuildDAG())
-  {
+  if (!CGProject->BuildDAG()){
     if (!editing)
       LogPane->AppendText("Error constructing DAG of hardware nodes\n");
     return;
@@ -2779,8 +2816,7 @@ void PortalMainFrame::OpenProject(wxString NP, bool editing)
 }
 
 // PortalMainFrame::OnProjOpen
-void PortalMainFrame::OnProjOpen(wxCommandEvent &WXUNUSED(event))
-{
+void PortalMainFrame::OnProjOpen(wxCommandEvent &WXUNUSED(event)){
   // stage 1, decide whether we need to close the current project
   if (CGProject)
     CloseProject();
@@ -2793,8 +2829,7 @@ void PortalMainFrame::OnProjOpen(wxCommandEvent &WXUNUSED(event))
                                               _("IR Files (*.yaml)|*.yaml"),
                                               wxFD_OPEN, wxDefaultPosition);
 
-  if (OpenDialog->ShowModal() == wxID_OK)
-  {
+  if (OpenDialog->ShowModal() == wxID_OK){
     OpenProject(OpenDialog->GetPath());
   }
 
@@ -2806,8 +2841,7 @@ bool PortalMainFrame::OnSaveInstFormat(wxDialog *InfoWin,
                                        CoreGenNode *node,
                                        CGNodeType InfoWinType,
                                        std::vector<std::vector<std::any>> *FieldsInformation,
-                                       std::vector<std::string> ExistingFields)
-{
+                                       std::vector<std::string> ExistingFields){
   bool savedAll = false;
   bool createNewNode = false;
 
