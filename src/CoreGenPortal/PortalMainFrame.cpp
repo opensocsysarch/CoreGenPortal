@@ -209,6 +209,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjOpen));
   Connect(wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjClose));
+  Connect(wxID_SAVEAS, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjSaveAs));
   Connect(ID_PROJSCOPEN, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjSCOpen));
   Connect(ID_PROJSUMMARY, wxEVT_COMMAND_MENU_SELECTED,
@@ -1929,6 +1931,54 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
     LogPane->AppendText("Committed user preferences\n");
   }
   UP->Destroy();
+}
+
+// PortalMainFrame::OnProjSaveAs
+void PortalMainFrame::OnProjSaveAs(wxCommandEvent& WXUNUSED(event)){
+  if (!CGProject){
+    LogPane->AppendText("No project is open!\n");
+    return;
+  }
+
+  wxFileDialog saveFileDialog(this,
+                              _("Save Project As"),
+                              UserConfig->wxGetProjectDir(),
+                              wxEmptyString,
+                              "Yaml Design Files (*.yaml)|*.yaml",
+                              wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+
+  if( saveFileDialog.ShowModal() == wxID_CANCEL )
+    return ;
+
+  // create the new directory
+  LogPane->AppendText("Saving project to " + saveFileDialog.GetPath() + wxT("\n") );
+
+  // close the current project
+  IRPane->SaveFile(IRFileName);
+  CloseProject(true);
+  ModuleBox->DeleteAllItems();
+  TreeItems.clear();
+  NodeItems.clear();
+
+  // copy the top-level design file over
+  wxCopyFile(IRFileName,saveFileDialog.GetPath());
+  IRFileName = saveFileDialog.GetPath();
+  wxFileName TName;
+  TName.Assign(IRFileName);
+  TName.MakeAbsolute();
+
+  // open the new project
+  SetupModuleBox();
+  OpenProject(IRFileName, true);
+
+  // reset the project's path in the yaml file
+  if( CGProject ){
+    if( !CGProject->GetProj()->SetProjRoot(std::string(TName.GetPath().mb_str())) ){
+      LogPane->AppendText("Error resetting project root to " + TName.GetPath() + wxT("\n"));
+    }
+    CGProject->WriteIR(std::string(IRFileName.mb_str()));
+    IRPane->LoadFile(IRFileName);
+  }
 }
 
 // PortalMainFrame::OnProjSaveFile

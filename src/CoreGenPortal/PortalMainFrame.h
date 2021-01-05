@@ -199,6 +199,7 @@ private:
   void OnProjSpecDoc(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
   void OnProjSaveFile(wxCommandEvent& event);
+  void OnProjSaveAs(wxCommandEvent &event);
   void OnBuildVerify(wxCommandEvent& event);
   void OnBuildCodegen(wxCommandEvent& event);
   void OnBuildLLVMCodegen(wxCommandEvent& event);
