@@ -209,6 +209,8 @@ void PortalMainFrame::CreateMenuBar(){
           wxCommandEventHandler(PortalMainFrame::OnProjOpen));
   Connect(wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjClose));
+  Connect(wxID_SAVE, wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(PortalMainFrame::OnProjSave));
   Connect(wxID_SAVEAS, wxEVT_COMMAND_MENU_SELECTED,
           wxCommandEventHandler(PortalMainFrame::OnProjSaveAs));
   Connect(ID_PROJSCOPEN, wxEVT_COMMAND_MENU_SELECTED,
@@ -1932,6 +1934,18 @@ void PortalMainFrame::OnUserPref(wxCommandEvent &event){
   }
   UP->Destroy();
 }
+
+// PortalMainFrame::OnProjSave
+void PortalMainFrame::OnProjSave(wxCommandEvent& WXUNUSED(event)){
+  if (!CGProject){
+    LogPane->AppendText("No project is open!\n");
+    return;
+  }
+
+  CGProject->WriteIR(std::string(IRFileName.mb_str()));
+  IRPane->LoadFile(IRFileName);
+}
+
 
 // PortalMainFrame::OnProjSaveAs
 void PortalMainFrame::OnProjSaveAs(wxCommandEvent& WXUNUSED(event)){
