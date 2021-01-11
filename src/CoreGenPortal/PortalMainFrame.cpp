@@ -1504,6 +1504,7 @@ void PortalMainFrame::AddNodeWin(){
 // PortalMainFrame::OnPopupNode
 void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
   CoreInfoWin *InfoWin = nullptr;
+  CoreDepChildWin *ChildWin = nullptr;
   switch (event.GetId()){
   case ID_TREE_INFONODE:
     // open tree info node
@@ -1515,6 +1516,13 @@ void PortalMainFrame::OnPopupNode(wxCommandEvent &event){
     break;
   case ID_TREE_DELNODE:
     DeleteNode(GetNodeFromItem(ModuleBox->GetFocusedItem()));
+    break;
+  case ID_TREE_CHILDNODE:
+    ChildWin = new CoreDepChildWin(this,
+                                   wxID_ANY,
+                                   GetNodeFromItem(ModuleBox->GetFocusedItem()));
+    ChildWin->ShowModal();
+    delete ChildWin;
     break;
   case ID_TREE_ADDNODE:
 
@@ -1582,8 +1590,9 @@ void PortalMainFrame::OnRightClickNode(wxTreeEvent &event){
     mnu.Append(ID_TREE_ADDNODE, "Add Node");
   }else{
     // this is an actual node
-    mnu.Append(ID_TREE_INFONODE, "Node Info");
-    mnu.Append(ID_TREE_DELNODE, "Delete Node");
+    mnu.Append(ID_TREE_INFONODE,  "Node Info");
+    mnu.Append(ID_TREE_DELNODE,   "Delete Node");
+    mnu.Append(ID_TREE_CHILDNODE, "Children");
   }
   mnu.Connect(wxEVT_COMMAND_MENU_SELECTED,
               wxCommandEventHandler(PortalMainFrame::OnPopupNode),
