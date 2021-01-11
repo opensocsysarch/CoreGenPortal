@@ -101,8 +101,7 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   wxBoxSizer *bSizer3 = new wxBoxSizer( wxVERTICAL );
 
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  if(Soc) m_userOK = new wxButton( this, wxID_OK );
-  else m_userOK = new wxButton( this, wxID_CANCEL );
+  m_userOK = new wxButton( this, wxID_CANCEL );
   m_userSAVE = new wxButton( this, wxID_SAVE);
   m_socbuttonsizer->SetAffirmativeButton( m_userOK );
   m_socbuttonsizer->SetCancelButton( m_userSAVE );
@@ -115,7 +114,6 @@ CoreSocInfoWin::CoreSocInfoWin( wxWindow* parent,
   this->SetSizer( bSizer3 );
   this->Layout();
   bSizer3->Fit(this);
-  //this->Centre(wxBOTH);
 }
 
 void CoreSocInfoWin::OnPressOk(wxCommandEvent& ok){

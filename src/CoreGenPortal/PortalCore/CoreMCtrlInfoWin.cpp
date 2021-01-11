@@ -87,7 +87,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
                                   wxT("InputPorts") );
   InputPortSizer->Add( InputPortCtrl, 0, wxALL, 0 );
   InnerSizer->Add( InputPortSizer, 0, wxALIGN_CENTER|wxALL, 5);
- 
+
   //-- ordering
   OrderSizer = new wxBoxSizer( wxHORIZONTAL );
   OrderText = new wxStaticText( Wnd,
@@ -130,8 +130,7 @@ CoreMCtrlInfoWin::CoreMCtrlInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  if(MCtrl) m_userOK = new wxButton( Wnd, wxID_OK );
-  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userOK = new wxButton( Wnd, wxID_CANCEL );
   m_userSAVE = new wxButton( Wnd, wxID_SAVE);
   m_socbuttonsizer->SetAffirmativeButton( m_userOK );
   m_socbuttonsizer->SetCancelButton( m_userSAVE );

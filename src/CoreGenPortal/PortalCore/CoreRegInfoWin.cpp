@@ -167,7 +167,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
   InnerSizer->Add( SubRegSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
   HCheckSizer1 = new wxBoxSizer( wxHORIZONTAL );
-  
+
   /*
   if( Reg && Reg->IsSIMD() )
     SIMDCheck->SetValue(true);
@@ -209,7 +209,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   HCheckSizer1->Add(ROCheck, 0, wxALL, 0 );
   InnerSizer->Add(HCheckSizer1, 0, wxALIGN_CENTER|wxALL, 5 );
-  
+
   HCheckSizer2 = new wxBoxSizer( wxHORIZONTAL );
   //-- csr check box
   CSRCheck = new wxCheckBox( Wnd,
@@ -243,7 +243,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   HCheckSizer2->Add(AMSCheck, 0, wxALL, 0);
   InnerSizer->Add( HCheckSizer2, 0, wxALIGN_CENTER|wxALL, 5 );
- 
+
   HCheckSizer3 = new wxBoxSizer( wxHORIZONTAL );
   //-- tus check box
   TUSCheck = new wxCheckBox( Wnd,
@@ -260,7 +260,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
     TUSCheck->SetValue(false);
 
   HCheckSizer3->Add(TUSCheck, 0, wxALL, 0);
-  
+
 
   //-- pc check box
   PCCheck = new wxCheckBox( Wnd,
@@ -305,8 +305,7 @@ CoreRegInfoWin::CoreRegInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  if(Reg) m_userOK = new wxButton( Wnd, wxID_OK );
-  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userOK = new wxButton( Wnd, wxID_CANCEL );
   m_userSAVE = new wxButton( Wnd, wxID_SAVE);
   m_socbuttonsizer->SetAffirmativeButton( m_userOK );
   m_socbuttonsizer->SetCancelButton( m_userSAVE );
