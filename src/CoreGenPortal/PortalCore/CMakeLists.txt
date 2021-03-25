@@ -39,6 +39,7 @@ SCCompConfig.cpp
 IRVizWin.cpp
 PipeVizWin.cpp
 InstFormatVizWin.cpp
+CoreDepChildWin.cpp
 )
 
 #-- target deps

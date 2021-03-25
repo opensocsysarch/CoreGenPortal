@@ -66,6 +66,7 @@
 #include "CoreGenPortal/PortalCore/IRVizWin.h"
 #include "CoreGenPortal/PortalCore/PipeVizWin.h"
 #include "CoreGenPortal/PortalCore/InstFormatVizWin.h"
+#include "CoreGenPortal/PortalCore/CoreDepChildWin.h"
 
 //-- COREGEN HEADERS
 #include "CoreGen/CoreGenBackend/CoreGenBackend.h"
@@ -199,6 +200,8 @@ private:
   void OnProjSpecDoc(wxCommandEvent& event);
   void OnProjClose(wxCommandEvent& event);
   void OnProjSaveFile(wxCommandEvent& event);
+  void OnProjSaveAs(wxCommandEvent &event);
+  void OnProjSave(wxCommandEvent &event);
   void OnBuildVerify(wxCommandEvent& event);
   void OnBuildCodegen(wxCommandEvent& event);
   void OnBuildLLVMCodegen(wxCommandEvent& event);
@@ -267,7 +270,8 @@ enum
   ID_TREE_SELECTNODE    = 50,
   ID_TREE_INFONODE      = 51,
   ID_TREE_ADDNODE       = 52,
-  ID_TREE_DELNODE       = 53
+  ID_TREE_DELNODE       = 53,
+  ID_TREE_CHILDNODE     = 54
 };
 
 enum{

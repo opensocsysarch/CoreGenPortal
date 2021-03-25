@@ -104,7 +104,7 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
   else{
     VersionInfo = "";
   }
-    
+
   VersionCtrl = new wxTextCtrl( Wnd,
                                  wxID_ANY,
                                  VersionInfo,
@@ -139,7 +139,7 @@ CorePluginInfoWin::CorePluginInfoWin( wxWindow* parent,
       FeatureCtrl->AppendText(GetFeatureStr(Plugin,i));
     }
   }
-  
+
 
   InnerSizer->Add( FeatureCtrl, 1, wxEXPAND|wxALIGN_CENTER|wxALL, 5 );
 

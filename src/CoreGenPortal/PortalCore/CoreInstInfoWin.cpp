@@ -24,7 +24,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
               wxSize(500,500), wxDEFAULT_DIALOG_STYLE|wxVSCROLL ){
 
   this->InstNode = Inst;
-  
+
   // init the internals
   this->SetLayoutAdaptationMode(wxDIALOG_ADAPTATION_MODE_ENABLED);
   this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -180,7 +180,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
       EncCtrl->AppendText(wxString(Inst->GetEncoding(i)->GetField()) +
                           wxT(" = ") + tmp + wxT("\n"));
     }
-  } 
+  }
   EncodingSizer->Add( EncCtrl, 0, wxALL, 0 );
   InnerSizer->Add( EncodingSizer, 0, wxALIGN_CENTER|wxALL, 5 );
 
@@ -194,8 +194,7 @@ CoreInstInfoWin::CoreInstInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  if(Inst) m_userOK = new wxButton( Wnd, wxID_OK );
-  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userOK = new wxButton( Wnd, wxID_CANCEL );
   m_userSAVE = new wxButton( Wnd, wxID_SAVE);
   m_socbuttonsizer->SetAffirmativeButton( m_userOK );
   m_socbuttonsizer->SetCancelButton( m_userSAVE );

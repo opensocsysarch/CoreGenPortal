@@ -170,8 +170,7 @@ CoreCommInfoWin::CoreCommInfoWin( wxWindow* parent,
 
   // setup all the buttons
   m_socbuttonsizer = new wxStdDialogButtonSizer();
-  if(Comm) m_userOK = new wxButton( Wnd, wxID_OK );
-  else m_userOK = new wxButton( Wnd, wxID_CANCEL );
+  m_userOK = new wxButton( Wnd, wxID_CANCEL );
   m_userSAVE = new wxButton( Wnd, wxID_SAVE);
   m_socbuttonsizer->SetAffirmativeButton( m_userOK );
   m_socbuttonsizer->SetCancelButton( m_userSAVE );
